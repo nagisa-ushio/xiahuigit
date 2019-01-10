@@ -40,8 +40,8 @@ VAR
 {
     String US, po, str;
     int correctpage;
-    String markPage2S,事件状态s,处理人姓名s,处理人工号s,处理人职务s,处理人部门s,处理日期s,审批状态s,提交人姓名s,提交人工号s,内容s,提交日期s,scon,
-        原事件状态s,原处理日期s,原处理人工号s;
+    String markPage2S,事件状态s,处理人姓名s,处理人工号s,处理人职务s,处理人部门s,处理日期s;
+    String 审批状态s,提交人姓名s,提交人工号s,内容s,提交日期s,scon,原事件状态s,原处理日期s,原处理人工号s;
     int LinkToFormID_int,LinkToFormPage_int,newPage,rec,markPage,markPage2;
     Struct2 st21;
 }
@@ -53,17 +53,15 @@ CLIENT
     if(str == "0")
     {
         return(0);
-    }
-    if(str == "1")
+    }else if(str == "1")
     {
         审批状态s = "待" + po + "审批";
-    }
-    if(str == "3")
+    }else if(str == "3")
     {
         审批状态s = "待替代人同意";
     }
     US = FW_GetUserID(2);
-    FW_Dialog1(正在进行审批中，请按 继续 并等待完成提示。);
+    FW_Dialog1(正在审批中...请按“继续”并等待完成提示。);
 }
 SERVER
 {

@@ -1,0 +1,56 @@
+﻿FIELD
+{
+	.1183.出生日期;
+	.1183.生日时间;
+	.1183.员工状态;
+}
+VAR
+{
+	String ygzt,Srch,csrq,zbnr,ybnr,srsj,dqrq;
+	int flag,cp,tp,fp,i;
+	Struct2 st2;
+}
+CLIENT
+{
+	ygzt = "在职";
+}
+SERVER
+{
+	dqrq = FW_GetSysDate(0);
+	zbnr = dqrq.Left(5);
+	flag=0;
+	Srch = "1183,ygzt@员工状态";
+	st2=FW_FindRecords(Srch,0);
+	if(st2.mError!=0)
+	{
+		flag=1;
+		return(GotoClient);
+	}
+	tp=st2.count;
+	for(i=0;i<tp;i++)
+	{
+		fp=st2.RecordNoList.Get[i];
+		csrq = FW_GetValue(1183,出生日期,fp);
+		if(csrq !="")
+		{
+			ybnr = csrq.Mid(5);
+			srsj = zbnr + ybnr;
+			FW_SetValue_w(1183,生日时间,fp,srsj);
+		}
+	}
+	return(GotoClient);
+}
+CLIENT
+{
+	for(i=0;i<tp;i++)
+	{
+		fp=st2.RecordNoList.Get[i];
+		csrq = FW_GetValue(1183,出生日期,fp);
+		if(csrq !="")
+		{
+			ybnr = csrq.Mid(5);
+			srsj = zbnr + ybnr;
+			FW_SetValue_w(1183,生日时间,fp,srsj);
+		}
+	}
+}

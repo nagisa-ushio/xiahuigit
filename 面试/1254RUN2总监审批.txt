@@ -1,0 +1,145 @@
+FIELD
+{
+    .1254.面试者状态;
+    .1254.总监意见;
+    .1254.总监签名;
+    .1254.总监日期;
+    .1254.人事专员账号;
+    .1254.人事专员姓名;
+    .1254.运营总监姓名;
+    .1254.运营总监账号;
+    .1254.总监审批状态;
+    .1254.人事提交状态;
+    .1254.1235待处理页;
+
+    .1235.事件状态;
+    .1235.处理人姓名;
+    .1235.处理人工号;
+    .1235.处理人职务;
+    .1235.处理人部门;
+    .1235.处理日期;
+    .1235.审批状态;
+    .1235.LinkToFormID;
+    .1235.LinkToFormPage;
+    .1235.提交人姓名;
+    .1235.提交人工号;
+    .1235.内容;
+    .1235.提交日期;
+}
+VAR
+{
+    int cp, approval_int, pending_page, np;
+    String majordomo_opnion, majordomo_sign, date_majordomo_sign, pensonnel_us, pensonnel_name, pensonnel_status;
+    String majordomo_us, majordomo_name, current_us, current_date, applied_date, majordomo_status, approval_str;
+    Struct0 st0_dialog1;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    pensonnel_status = FW_GetValue(1254, 人事提交状态, cp);
+    if((pensonnel_status == "")||(pensonnel_status == "（待提交）"))
+    {
+        FW_Dialog1(还未到总监审批流程！);
+        return(0);
+    }else if(pensonnel_status == "（已退回）")
+    {
+        FW_Dialog1(人事还未重新提交！);
+        return(0);
+    }
+    majordomo_status = FW_GetValue(1254, 总监审批状态, cp);
+    if(majordomo_status == "（已审批）")
+    {
+        FW_Dialog1(总监已审批过当前应聘者面试记录！);
+        return(0);
+    }
+    current_us = FW_GetUserID(2);
+    majordomo_us = FW_GetValue(1254, 运营总监账号, cp);
+    if(current_us != majordomo_us)
+    {
+        FW_Dialog1(当前登录账号不是运营总监账号，无法进行审批！);
+        return(0);
+    }
+    majordomo_opnion = FW_GetValue(1254, 总监意见, cp);
+    if(majordomo_opnion == "")
+    {
+        FW_Dialog1(请填写总监意见！);
+        return(0);
+    }
+    majordomo_sign = FW_GetValue(1254, 总监签名, cp);
+    if(majordomo_sign == "")
+    {
+        FW_Dialog1(请填写总监签名！);
+        return(0);
+    }
+    date_majordomo_sign = FW_GetValue(1254, 总监日期, cp);
+    if(date_majordomo_sign == "")
+    {
+        FW_Dialog1(总监意见填写日期不能为空！);
+        return(0);
+    }
+    st0_dialog1.message = "请填写通过或退回来进行审批。";   //设置可填写的对话框并设置提示信息
+    st0_dialog1.sVALUE = "通过";    //预设值为“通过”
+    approval_int = FW_Dialog1(st0_dialog1);    //当点击继续才会进行相关审批
+    if(approval_int == 1)
+    {
+        approval_str = st0_dialog1.sVALUE;    //取得审批人输入的内容
+        if((approval_str != "通过")&&(approval_str != "退回"))
+        {
+            FW_Dialog1(只能输入“通过”或“退回”来进行审批！);
+            return(0);
+        }
+    }else
+    {
+        return(0);
+    }
+    current_date = FW_GetSysDate(0);
+    pensonnel_us = FW_GetValue(1254, 人事专员账号, cp);
+    pensonnel_name = FW_GetValue(1254, 人事专员姓名, cp);
+    majordomo_name = FW_GetValue(1254, 运营总监姓名, cp);
+}
+SERVER
+{
+    pending_page = FW_GetValue(1254, 1235待处理页, cp);
+    applied_date = FW_GetValue(1235, 提交日期, pending_page);
+    FW_SetValue_w(1235, 事件状态, pending_page, "已处理");
+    np = FW_AddNewPage_w(1235);
+    FW_SetValue_w(1254, 1235待处理页, cp, np);
+    if(approval_str == "通过")
+    {
+        FW_SetValue_w(1254, 总监审批状态, cp, "（已审批）");
+        FW_SetValue_w(1128, 面试者状态, cp, "待人事确认跟进");
+
+        FW_SetValue_w(1235, 审批状态, np, "待人事确认跟进");
+        FW_SetValue_w(1235, 内容, np, "应聘者面试记录");
+    }else
+    {
+        FW_SetValue_w(1254, 人事提交状态, cp, "（已退回）");
+        FW_SetValue_w(1128, 面试者状态, cp, "总监退回待人事重新提交");
+        FW_SetValue_w(1235, 审批状态, np, "退回待提交");
+        FW_SetValue_w(1235, 内容, np, "应聘者面试记录");
+    }
+    FW_SetValue_w(1235, 事件状态, np, "待处理");
+    FW_SetValue_w(1235, 处理人姓名, np, pensonnel_name);
+    FW_SetValue_w(1235, 处理人工号, np, pensonnel_us);
+    FW_SetValue_w(1235, 处理人职务, np, "人事专员");
+    FW_SetValue_w(1235, 处理日期, np, current_date);
+    FW_SetValue_w(1235, LinkToFormID, np, "1128");
+    FW_SetValue_w(1235, LinkToFormPage, np, cp);
+    FW_SetValue_w(1235, 提交人姓名, np, majordomo_name);
+    FW_SetValue_w(1235, 提交人工号, np, majordomo_us);
+    FW_SetValue_w(1235, 提交日期, np, applied_date);
+    return(GotoClient);
+}
+CLIENT
+{
+    if(approval_str == "通过")
+    {
+        FW_SetValue_w(1254, 总监审批状态, cp, "（已审批）");
+        FW_SetValue_w(1128, 面试者状态, cp, "待人事确认跟进");
+    }else
+    {
+        FW_SetValue_w(1254, 人事提交状态, cp, "（已退回）");
+        FW_SetValue_w(1128, 面试者状态, cp, "总监退回待人事重新提交");
+    }
+    FW_Dialog1(审批完成！已送往人事进行跟进确认。);
+}

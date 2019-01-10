@@ -93,7 +93,7 @@ CLIENT
     is_continue = FW_Dialog1(是否确认申请信息填写无误并继续进行提交？);
     if(is_continue == 0)
     {
-        Goto(-1);
+        return(0);
     }
     申请人备注s = FW_GetValue(1212,申请人备注,currentPage);
     物品编号s=FW_GetValue(1212,物品编号,currentPage);
@@ -110,7 +110,7 @@ SERVER
     st2=FW_FindRecords(Srch,1);
     if(st2.mError ==0)
     {
-        flag=1;
+        flag = 1;
         return(GotoClient);
     }
     newPage = FW_AddNewPage_w( 1116 );
@@ -148,7 +148,7 @@ CLIENT
     if(flag == 1)
     {
         FW_Dialog1(已提交过相同的申请！);
-        Goto(-1);
+        return(0);
     }
     FW_GotoFormPage(1116, newPage);
 }
@@ -188,5 +188,5 @@ CLIENT
 
     FW_SetValue_w(1212, Field6,currentPage,"ClientListWinRefresh");
 
-    FW_Dialog1(固定物资申请提交成功！);
+    FW_Dialog1(借用申请提交成功！);
 }

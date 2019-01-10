@@ -1,0 +1,159 @@
+FIELD
+{
+    .1128.面试者状态;
+
+    .1254.人事跟进状态;
+    .1254.总监审批状态;
+    .1254.人事专员账号;
+    .1254.人事专员姓名;
+    .1254.运营总监姓名;
+    .1254.运营总监账号;
+    .1254.总监审批状态;
+    .1254.1235待处理页;
+
+    .1235.事件状态;
+    .1235.处理人姓名;
+    .1235.处理人工号;
+    .1235.处理人职务;
+    .1235.处理人部门;
+    .1235.处理日期;
+    .1235.审批状态;
+    .1235.LinkToFormID;
+    .1235.LinkToFormPage;
+    .1235.提交人姓名;
+    .1235.提交人工号;
+    .1235.内容;
+    .1235.提交日期;
+
+    .1168.工号前缀;
+    .1168.当前工号数字;
+
+    .1131.系统预派工号;
+}
+VAR
+{
+    String status_finally, status_majordomo, us_current, us_personnel;
+    String approval_str, name_personnel, name_majordomo, us_majordomo;
+    String date_apply, name_resign, us_resign, date_current, last_us_prefix, us_number_str, new_last_us;
+    int cp, approval_int, pending_page, us_number_int, np;
+    Struct0 st0_dialog1, st0_1131;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    status_majordomo = FW_GetValue(1254, 总监审批状态, cp);
+    if((status_majordomo == "")||(status_majordomo == "（待审批）"))
+    {
+        FW_Dialog1(还未到人事跟确认跟进流程！);
+        return(0);
+    }
+    cp = FW_GetCurrentRecNum();
+    status_finally = FW_GetValue(1254, 人事跟进状态, cp);
+    if(status_finally == "（已跟进）")
+    {
+        FW_Dialog1(人事已对当前应聘者面试记录进行过确认跟进！);
+        return(0);
+    }
+    us_current = FW_GetUserID(2);
+    us_personnel = FW_GetValue(1254, 人事专员账号, cp);
+    if(us_personnel != us_current)
+    {
+        FW_Dialog1(只有人事账号才可以进行确认跟进！);
+        return(0);
+    }
+    if(status_majordomo == "（已退回）")
+    {
+        FW_Dialog1(总监还未重新审批通过！);
+        return(0);
+    }
+
+    st0_dialog1.message = "请填写确认跟进或退回来进行审批。";   //设置可填写的对话框并设置提示信息
+    st0_dialog1.sVALUE = "确认跟进";    //预设值为“通过”
+    approval_int = FW_Dialog1(st0_dialog1);    //当点击继续才会进行相关审批
+    if(approval_int == 1)
+    {
+        approval_str = st0_dialog1.sVALUE;    //取得审批人输入的内容
+        if((approval_str != "确认跟进")&&(approval_str != "退回"))
+        {
+            FW_Dialog1(只能输入“确认跟进”或“退回”来进行审批！);
+            return(0);
+        }
+    }else
+    {
+        return(0);
+    }
+    date_current = FW_GetSysDate(0);
+    name_personnel = FW_GetValue(1254, 人事专员姓名, cp);
+    name_majordomo = FW_GetValue(1254, 运营总监姓名, cp);
+    us_majordomo = FW_GetValue(1254, 运营总监账号, cp);
+}
+SERVER
+{
+    pending_page = FW_GetValue(1254, 1235待处理页, cp);
+    FW_SetValue_w(1235, 事件状态, pending_page, "已处理");
+    date_apply = FW_GetValue(1235, 提交日期, pending_page);
+    if(approval_str == "确认跟进")
+    {
+        FW_SetValue_w(1254, 人事跟进状态, cp, "（已跟进）");
+        last_us_prefix = FW_GetValue(1168, 工号前缀, 0);
+        us_number_int = FW_GetValue(1168, 当前工号数字, 0);
+        us_number_int = us_number_int + 1;
+        us_number_str = us_number_int.toString;
+        new_last_us = last_us_prefix + us_number_str;
+        FW_SetValue_w(1131, 系统预派工号, cp, new_last_us);
+
+        FW_SetValue_w(1168, 当前工号数字, 0, us_number_int);
+        FW_SetValue_w(1128, 面试者状态, cp, "人事已跟进待最后入职");
+    }else
+    {
+        FW_SetValue_w(1254, 总监审批状态, cp, "（已退回）");
+        np = FW_AddNewPage_w(1235);
+        FW_SetValue_w(1254, 1235待处理页, cp, np);
+
+        FW_SetValue_w(1235, 审批状态, np, "退回待重新审批");
+        FW_SetValue_w(1235, 内容, np, "应聘者面试记录");
+        FW_SetValue_w(1235, 事件状态, np, "待处理");
+        FW_SetValue_w(1235, 处理人姓名, np, name_majordomo);
+        FW_SetValue_w(1235, 处理人工号, np, us_majordomo);
+        FW_SetValue_w(1235, 处理人职务, np, "运营总监");
+        FW_SetValue_w(1235, 处理日期, np, date_current);
+        FW_SetValue_w(1235, LinkToFormID, np, "1128");
+        FW_SetValue_w(1235, LinkToFormPage, np, cp);
+        FW_SetValue_w(1235, 提交人姓名, np, name_personnel);
+        FW_SetValue_w(1235, 提交人工号, np, us_personnel);
+        FW_SetValue_w(1235, 提交日期, np, date_apply);
+    }
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_FormOpen(1131);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+    if(approval_str == "确认跟进")
+    {
+        FW_SetValue_w(1254, 人事跟进状态, cp, "（已跟进）");
+        FW_SetValue_w(1128, 面试者状态, cp, "人事已跟进待最后入职");
+        FW_SetValue_w(1131, 系统预派工号, cp, new_last_us);
+        FW_Dialog1(确认跟进完成，即将进入入职操作！);
+    }else
+    {
+        FW_SetValue_w(1254, 1235待处理页, cp, np);
+        FW_Dialog1(已进行退回！);
+    }
+}
+SERVER
+{
+    if(approval_str == "确认跟进")
+    {
+        st0_1131.FormID = 1131;
+        st0_1131.Record = cp;
+        return(st0_1131);
+    }
+}
+

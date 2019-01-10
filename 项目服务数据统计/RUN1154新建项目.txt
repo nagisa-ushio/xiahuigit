@@ -1,0 +1,53 @@
+FIELD
+{
+    .1153.项目点编号;
+    .1153.项目点;
+    .1153.项目状态;
+}
+VAR
+{
+    int np, rec_1153;
+    String status, project_number, project_name;
+    Struct2 st2_1153;
+    Struct0 st0_1153;
+}
+CLIENT
+{
+    status = "项目待完善";
+}
+
+SERVER
+{
+    st2_1153 = FW_FindRecords("1153, status@项目状态", 1);
+    if(st2.mError == 0)
+    {
+        np = st2_1153.RecordNoList.Get[0];
+        return(GotoClient);
+    }
+    np = FW_AddNewPage_w(1153);
+    FW_SetValue_w(1153, 项目状态, np, status);
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_GotoFormPage(1153, np);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+    if(st2.mError != 0)
+    {
+     FW_SetValue_w(1153, 项目状态, np, status);
+    }
+}
+SERVER
+{
+    st0_1153.FormID = 1153;
+    st0_1153.Record = np;
+    return(st0_1153);
+}
+
+

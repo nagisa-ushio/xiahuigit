@@ -32,7 +32,8 @@ FIELD
 }
 VAR
 {
-    String 当前用户工号S,审批操作S,审批状态S,查找处理人条件S,处理人工号S,处理人姓名S,提交人姓名S,提交人工号S,提交日期S,处理人职务S,处理人部门S,处理日期S;
+    String 当前用户工号S,审批操作S,审批状态S,查找处理人条件S,处理人工号S,处理人姓名S;
+    String 提交人姓名S,提交人工号S,提交日期S,处理人职务S,处理人部门S,处理日期S;
     int 当前页I,处理人记录页I,当前待处理标记I,新纪录I;
     Struct2 st02;
 }
@@ -42,7 +43,7 @@ CLIENT
     审批操作S = CURRENT.sVALUE;
     if(审批操作S == "0")
     {
-        Goto(-1);
+        return(0);
     }else if(审批操作S == "1")
     {
         提交人姓名S = FW_GetValue(1138,姓名,当前页I);
@@ -67,7 +68,7 @@ CLIENT
         查找处理人条件S = "1087,处理人工号S@UserName";
     }
     当前用户工号S = FW_GetUserID(2);
-    FW_Dialog1(正在进行审批中，请按 继续 并等待完成提示。);
+    FW_Dialog1(正在审批中...请按“继续”并等待完成提示。);
 }
 SERVER
 {

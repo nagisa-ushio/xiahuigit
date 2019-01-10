@@ -17,7 +17,7 @@ SERVER
     start_date = FW_GetValue(1139,预计加班起始日期,961);
     if(start_date == "")
     {
-        FW_Dialog1('请填写日期！');
+        FW_Dialog1('no');
         FW_FieldPropertySet_w(1139,Field2,st30_red);
     }else{
         FW_FieldPropertySet_w(1139,Field2,st30_black);

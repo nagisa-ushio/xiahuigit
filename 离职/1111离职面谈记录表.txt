@@ -1,0 +1,196 @@
+FIELD
+{
+    .1111.UserName;
+    .1111.面谈记录1;
+    .1111.面谈记录1说明;
+    .1111.面谈记录2;
+    .1111.面谈记录3;
+    .1111.面谈记录4;
+    .1111.面谈记录5;
+    .1111.面谈记录6;
+    .1111.面谈记录7;
+    .1111.面谈记录8;
+    .1111.面谈记录9;
+    .1111.其他;
+    .1111.面谈人;
+    .1111.填表日期;
+    .1111.离职面谈记录表状态;
+
+    .1257.人事确认状态;
+
+    .1110.批准离职日期;
+    .1110.批准离职日期;
+    .1110.员工状态;
+
+    .1087.State;
+    .1087.姓名;
+    .1087.GroupID;
+    .1087.UserName;
+    .1087.Expiry;
+    .1087.POST;
+    .1087.用户ID;
+    .1087.归属范围;
+    .1087.部门;
+}
+VAR
+{
+    int cp, rec_1087;
+    String record1, caption1, interviewer, record2, record3, record4, record5, record6;
+    String record7, record8, record9, other, date_write, us_resign, group_resign2;
+    String name_resign, group_resign, post_resign, id_resign, range_resign, date_approval;
+    Struct2 st2_1087;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    interviewer = FW_GetValue(1111, 面谈人, cp);
+    if(interviewer=="")
+    {
+        FW_Dialog1(请填写 "面谈人"！);
+        return(0);
+    }
+
+    record1 = FW_GetValue(1111, 面谈记录1, cp);
+    if(record1 == "")
+    {
+        FW_Dialog1(请选择离职的主要原因！);
+        return(0);
+    }
+
+    caption1 = FW_GetValue(1111, 面谈记录1说明, cp);
+    if(caption1 == "")
+    {
+        FW_Dialog1(请对离职的主要原因加以说明！);
+        return(0);
+    }
+
+
+    record2 = FW_GetValue(1111,面谈记录2,cp);
+    if(record2=="")
+    {
+        FW_Dialog1(请填写 "面谈记录第2点");
+        return(0);
+    }
+
+    record3 = FW_GetValue(1111,面谈记录3,cp);
+    if(record3=="")
+    {
+        FW_Dialog1(请填写 "面谈记录第3点");
+        return(0);
+    }
+
+    record4 = FW_GetValue(1111,面谈记录4,cp);
+    if(record4=="")
+    {
+        FW_Dialog1(请填写 "面谈记录第4点");
+        return(0);
+    }
+
+    record5 = FW_GetValue(1111,面谈记录5,cp);
+    if(record5=="")
+    {
+        FW_Dialog1(请填写 "面谈记录第5点");
+        return(0);
+    }
+
+    record6 = FW_GetValue(1111,面谈记录6,cp);
+    if(record6=="")
+    {
+        FW_Dialog1(请填写 "面谈记录第6点");
+        return(0);
+    }
+
+    record7 = FW_GetValue(1111,面谈记录7,cp);
+    if(record7=="")
+    {
+        FW_Dialog1(请填写 "面谈记录第7点");
+        return(0);
+    }
+
+    record8 = FW_GetValue(1111,面谈记录8,cp);
+    if(record8=="")
+    {
+        FW_Dialog1(请填写 "面谈记录第8点");
+        return(0);
+    }
+
+    record9 = FW_GetValue(1111,面谈记录9,cp);
+    if(record9=="")
+    {
+        FW_Dialog1(请填写 "面谈记录第9点");
+        return(0);
+    }
+
+    other = FW_GetValue(1111,其他,cp);
+    if(other=="")
+    {
+        FW_Dialog1(请填写 "其他");
+        return(0);
+    }
+
+    date_write = FW_GetValue(1111,填表日期,cp);
+    if(date_write=="")
+    {
+        FW_Dialog1(请填写 "填表日期");
+        return(0);
+    }
+    date_write = FW_GetSysDate(0);
+    us_resign = FW_GetValue(1111, UserName, cp);
+}
+SERVER
+{
+    st2_1087 = FW_FindRecords("1087, us_resign@UserName", 1);
+    rec_1087 = st2_1087.RecordNoList.Get[0];
+
+    FW_SetValue_w(1087, State, rec_1087, "停止使用");
+
+    name_resign = FW_GetValue(1087, 姓名, rec_1087);
+    name_resign = name_resign + "（停止使用）";
+    FW_SetValue_w(1087, 姓名, rec_1087, name_resign);
+
+    group_resign = FW_GetValue(1087, GroupID, rec_1087);
+    group_resign = group_resign + "（停止使用）";
+    FW_SetValue_w(1087, GroupID, rec_1087, group_resign);
+
+    group_resign2 = FW_GetValue(1087, 部门, rec_1087);
+    group_resign2 = group_resign2 + "（停止使用）";
+    FW_SetValue_w(1087, 部门, rec_1087, group_resign2);
+
+    us_resign = us_resign + "（停止使用）";
+    FW_SetValue_w(1087, UserName, rec_1087, us_resign);
+
+    date_approval = FW_GetValue(1110, 批准离职日期, cp);
+    FW_SetValue_w(1087, Expiry, rec_1087, date_approval);
+
+    post_resign = FW_GetValue(1087, POST, rec_1087);
+    post_resign = post_resign + "（停止使用）";
+    FW_SetValue_w(1087, POST, rec_1087, post_resign);
+
+    id_resign = FW_GetValue(1087, 用户ID, rec_1087);
+    id_resign = id_resign + "（停止使用）";
+    FW_SetValue_w(1087, 用户ID, rec_1087, id_resign);
+
+    range_resign = FW_GetValue(1087, 归属范围, rec_1087);
+    range_resign = range_resign + "（停止使用）";
+    FW_SetValue_w(1087, 归属范围, rec_1087, range_resign);
+
+    FW_SetValue_w(1257, 人事确认状态, cp, "（已确认）");
+
+    FW_SetValue_w(1111, 填表日期, cp, date_write);
+    FW_SetValue_w(1111, 离职面谈记录表状态, cp, "已完成");
+
+    FW_SetValue_w(1110, 离职申请状态, cp, "已确认离职");
+    FW_SetValue_w(1110, 员工状态, cp, "离职");
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_SetValue_w(1257, 人事确认状态, cp, "（已确认）");
+
+    FW_SetValue_w(1111, 填表日期, cp, date_write);
+    FW_SetValue_w(1111, 离职面谈记录表状态, cp, "已完成");
+
+    FW_SetValue_w(1110, 离职申请状态, cp, "已确认离职");
+    FW_SetValue_w(1110, 员工状态, cp, "离职");
+    FW_Dialog1(保存成功，离职确认完成！);
+}

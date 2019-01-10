@@ -1,0 +1,9 @@
+FIELD
+{
+    .1261.QueryField9;
+}
+CLIENT
+{
+    FW_SetValue_w(1261, QueryField9, 0, "全部");
+    FW_RecordSort(1261, QueryField9, 0);
+}

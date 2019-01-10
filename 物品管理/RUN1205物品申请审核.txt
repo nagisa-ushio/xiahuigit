@@ -26,10 +26,10 @@ VAR
 }
 CLIENT
 {
-    is_continue = FW_Dialog1(审核中，请按继续并等待审核结果提示。);
+    is_continue = FW_Dialog1(审核中...请按“继续”并等待审核结果提示。);
     if(is_continue == 0)
     {
-        Goto(-1);
+        return(0);
     }
     cp = FW_GetCurrentRecNum();
     s物品编号 = FW_GetValue(1205,物品编号,cp);

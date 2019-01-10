@@ -1,0 +1,35 @@
+FIELD
+{
+    .1153.项目点编号;
+    .1153.项目点;
+    .1153.项目状态;
+}
+VAR
+{
+    String project_number, project_name, status;
+    int cp;
+    Struct0 st0_1154;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    project_name = FW_GetValue(1153, 项目点编号, cp);
+    project_number = FW_GetValue(1153, 项目点, cp);
+}
+SERVER
+{
+    FW_SetValue_w(1153, 项目点编号, cp, project_number);
+    FW_SetValue_w(1153, 项目状态, cp, project_name);
+    FW_SetValue_w(1153, 项目状态, cp, "已建立");
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_SetValue_w(1153, 项目状态, cp, "已建立");
+}
+SERVER
+{
+    st0_1154.FormID = 1154;
+    st0_1154.Record = 0;
+    return(st0_1154);
+}

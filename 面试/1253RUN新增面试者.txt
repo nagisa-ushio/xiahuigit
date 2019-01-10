@@ -1,0 +1,45 @@
+FIELD
+{
+    .1252.面试者状态;
+
+    .1128.面试;
+
+    .1131.入职;
+}
+VAR
+{
+    int np;
+    String find_condition;
+    Struct2 st2_1252;
+    Struct0 st0_1252;
+}
+CLIENT
+{
+    find_condition = "基础信息待完善";
+}
+SERVER
+{
+    np = FW_AddNewPage_w(1252);
+    FW_SetValue_w(1252, 面试者状态, np, find_condition);
+    FW_SetValue_w(1128, 面试, np, "面试");
+    FW_SetValue_w(1131, 入职, np, "入职");
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_GotoFormPage(1252, np);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+
+}
+SERVER
+{
+    st0_1252.FormID = 1252;
+    st0_1252.Record = np;
+    return(st0_1252);
+}

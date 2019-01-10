@@ -1,0 +1,152 @@
+FIELD
+{
+    .1110.离职申请状态;
+
+    .1257.机构审批状态;
+    .1257.人事确认状态;
+    .1257.name1;
+    .1257.UserName;
+    .1257.name3;
+    .1257.UserName3;
+    .1257.name5;
+    .1257.UserName5;
+    .1257.POST5;
+    .1257.name6;
+    .1257.1235待处理页;
+
+    .1235.事件状态;
+    .1235.处理人姓名;
+    .1235.处理人工号;
+    .1235.处理人职务;
+    .1235.处理人部门;
+    .1235.处理日期;
+    .1235.审批状态;
+    .1235.LinkToFormID;
+    .1235.LinkToFormPage;
+    .1235.提交人姓名;
+    .1235.提交人工号;
+    .1235.内容;
+    .1235.提交日期;
+
+    .1111.面谈人;
+    .1111.离职面谈记录表状态;
+    .1111.填表日期;
+}
+VAR
+{
+    String status_org, status_finally, us_current, username3, approval_str, post_handle, us_handle, name_handle;
+    String date_apply, name_resign, us_resign, date_current, status_approval, interviewer;
+    int cp, status_handle, approval_int, pending_page, np, rec_1087;
+    Struct0 st0_dialog1, st0_1111;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    us_current = FW_GetUserID(2);
+    username3 = FW_GetValue(1257, UserName3, cp);
+    if(us_current != username3)
+    {
+        FW_Dialog1(当前登录账号没有确认最后已离职的权限！);
+        return(0);
+    }
+
+    status_org = FW_GetValue(1257, 机构审批状态, cp);
+    status_finally = FW_GetValue(1257, 人事确认状态, cp);
+    if(status_org != "（已审批）")
+    {
+        FW_Dialog1(无法审批，暂未到达此流程！);
+        return(0);
+    }else if(status_finally == "（已确认）")
+    {
+        status_handle = 1;
+        approval_int = FW_Dialog1(已进行过确认！是否要查看离职员工面谈记录表？);
+        if(approval_int == 0)
+        {
+            return(0);
+        }
+    }else
+    {
+        status_handle = 0;
+        st0_dialog1.message = "请填写确认或退回来进行审批。";   //设置可填写的对话框并设置提示信息
+        st0_dialog1.sVALUE = "确认";    //预设值为“通过”
+        approval_int = FW_Dialog1(st0_dialog1);    //当点击继续才会进行相关审批
+        if(approval_int == 1)
+        {
+            approval_str = st0_dialog1.sVALUE;    //取得审批人输入的内容
+            if((approval_str != "确认")&&(approval_str != "退回"))
+            {
+                FW_Dialog1(只能输入“确认”或“退回”来进行审批！);
+                return(0);
+            }
+        }else
+        {
+            return(0);
+        }
+    }
+}
+SERVER
+{
+    if(status_handle == 0)
+    {
+        date_current = FW_GetSysDate(0);
+        pending_page = FW_GetValue(1257, 1235待处理页, cp);
+        FW_SetValue_w(1235, 事件状态, pending_page, "已处理");
+        date_apply = FW_GetValue(1235, 提交日期, pending_page);
+        if(approval_str == "确认")
+        {
+            interviewer = FW_GetValue(1257, name6, cp);
+            FW_SetValue_w(1111, 面谈人, cp, interviewer);
+            FW_SetValue_w(1111, 离职面谈记录表状态, cp, "待完善");
+            FW_SetValue_w(1111, 填表日期, cp, date_current);
+        }else
+        {
+            post_handle = FW_GetValue(1257, POST5, cp);
+            us_handle = FW_GetValue(1257, UserName5, cp);
+            name_handle = FW_GetValue(1257, name5, cp);
+            status_approval = "退回待重新审批";
+            name_resign = FW_GetValue(1257, name1, cp);
+            us_resign = FW_GetValue(1257, UserName, cp);
+
+            np = FW_AddNewPage_w(1235);
+            FW_SetValue_w(1257, 1235待处理页, cp, np);
+
+            FW_SetValue_w(1235, 事件状态, np, "待处理");
+            FW_SetValue_w(1235, 审批状态, np, status_approval);
+            FW_SetValue_w(1235, 处理人姓名, np, name_handle);
+            FW_SetValue_w(1235, 处理人工号, np, us_handle);
+            FW_SetValue_w(1235, 处理人职务, np, post_handle);
+            FW_SetValue_w(1235, 处理日期, np, date_current);
+            FW_SetValue_w(1235, LinkToFormID, np, 1110);
+            FW_SetValue_w(1235, LinkToFormPage, np, cp);
+            FW_SetValue_w(1235, 提交人姓名, np, name_resign);
+            FW_SetValue_w(1235, 提交人工号, np, us_resign);
+            FW_SetValue_w(1235, 内容, np, "离职申请");
+            FW_SetValue_w(1235, 提交日期, np, date_apply);
+
+            FW_SetValue_w(1257, 机构审批状态, cp, "（已退回）");
+        }
+    }
+    return(GotoClient);
+}
+CLIENT
+{
+    if(status_handle == 0)
+    {
+        if(approval_str == "确认")
+        {
+            FW_Dialog1(确认成功！即将进入《离职员工面谈记录表》填写。);
+        }else
+        {
+            FW_SetValue_w(1257, 1235待处理页, cp, np);
+            FW_SetValue_w(1257, 机构审批状态, cp, "（已退回）");
+            FW_Dialog1(已退回此申请！);
+            return(0);
+        }
+    }
+}
+SERVER
+{
+    st0_1111.FormID = 1111;
+    st0_1111.Record = cp;
+    return(st0_1111);
+}

@@ -5,9 +5,11 @@ FIELD
     .1243.物品编号;
     .1243.实际归还日期;
     .1243.物品使用状态;
+
     .1114.物品编号;
     .1114.状态;
     .1114.现有库存;
+
     .1116.物品使用状态;
     .1116.实际归还日期;
 }
@@ -36,7 +38,6 @@ CLIENT
     if(归还数量i == 0)
     {
         FW_Dialog1(归还数量不能为空！);
-        FW_SetValue_w(1243,ReleaseEvent,0,"");
         return(0);
     }else if(归还数量i > 申请数量i)
     {
@@ -44,7 +45,6 @@ CLIENT
         if(ret == 0)
         {
             FW_Dialog1(已取消此次归还！);
-            FW_SetValue_w(1243,ReleaseEvent,0,"");
             return(0);
         }
     }
@@ -53,7 +53,6 @@ CLIENT
     if(实际归还日期s == "")
     {
         FW_Dialog1(实际归还日期不能为空！);
-        FW_SetValue_w(1243,ReleaseEvent,0,"");
         return(0);
     }
     flag = 0;
@@ -82,7 +81,6 @@ CLIENT
     if(flag == 1)
     {
         FW_Dialog1(库存中未找到该归还的物品！);
-        FW_SetValue_w(1243,ReleaseEvent,0,"");
         return(0);
     }
     FW_SetValue_w(1114,现有库存,recordPage,现有库存i);
@@ -96,4 +94,4 @@ SERVER
     st0.FormID = 1242;
     st0.Record = 0;
     return(st0);
-} 
+}

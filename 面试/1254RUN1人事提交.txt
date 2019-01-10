@@ -1,0 +1,412 @@
+FIELD
+{
+    .1128.面试者状态;
+    .1128.姓名;
+    .1128.性别;
+    .1128.出生日期;
+    .1128.籍贯;
+    .1128.婚姻状况;
+    .1128.政治面貌;
+    .1128.学历;
+    .1128.毕业院校;
+    .1128.专业;
+    .1128.现住址;
+    .1128.联系电话;
+    .1128.语言;
+    .1128.资格证书;
+    .1128.应聘岗位;
+    .1128.面试日期;
+    .1128.第一;
+    .1128.第一分值;
+    .1128.第二;
+    .1128.第二分值;
+    .1128.第三;
+    .1128.第三分值;
+    .1128.自我介绍;
+    .1128.曾经工作;
+    .1128.岗位意愿;
+    .1128.团队配合;
+
+    .1251.word简历;
+    .1251.pdf简历;
+    .1251.求职人员登记表照片;
+    .1251.团队角色照片正面;
+    .1251.团队角色照片反面;
+    .1251.自我透视评分表照片;
+
+    .1254.岗位匹配;
+    .1254.职业计划;
+    .1254.其他;
+    .1254.答疑;
+    .1254.到岗日期;
+    .1254.面试结果;
+    .1254.原因;
+    .1254.人事签名;
+    .1254.人事日期;
+    .1254.人事提交状态;
+    .1254.总监审批状态;
+    .1254.人事跟进状态;
+    .1254.入职状态;
+    .1254.人事专员账号;
+    .1254.人事专员姓名;
+    .1254.运营总监账号;
+    .1254.运营总监姓名;
+    .1254.1235待处理页;
+
+    .1235.事件状态;
+    .1235.处理人姓名;
+    .1235.处理人工号;
+    .1235.处理人职务;
+    .1235.处理人部门;
+    .1235.处理日期;
+    .1235.审批状态;
+    .1235.LinkToFormID;
+    .1235.LinkToFormPage;
+    .1235.提交人姓名;
+    .1235.提交人工号;
+    .1235.内容;
+    .1235.提交日期;
+}
+VAR
+{
+    String status_interview, name, sex, birthday, birthplace, is_married, politics, school_record;
+    String graduated_school, major, address, phone, language, credentials, position_applied;
+    String date_interview, first, first_score, second, second_score, third, third_score;
+    String self_introduction, work_once, work_wish, team_cooperatioon, post_match;
+    String future_plan, other, answer, work_date, result, reason, majordomo_opnion;
+    String pensonnel_sign, date_personnel_sign, majordomo_sign, date_majordomo_sign;
+    String pdf_resume, word_resume, photo1, photo2, photo3, photo4, current_us, pensonnel_us;
+    String majordomo_us, pensonnel_name, majordomo_name, pensonnel_status, current_date;
+    int cp, skip_to1252, is_continue, pending_page, newPage;
+    Struct2 st2_1087;
+    Struct0 st0_1252;
+}
+CLIENT
+{
+    FW_FormOpen(1251);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    pensonnel_status = FW_GetValue(1254, 人事提交状态, cp);
+    if(pensonnel_status == "（已提交）")
+    {
+        FW_Dialog1(人事已提交过当前应聘者面试记录！);
+        return(0);
+    }
+    status_interview = FW_GetValue(1128, 面试者状态, cp);
+    skip_to1252 = -1;
+    if(status_interview == "基础信息待完善")
+    {
+        FW_Dialog1(因为面试者状态为“基础信息待完善”，所以即将跳转到面试者基础信息表中进行确认面试！);
+        skip_to1252 = 1;
+    }
+    if(skip_to1252 != 1)
+    {
+        pensonnel_us = FW_GetValue(1254, 人事专员账号, cp);
+        if(pensonnel_us == "")
+        {
+            FW_Dialog1(pensonnel username is null，please contact the server administrator!);
+            return(0);
+        }
+        current_us = FW_GetUserID(2);
+        if(current_us != pensonnel_us)
+        {
+            FW_Dialog1(当前登录账号不是人事账号！);
+            return(0);
+        }
+        majordomo_us = FW_GetValue(1254, 运营总监账号, cp);
+        if(majordomo_us == "")
+        {
+            FW_Dialog1(majordomo username is null，please contact the server administrator!);
+            return(0);
+        }
+        name = FW_GetValue(1128, 姓名, cp);
+        if(name == "")
+        {
+            FW_Dialog1(请填写“姓名”！);
+            return(0);
+        }
+        sex = FW_GetValue(1128, 性别, cp);
+        if(sex == "")
+        {
+            FW_Dialog1(请填写“性别”！);
+            return(0);
+        }
+        birthday = FW_GetValue(1128, 出生日期, cp);
+        if(birthday == "")
+        {
+            FW_Dialog1(请填写“出生日期”！);
+            return(0);
+        }
+        birthplace = FW_GetValue(1128, 籍贯, cp);
+        if(birthplace == "")
+        {
+            FW_Dialog1(请填写“籍贯”！);
+            return(0);
+        }
+        is_married = FW_GetValue(1128, 婚姻状况, cp);
+        if(is_married == "")
+        {
+            FW_Dialog1(请填写“姓名”！);
+            return(0);
+        }
+        politics = FW_GetValue(1128, 政治面貌, cp);
+        if(politics == "")
+        {
+            FW_Dialog1(请填写“政治面貌”！);
+            return(0);
+        }
+        school_record = FW_GetValue(1128, 学历, cp);
+        if(school_record == "")
+        {
+            FW_Dialog1(请填写“学历”！);
+            return(0);
+        }
+        graduated_school = FW_GetValue(1128, 毕业院校, cp);
+        if(graduated_school == "")
+        {
+            FW_Dialog1(请填写“毕业院校”！);
+            return(0);
+        }
+        major = FW_GetValue(1128, 专业, cp);
+        if(major == "")
+        {
+            FW_Dialog1(请填写“专业”！);
+            return(0);
+        }
+        address = FW_GetValue(1128, 现住址, cp);
+        if(address == "")
+        {
+            FW_Dialog1(请填写“现住址”！);
+            return(0);
+        }
+        phone = FW_GetValue(1128, 联系电话, cp);
+        if(phone == "")
+        {
+            FW_Dialog1(请填写“联系电话”！);
+            return(0);
+        }
+        language = FW_GetValue(1128, 语言, cp);
+        if(language == "")
+        {
+            FW_Dialog1(请填写“语言”！);
+            return(0);
+        }
+        credentials = FW_GetValue(1128, 资格证书, cp);
+        if(credentials == "")
+        {
+            FW_Dialog1(请填写“资格证书”！);
+            return(0);
+        }
+        position_applied = FW_GetValue(1128, 应聘岗位, cp);
+        if(position_applied == "")
+        {
+            FW_Dialog1(请填写“应聘岗位”！);
+            return(0);
+        }
+        date_interview = FW_GetValue(1128, 面试日期, cp);
+        if(date_interview == "")
+        {
+            FW_Dialog1(请填写“面试日期”！);
+            return(0);
+        }
+        first = FW_GetValue(1128, 第一, cp);
+        if(first == "")
+        {
+            FW_Dialog1(请填写“第一团队角色”！);
+            return(0);
+        }
+        first_score = FW_GetValue(1128, 第一分值, cp);
+        if(first_score == "")
+        {
+            FW_Dialog1(请填写“第一团队角色分值”！);
+            return(0);
+        }
+        second = FW_GetValue(1128, 第二, cp);
+        if(second == "")
+        {
+            FW_Dialog1(请填写“第二团队角色”！);
+            return(0);
+        }
+        second_score = FW_GetValue(1128, 第二分值, cp);
+        if(second_score == "")
+        {
+            FW_Dialog1(请填写“第二团队角色分值”！);
+            return(0);
+        }
+        FW_SetValue_w(1128, 第二分值, cp, second_score);
+        
+        third = FW_GetValue(1128, 第三, cp);
+        if(third == "")
+        {
+            FW_Dialog1(请填写“第三团队角色”！);
+            return(0);
+        }
+        third_score = FW_GetValue(1128, 第三分值, cp);
+        if(third_score == "")
+        {
+            FW_Dialog1(请填写“第三团队角色分值”！);
+            return(0);
+        }
+        self_introduction = FW_GetValue(1128, 自我介绍, cp);
+        if(self_introduction == "")
+        {
+            FW_Dialog1(请填写“自我介绍”！);
+            return(0);
+        }
+        work_once = FW_GetValue(1128, 曾经工作, cp);
+        if(work_once == "")
+        {
+            FW_Dialog1(请填写“曾经工作/实习经验”！);
+            return(0);
+        }
+        work_wish = FW_GetValue(1128, 岗位意愿, cp);
+        if(work_wish == "")
+        {
+            FW_Dialog1(请填写“岗位意愿度及稳定度”！);
+            return(0);
+        }
+        team_cooperatioon = FW_GetValue(1128, 团队配合, cp);
+        if(team_cooperatioon == "")
+        {
+            FW_Dialog1(请填写“团队配合度、个人性格特征”！);
+            return(0);
+        }
+        word_resume = FW_GetValue(1251, word简历, cp);
+        pdf_resume = FW_GetValue(1251, pdf简历, cp);
+        if((word_resume == "")&&(pdf_resume == ""))
+        {
+            FW_Dialog1(请上传附件 “简历word或pdf”！);
+            return(0);
+        }
+        photo1 = FW_GetValue(1251, 求职人员登记表照片, cp);
+        if(photo1 == "")
+        {
+            FW_Dialog1(请上传“求职人员登记表照片”！);
+            return(0);
+        }
+        photo2 = FW_GetValue(1251, 团队角色照片正面, cp);
+        if(photo2 == "")
+        {
+            FW_Dialog1(请上传 “团队角色照片正面”！);
+            return(0);
+        }
+        photo3 = FW_GetValue(1251, 团队角色照片反面, cp);
+        if(photo3 == "")
+        {
+            FW_Dialog1(请上传 “团队角色照片反面”！);
+            return(0);
+        }
+        photo4 = FW_GetValue(1251, 自我透视评分表照片, cp);
+        if(photo4 == "")
+        {
+            FW_Dialog1(请上传 “自我透视评分表照片”！);
+            return(0);
+        }
+
+        post_match = FW_GetValue(1254, 岗位匹配, cp);
+        if(post_match == "")
+        {
+            FW_Dialog1(请填写“岗位匹配度及专业能力”！);
+            return(0);
+        }
+        future_plan = FW_GetValue(1254, 职业计划, cp);
+        if(future_plan == "")
+        {
+            FW_Dialog1(请填写“未来的职业计划”！);
+            return(0);
+        }
+        work_date = FW_GetValue(1254, 到岗日期, cp);
+        if(work_date == "")
+        {
+            FW_Dialog1(请填写“如果被录用到岗日期”！);
+            return(0);
+        }
+        result = FW_GetValue(1254, 面试结果, cp);
+        if(result == "")
+        {
+            FW_Dialog1(请填写“面试结果”！);
+            return(0);
+        }else if(result == "不予录用")
+        {
+            FW_Dialog1(面试结果为不予录用则无需进行人事提交！);
+            return(0);
+        }
+        reason = FW_GetValue(1254, 原因, cp);
+        if(reason == "")
+        {
+            FW_Dialog1(请填写“原因”！);
+            return(0);
+        }
+        pensonnel_sign = FW_GetValue(1254, 人事签名, cp);
+        if(pensonnel_sign == "")
+        {
+            FW_Dialog1(请填写“人事签名”！);
+            return(0);
+        }
+        date_personnel_sign = FW_GetValue(1254, 人事日期, cp);
+        if(date_personnel_sign == "")
+        {
+            FW_Dialog1(请填写“人事签名日期”！);
+            return(0);
+        }
+        FW_SetValue_w(1254, 人事日期, cp, date_personnel_sign);
+        is_continue = FW_Dialog1(确认填写无误并提交给总监审批吗？);
+        if(is_continue == 0)
+        {
+            return(0);
+        }
+        pending_page = FW_GetValue(1254, 1235待处理页, cp);
+        pensonnel_name = FW_GetValue(1254, 人事专员姓名, cp);
+        majordomo_name = FW_GetValue(1254, 运营总监姓名, cp);
+        current_date = FW_GetSysDate(0);
+        FW_SetValue_w(1254, 人事提交状态, cp, "（已提交）");
+        FW_SetValue_w(1254, 总监审批状态, cp, "（待审批）");
+        FW_SetValue_w(1254, 人事跟进状态, cp, "（待跟进）");
+        FW_SetValue_w(1254, 入职状态, cp, "（待入职）");
+    }
+}
+SERVER
+{
+    FW_SetValue_w(1128, 第二分值, cp, second_score);
+    FW_SetValue_w(1254, 人事日期, cp, date_personnel_sign);
+    if(skip_to1252 == 1)
+    {
+        st0_1252.FormID = 1252;
+        st0_1252.Record = cp;
+        return(st0_1252);
+    }
+    FW_SetValue_w(1254, 人事提交状态, cp, "（已提交）");
+    FW_SetValue_w(1254, 总监审批状态, cp, "（待审批）");
+    FW_SetValue_w(1254, 人事跟进状态, cp, "（待跟进）");
+    FW_SetValue_w(1254, 入职状态, cp, "（待入职）");
+    newPage = FW_AddNewPage_w(1235);
+    FW_SetValue_w(1254, 1235待处理页, cp, newPage);
+
+    FW_SetValue_w(1235, 事件状态, newPage, "待处理");
+    FW_SetValue_w(1235, 处理人姓名, newPage, majordomo_name);
+    FW_SetValue_w(1235, 处理人工号, newPage, majordomo_us);
+    FW_SetValue_w(1235, 处理人职务, newPage, "运营总监");
+    FW_SetValue_w(1235, 审批状态, newPage, "待运营总监审批");
+    FW_SetValue_w(1235, LinkToFormID, newPage, "1128");
+    FW_SetValue_w(1235, LinkToFormPage, newPage, cp);
+    FW_SetValue_w(1235, 提交人姓名, newPage, pensonnel_name);
+    FW_SetValue_w(1235, 提交人工号, newPage, pensonnel_us);
+    FW_SetValue_w(1235, 内容, newPage, "应聘者面试记录");
+    FW_SetValue_w(1235, 提交日期, newPage, current_date);
+
+    FW_SetValue_w(1235, 事件状态, pending_page, "已处理");
+
+    FW_SetValue_w(1128, 面试者状态, cp, "待总监审批");
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_SetValue_w(1128, 面试者状态, cp, "待总监审批");
+    FW_Dialog1(应聘者面试记录成功提交给运营总监审核！);
+}

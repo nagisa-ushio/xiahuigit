@@ -1,0 +1,95 @@
+FIELD
+{
+    .1105.姓名;
+    .1105.GroupID;
+    .1105.岗位;
+    .1105.入职日期;
+    .1105.面谈日期;
+    .1105.面谈人;
+    .1105.重点面谈内容;
+    .1105.面谈内容记录;
+    .1105.员工主要反馈意见;
+    .1105.后续跟进安排;
+    .1105.记录状态;
+}
+VAR
+{
+    int cp, rec_1257;
+    String name_resign, group_resign, post_resign, date_entry, date_interview;
+    String interviewer, important_content, record_interview, opinion_staff, follow_up;
+    Struct2 st2_1257;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    name_resign = FW_GetValue(1105, 姓名, cp);
+    if(name_resign == "")
+    {
+        FW_Dialog1(员工姓名不能为空！);
+        return(0);
+    }
+    group_resign = FW_GetValue(1105, GroupID, cp);
+    if(group_resign == "")
+    {
+        FW_Dialog1(部门不能为空！);
+        return(0);
+    }
+    post_resign = FW_GetValue(1105, 岗位, cp);
+    if(post_resign == "")
+    {
+        FW_Dialog1(岗位不能为空！);
+        return(0);
+    }
+    date_entry = FW_GetValue(1105, 入职日期, cp);
+    if(date_entry == "")
+    {
+        FW_Dialog1(入职日期不能为空！);
+        return(0);
+    }
+    date_interview = FW_GetValue(1105, 面谈日期, cp);
+    if(date_interview == "")
+    {
+        FW_Dialog1(面谈日期不能为空！);
+        return(0);
+    }
+    interviewer = FW_GetValue(1105, 面谈人, cp);
+    if(interviewer == "")
+    {
+        FW_Dialog1(面谈人不能为空！);
+        return(0);
+    }
+    record_interview = FW_GetValue(1105, 面谈内容记录, cp);
+    if(record_interview == "")
+    {
+        FW_Dialog1(面谈内容记录不能为空！);
+        return(0);
+    }
+    important_content = FW_GetValue(1105, 重点面谈内容, cp);
+    if(important_content == "")
+    {
+        FW_Dialog1(重点面谈内容不能为空！);
+        return(0);
+    }
+    opinion_staff = FW_GetValue(1105, 员工主要反馈意见, cp);
+    if(opinion_staff == "")
+    {
+        FW_Dialog1(员工主要反馈意见不能为空！);
+        return(0);
+    }
+    follow_up = FW_GetValue(1105, 后续跟进安排, cp);
+    if(follow_up == "")
+    {
+        FW_Dialog1(后续跟进安排不能为空！);
+        return(0);
+    }
+    FW_SetValue_w(1105, 记录状态, cp, "已完成");
+}
+SERVER
+{
+    FW_SetValue_w(1105, 记录状态, cp, "已完成");
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_Dialog1(记录完成！);
+}

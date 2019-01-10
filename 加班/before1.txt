@@ -17,16 +17,20 @@ FIELD
     .1139.GroupID3;
     .1139.季度加班;
     .1139.季度加班剩余;
+    .1139.考勤年月;
+
     .1143.季度加班超额提醒时间;
     .1143.个人季度加班上限;
     .1143.季度加班累计;
 }
 VAR
 {
-    String status,jb,qt,qsrq,S加班起始年月,S加班起始年,S加班起始月,qssj,jsrq,jssj,yjgj,sysm,tdr,jjlxdh,zt,SQRQ,US,gd,str,Srch1,S季度加班,S季度加班剩余,S1,Sdiffrence;
-    int cp,rec,flag,ilength;
-    double D超额提醒时间,D季度加班累计,D预计加班共计小时数,D个人季度加班上限,D申请后季度加班累计,diffrence;
-    Struct2 st21;
+    String status, date_begin, time_begin, date_end, time_end, total_hours, overtime_reason;
+    String person_replace, emergency_contact_number, US, group_id, approval, Srch1;
+    String S季度加班,S季度加班剩余,remain_message,Sdiffrence,S加班起始年月,S加班起始年,S加班起始月;
+    int cp, record1143, exist_record1143, remain, I加班起始月;
+    double D超额提醒时间, D季度加班累计, D预计加班共计小时数, D个人季度加班上限, D申请后季度加班累计, diffrence_limit;
+    Struct2 st20_1143;
 }
 CLIENT
 {
@@ -41,94 +45,93 @@ CLIENT
         FW_Dialog1(此申请单不在“申请人提交”流程！);
         return(0);
     }
-    qsrq = FW_GetValue(1139,预计加班起始日期,cp);
-    if(qsrq=="")
+    date_begin = FW_GetValue(1139,预计加班起始日期,cp);
+    if(date_begin == "")
     {
         FW_Dialog1(请填写 "预计加班起始日期");
         return(0);
     }
-    S加班起始年月 = qsrq.Left(7);
+    S加班起始年月 = date_begin.Left(7);
     S加班起始年 = S加班起始年月.Left(4);
     S加班起始月 = S加班起始年月.Mid(5);
+    I加班起始月 = S加班起始月.toIntege;
+    S加班起始月 = I加班起始月.toString;
     S加班起始年月 = S加班起始年 + "年" + S加班起始月 + "月";
 
-    qssj = FW_GetValue(1139,预计加班起始时间,cp);
-    if(qssj=="")
+    time_begin = FW_GetValue(1139,预计加班起始时间,cp);
+    if(time_begin == "")
     {
         FW_Dialog1(请填写 "预计加班起始时间");
         return(0);
     }
 
-    jsrq = FW_GetValue(1139,预计加班结束日期,cp);
-    if(jsrq=="")
+    date_end = FW_GetValue(1139,预计加班结束日期,cp);
+    if(date_end == "")
     {
         FW_Dialog1(请填写 "预计加班结束日期");
         return(0);
     }
 
-    jssj = FW_GetValue(1139,预计加班结束时间,cp);
-    if(jssj=="")
+    time_end = FW_GetValue(1139,预计加班结束时间,cp);
+    if(time_end == "")
     {
         FW_Dialog1(请填写 "预计加班结束时间");
         return(0);
     }
 
-    yjgj = FW_GetValue(1139,预计加班共计小时数,cp);
+    total_hours = FW_GetValue(1139,预计加班共计小时数,cp);
     D预计加班共计小时数 = FW_GetValue(1139,预计加班共计小时数,cp);
-    if(yjgj=="")
+    if(total_hours == "")
     {
         FW_Dialog1(请填写 "预计加班共计小时数");
         return(0);
     }
 
-    sysm = FW_GetValue(1139,事由说明,cp);
-    if(sysm=="")
+    overtime_reason = FW_GetValue(1139,事由说明,cp);
+    if(overtime_reason == "")
     {
         FW_Dialog1(请填写 "事由说明");
         return(0);
     }
 
-    jjlxdh = FW_GetValue(1139,紧急联系电话,cp);
-    if(jjlxdh=="")
+    emergency_contact_number = FW_GetValue(1139,紧急联系电话,cp);
+    if(emergency_contact_number == "")
     {
         FW_Dialog1(请填写 "紧急联系电话");
         return(0);
     }
-    str=CURRENT.sVALUE;
-    if(str=="0")
+    approval = CURRENT.sVALUE;
+    if(approval == "0")
     {
-        //FW_Dialog1(等待);
-        return(0);		
+        return(0);
     }
-    gd = FW_GetValue(1139,GroupID,cp);
+    group_id = FW_GetValue(1139, GroupID, cp);
     US = FW_GetUserID(2);
-
+    exist_record1143 = -1;
 }
 SERVER
 {
-    flag=0;
-    Srch1="1143,US@UserName";
-    st21=FW_FindRecords(Srch1,1);
-    if(st21.mError!=0)
+    st20_1143=FW_FindRecords("1143, US@UserName", 1);
+    if(st20_1143.mError!=0)
     {
-        flag=2;
+        exist_record1143 = 0;
         return(GotoClient);
     }
-    rec=st21.RecordNoList.Get[0];
-    D超额提醒时间=FW_GetValue(1143,季度加班超额提醒时间,rec);
-    D季度加班累计=FW_GetValue(1143,季度加班累计,rec);
+    record1143 = st20_1143.RecordNoList.Get[0];
+    D超额提醒时间 = FW_GetValue(1143, 季度加班超额提醒时间, record1143);
+    D季度加班累计 = FW_GetValue(1143, 季度加班累计, record1143);
     D申请后季度加班累计 = D季度加班累计 + D预计加班共计小时数;
-        D个人季度加班上限 = FW_GetValue(1143,个人季度加班上限,rec);
+    D个人季度加班上限 = FW_GetValue(1143, 个人季度加班上限, record1143);
     if((D申请后季度加班累计 >= D超额提醒时间)&&(D申请后季度加班累计 <= D个人季度加班上限))
     {
-        flag=3;
-        FW_SetValue_w(1139,季度加班,cp,D申请后季度加班累计);
-        diffrence = D个人季度加班上限 - D申请后季度加班累计;
+        remain = 1;
+        FW_SetValue_w(1139, 季度加班, cp, D申请后季度加班累计);
+        diffrence_limit = D个人季度加班上限 - D申请后季度加班累计;
     }else if(D申请后季度加班累计 > D个人季度加班上限)
     {
-        flag = 4;
-        diffrence = D个人季度加班上限 - D季度加班累计;
-        FW_SetValue_w(1139,季度加班剩余,cp,diffrence);
+        remain = 2;
+        diffrence_limit = D个人季度加班上限 - D季度加班累计;
+        FW_SetValue_w(1139, 季度加班剩余, cp, diffrence_limit);
     }
     FW_SetValue_w(1139, 考勤年月, cp, S加班起始年月);
     return(GotoClient);
@@ -136,22 +139,22 @@ SERVER
 CLIENT
 {
     FW_SetValue_w(1139, 考勤年月, cp, S加班起始年月);
-    if(flag==2)
+    if(exist_record1143 == 0)
     {
-        FW_Dialog1(未找到申请人的人员档案，请联系相关负责人先添加!);	
+        FW_Dialog1(未找到申请人的人员档案，请联系相关负责人先添加!);
         return(0);
-    }else if(flag == 3)
+    }else if(remain == 1)
     {
         FW_SetValue_w(1139,季度加班,cp,D申请后季度加班累计);
         S季度加班 = FW_GetValue(1139,季度加班,cp);
-        S1 = "此次加班申请通过后您的季度加班累计已达 " + S季度加班 + " 小时，当到达霞辉规定的 50 个小时后将不再允许提交加班申请，请注意合理安排加班时间。";
-        FW_Dialog1(S1);
-    }else if(flag == 4)
+        remain_message = "此次加班申请通过后您的季度加班累计已达 " + S季度加班 + " 小时，当到达霞辉规定的 50 个小时后将不再允许提交加班申请，请注意合理安排加班时间。";
+        FW_Dialog1(remain_message);
+    }else if(remain == 2)
     {
-        FW_SetValue_w(1139,季度加班剩余,cp,diffrence);
+        FW_SetValue_w(1139,季度加班剩余,cp,diffrence_limit);
         Sdiffrence = FW_GetValue(1139,季度加班剩余,cp);
-        S1 = "此次申请后季度加班累计时间将超出加班规定上限 50 小时，无法进行此次加班申请,您本月最多还能申请加班 " + Sdiffrence + " 小时。";
-        FW_Dialog1(S1);	
+        remain_message = "此次申请后季度加班累计时间将超出加班规定上限 50 小时，无法进行此次加班申请,您本月最多还能申请加班 " + Sdiffrence + " 小时。";
+        FW_Dialog1(remain_message);
         return(0);
     }
 }

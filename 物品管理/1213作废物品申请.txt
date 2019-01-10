@@ -1,0 +1,69 @@
+FIELD
+{
+    .1213.物品使用状态;
+    .1213.领用状态;
+    .1213.UserName;
+    .1213.物品编号;
+    .1213.物品类别;
+
+    .1203.UserName;
+}
+VAR
+{
+    int cp,rec,is_continue;
+    String us,status,ustatus,num,type;
+    Struct2 st20;
+    Struct0 st00;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    us = FW_GetValue(1213,UserName,cp);
+    status = FW_GetValue(1213,物品使用状态,cp);
+    num = FW_GetValue(1213,物品编号,cp);
+    if((status != "领用待审核")&&(status != "借用待审核"))
+    {
+        FW_Dialog1(只有状态为“待审核”的申请才支持取消作废！);
+        return(0);
+    }
+    ustatus = "已作废" + us;
+    status = "已作废" + status;
+    num = "已作废" + num;
+    is_continue = FW_Dialog1(作废后将不能恢复，是否继续？);
+    if(is_continue == 0)
+    {
+        return(0);
+    }
+}
+SERVER
+{
+    FW_SetValue_w(1213,领用状态,cp,"已作废");
+    FW_SetValue_w(1213,物品使用状态,cp,status);
+    FW_SetValue_w(1213,UserName,cp,ustatus);
+    FW_SetValue_w(1213,物品编号,cp,num);
+    FW_SetValue_w(1213,物品类别,cp,"");
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_SetValue_w(1213,领用状态,cp,"已作废");
+    FW_SetValue_w(1213,物品使用状态,cp,status);
+    FW_SetValue_w(1213,UserName,cp,ustatus);
+    FW_SetValue_w(1213,物品编号,cp,num);
+    FW_SetValue_w(1213,物品类别,cp,"");
+    st20 = FW_FindRecords("1203,us@UserName",1);
+    if(st20.mError == 0)
+    {
+        rec = st20.RecordNoList.Get[0];
+        FW_Dialog1(作废操作成功！);
+    }else
+    {
+        FW_Dialog1("some error may have occurred!");
+    }
+}
+SERVER
+{
+    st00.FormID = 1203;
+    st00.Record = rec;
+    return(st00);
+}

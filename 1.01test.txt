@@ -1,1 +1,20 @@
-1.01test twice
+FIELD
+{
+    .1143.月调休可透支时间;
+    .1143.弹性调休剩余次数;
+}
+VAR
+{
+    double a, b;
+    int cp, c, d;
+}
+SERVER
+{
+    cp = FW_GetCurrentRecNum();
+    a = FW_GetValue(1143,月调休可透支时间,cp);
+    c = FW_GetValue(1143,弹性调休剩余次数,cp);
+    d = a - c;
+    FW_Dialog1(b);
+    
+}
+

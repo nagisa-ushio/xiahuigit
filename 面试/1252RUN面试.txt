@@ -1,0 +1,171 @@
+FIELD
+{
+    .1128.面试;
+
+    .1252.面试者状态;
+    .1252.面试者编号;
+    .1252.姓名;
+    .1252.性别;
+    .1252.学历;
+    .1252.联系电话;
+    .1252.毕业院校;
+    .1252.专业;
+    .1252.应聘岗位;
+
+    .1087.UserName;
+    .1087.姓名;
+    .1087.POST;
+
+    .1254.人事专员账号;
+    .1254.人事专员姓名;
+    .1254.运营总监账号;
+    .1254.运营总监姓名;
+    .1254.人事提交状态;
+    .1254.总监审批状态;
+    .1254.人事跟进状态;
+    .1254.入职状态;
+
+    .1131.入职;
+}
+VAR
+{
+    int cp, rec_1087, is_pensonnel, pending_post_1087;
+    String status, number, name, sex, education, phone, university, major, position_applied;
+    String pending_person_post, current_post, current_us, current_name, majordomo_us, majordomo_name;
+    Struct2 st2_1087;
+    Struct0 st0_1128;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    number = FW_GetValue(1252, 面试者编号, cp);
+    if(number == "")
+    {
+        FW_Dialog1(面试者编号不能为空！);
+        return(0);
+    }
+    name = FW_GetValue(1252, 姓名, cp);
+    if(name == "")
+    {
+        FW_Dialog1(姓名不能为空！);
+        return(0);
+    }
+    sex = FW_GetValue(1252, 性别, cp);
+    if(sex == "")
+    {
+        FW_Dialog1(性别不能为空！);
+        return(0);
+    }
+    education = FW_GetValue(1252, 学历, cp);
+    if(education == "")
+    {
+        FW_Dialog1(学历不能为空！);
+        return(0);
+    }
+    phone = FW_GetValue(1252, 联系电话, cp);
+    if(phone == "")
+    {
+        FW_Dialog1(联系电话不能为空！);
+        return(0);
+    }
+    university = FW_GetValue(1252, 毕业院校, cp);
+    if(university == "")
+    {
+        FW_Dialog1(毕业院校不能为空！);
+        return(0);
+    }
+    major = FW_GetValue(1252, 专业, cp);
+    if(major == "")
+    {
+        FW_Dialog1(专业不能为空！);
+        return(0);
+    }
+    position_applied = FW_GetValue(1252, 应聘岗位, cp);
+    if(position_applied == "")
+    {
+        FW_Dialog1(应聘岗位不能为空！);
+        return(0);
+    }
+    status = FW_GetValue(1252, 面试者状态, cp);
+    pending_person_post = "运营总监";
+    current_us = FW_GetUserID(2);
+}
+SERVER
+{
+    st2_1087 = FW_FindRecords("1087, current_us@UserName", 1);
+    rec_1087 = st2_1087.RecordNoList.Get[0];
+    is_pensonnel = -1;
+    current_post = FW_GetValue(1087, POST, rec_1087);
+    if(current_post != "人事专员")
+    {
+        is_pensonnel = 0;
+        return(GotoClient);
+    }
+    current_name = FW_GetValue(1087, 姓名, rec_1087);
+    FW_SetValue_w(1254, 人事专员姓名, cp, current_name);
+    FW_SetValue_w(1254, 人事专员账号, cp, current_us);
+
+    pending_post_1087 = -1;
+    st2_1087 = FW_FindRecords("1087, pending_person_post@POST", 1);
+    if(st2_1087.mError != 0)
+    {
+        pending_post_1087 = 0;
+        return(GotoClient);
+    }
+    rec_1087 = st2_1087.RecordNoList.Get[0];
+    majordomo_name = FW_GetValue(1087, 姓名, rec_1087);
+    majordomo_us = FW_GetValue(1087, UserName, rec_1087);
+    FW_SetValue_w(1254, 运营总监姓名, cp, majordomo_name);
+    FW_SetValue_w(1254, 运营总监账号, cp, majordomo_us);
+    FW_SetValue_w(1254, 人事提交状态, cp, "（待提交）");
+    FW_SetValue_w(1254, 总监审批状态, cp, "（待审批）");
+    FW_SetValue_w(1254, 人事跟进状态, cp, "（待跟进）");
+    FW_SetValue_w(1254, 入职状态, cp, "（待入职）");
+
+    FW_SetValue_w(1252, 面试者状态, cp, "待人事提交");
+
+    FW_SetValue_w(1128, 面试, cp, "面试");
+
+    FW_SetValue_w(1131, 入职, cp, "入职");
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_FormOpen(1254);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+    if(is_pensonnel == 0)
+    {
+        FW_Dialog1(当前登录账号不是人事账号，无法进行面试！);
+        return(0);
+    }else if(pending_post_1087 == 0)
+    {
+        FW_Dialog1(error：pending_person_post in 1087 no found！);
+        return(0);
+    }
+    FW_SetValue_w(1254, 人事专员姓名, cp, current_name);
+    FW_SetValue_w(1254, 人事专员账号, cp, current_us);
+    FW_SetValue_w(1254, 运营总监姓名, cp, majordomo_name);
+    FW_SetValue_w(1254, 运营总监账号, cp, majordomo_us);
+    FW_SetValue_w(1254, 人事提交状态, cp, "（待提交）");
+    FW_SetValue_w(1254, 总监审批状态, cp, "（待审批）");
+    FW_SetValue_w(1254, 人事跟进状态, cp, "（待跟进）");
+    FW_SetValue_w(1254, 入职状态, cp, "（待入职）");
+    FW_SetValue_w(1252, 面试者状态, cp, "待人事提交");
+
+    FW_SetValue_w(1128, 面试, cp, "面试");
+
+    FW_SetValue_w(1131, 入职, cp, "入职");
+    FW_Dialog1(保存成功，即将进入应聘者面试记录！);
+}
+SERVER
+{
+    st0_1128.FormID = 1128;
+    st0_1128.Record = cp;
+    return(st0_1128);
+}

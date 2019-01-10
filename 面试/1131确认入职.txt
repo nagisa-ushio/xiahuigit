@@ -1,0 +1,256 @@
+FIELD
+{
+    .1128.姓名;
+    .1128.性别;
+    .1128.出生日期;
+    .1128.籍贯;
+    .1128.婚姻状况;
+    .1128.政治面貌;
+    .1128.学历;
+    .1128.毕业院校;
+    .1128.专业;
+    .1128.现住址;
+    .1128.联系电话;
+    .1128.语言;
+    .1128.资格证书;
+    .1128.应聘岗位;
+    .1128.面试日期;
+    .1128.第一;
+    .1128.第一分值;
+    .1128.第二;
+    .1128.第二分值;
+    .1128.第三;
+    .1128.第三分值;
+    .1128.自我介绍;
+    .1128.曾经工作;
+    .1128.岗位意愿;
+    .1128.团队配合;
+
+    .1254.人事专员账号;
+    .1254.入职状态;
+
+    .1131.系统预派工号;
+    .1131.试用片区;
+    .1131.归属范围;
+    .1131.试用期;
+    .1131.试用薪资;
+    .1131.入职日期;
+    .1131.面试者状态;
+
+    .1098.员工状态;
+    .1098.UserName;
+    .1098.姓名;
+    .1098.性别;
+    .1098.出生日期;
+    .1098.学历;
+    .1098.籍贯;
+    .1098.婚姻状况;
+    .1098.入职日期;
+    .1098.试用部门;
+    .1098.入职部门;
+    .1098.现属部门;
+    .1098.现任岗位;
+    .1098.入职岗位;
+    .1098.试用期;
+    .1098.试用薪资;
+    .1098.毕业院校;
+    .1098.其他资格证书;
+    .1098.本人联系方式;
+    .1098.常住地址;
+    .1098.所学专业;
+    .1098.部门;
+    .1098.归属范围;
+
+    .1087.State;
+    .1087.姓名;
+    .1087.GroupID;
+    .1087.级别;
+    .1087.Expiry;
+    .1087.Password;
+    .1087.POST;
+    .1087.用户ID;
+    .1087.归属范围;
+    .1087.部门;
+}
+VAR
+{
+    int cp, is_continue, np_1098, np_1087;
+    String name, sex, birthday, birthplace, is_married, graduated_school, major, pensonnel_us;
+    String school_record, address, phone, credentials, position_applied, date_entry;
+    String new_us, belong_to, groupid, trial_period, trial_salary, current_us, status;
+    Struct0 st0_1183;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    pensonnel_us = FW_GetValue(1254, 人事专员账号, cp);
+    current_us = FW_GetUserID(2);
+    if(current_us != pensonnel_us)
+    {
+        FW_Dialog1(只有人事才可以进行入职操作！);
+        return(0);
+    }
+    status = FW_GetValue(1131, 面试者状态, cp);
+    if(status == "已入职")
+    {
+        FW_Dialog1(此员工已进行过入职操作！);
+        return(0);
+    }else if(status != "人事已确认跟进待分配帐号")
+    {
+        FW_Dialog1(未到入职流程！);
+        return(0);
+    }
+    new_us = FW_GetValue(1131, 系统预派工号, cp);
+    if(new_us == "")
+    {
+        FW_Dialog1(系统预派工号出错，请联系管理员处理！);
+        return(0);
+    }
+
+    belong_to = FW_GetValue(1131, 归属范围, cp);
+    if(belong_to == "")
+    {
+        FW_Dialog1(归属范围不能为空！);
+        return(0);
+    }
+
+    groupid = FW_GetValue(1131, 试用片区, cp);
+    if(groupid == "")
+    {
+        FW_Dialog1(试用片区不能为空！);
+        return(0);
+    }
+
+    trial_salary = FW_GetValue(1131, 试用薪资, cp);
+    if(trial_salary == "")
+    {
+        FW_Dialog1(试用薪资不能为空！);
+        return(0);
+    }
+
+    trial_period = FW_GetValue(1131, 试用期, cp);
+    if(trial_period == "")
+    {
+        FW_Dialog1(试用期不能为空！);
+        return(0);
+    }
+
+    date_entry = FW_GetValue(1131, 入职日期, cp);
+    if(date_entry == "")
+    {
+        FW_Dialog1(入职日期不能为空！);
+        return(0);
+    }
+    is_continue = FW_Dialog1(确认信息填写无误并分配工号吗？);
+    if(is_continue == 0)
+    {
+        return(0);
+    }
+}
+SERVER
+{
+    np_1098 = FW_AddNewPage_w(1098);
+
+    name = FW_GetValue(1128, 姓名, cp);
+    FW_SetValue_w(1098, 姓名, np_1098, name);
+
+    sex = FW_GetValue(1128, 性别, cp);
+    FW_SetValue_w(1098, 性别, np_1098, sex);
+
+    birthday = FW_GetValue(1128, 出生日期, cp);
+    FW_SetValue_w(1098, 出生日期, np_1098, birthday);
+
+    birthplace = FW_GetValue(1128, 籍贯, cp);
+    FW_SetValue_w(1098, 籍贯, np_1098, birthplace);
+
+    is_married = FW_GetValue(1128, 婚姻状况, cp);
+    FW_SetValue_w(1098, 婚姻状况, np_1098, is_married);
+
+    school_record = FW_GetValue(1128, 学历, cp);
+    FW_SetValue_w(1098, 学历, np_1098, school_record);
+
+    graduated_school = FW_GetValue(1128, 毕业院校, cp);
+    FW_SetValue_w(1098, 毕业院校, np_1098, graduated_school);
+
+    major = FW_GetValue(1128, 专业, cp);
+    FW_SetValue_w(1098, 所学专业, np_1098, major);
+
+    address = FW_GetValue(1128, 现住址, cp);
+    FW_SetValue_w(1098, 常住地址, np_1098, address);
+
+    phone = FW_GetValue(1128, 联系电话, cp);
+    FW_SetValue_w(1098, 本人联系方式, np_1098, phone);
+
+    credentials = FW_GetValue(1128, 资格证书, cp);
+    FW_SetValue_w(1098, 其他资格证书, np_1098, credentials);
+
+    position_applied = FW_GetValue(1128, 应聘岗位, cp);
+    FW_SetValue_w(1098, 现任岗位, np_1098, position_applied);
+    FW_SetValue_w(1098, 入职岗位, np_1098, position_applied);
+
+    FW_SetValue_w(1098, 入职日期, np_1098, date_entry);
+    FW_SetValue_w(1098, UserName, np_1098, new_us);
+    FW_SetValue_w(1098, 试用部门, np_1098, groupid);
+    FW_SetValue_w(1098, 入职部门, np_1098, groupid);
+    FW_SetValue_w(1098, 现属部门, np_1098, groupid);
+    FW_SetValue_w(1098, 试用期, np_1098, trial_period);
+    FW_SetValue_w(1098, 试用薪资, np_1098, trial_salary);
+    FW_SetValue_w(1098, 员工状态, np_1098, "在职");
+    FW_SetValue_w(1098, 部门, np_1098, groupid);
+    FW_SetValue_w(1098, 归属范围, np_1098, belong_to);
+    FW_SetValue_w(1098, 员工状态, np_1098, "在职");
+
+    np_1087 = FW_AddNewPage_w(1087);
+    FW_SetValue_w(1087, State, np_1087, "使用中");
+    FW_SetValue_w(1087, 姓名, np_1087, name);
+    FW_SetValue_w(1087, GroupID, np_1087, groupid);
+    FW_SetValue_w(1087, UserName, np_1087, new_us);
+    FW_SetValue_w(1087, Expiry, np_1087, "2020年01月01日");
+    FW_SetValue_w(1087, Password, np_1087, "12345678");
+    FW_SetValue_w(1087, POST, np_1087, position_applied);
+    FW_SetValue_w(1087, 用户ID, np_1087, "");
+    FW_SetValue_w(1087, 归属范围, np_1087, belong_to);
+    FW_SetValue_w(1087, 部门, np_1087, groupid);
+    if(position_applied == "服务总监")
+    {
+        FW_SetValue_w(1087, 级别, np_1087, "3");
+    }else if(position_applied == "运营总监")
+    {
+        FW_SetValue_w(1087, 级别, np_1087, "6");
+    }else if(position_applied == "主管")
+    {
+        FW_SetValue_w(1087, 级别, np_1087, "13");
+    }else if(position_applied == "执行主任")
+    {
+        FW_SetValue_w(1087, 级别, np_1087, "5");
+    }else if(position_applied == "人事专员")
+    {
+        FW_SetValue_w(1087, 级别, np_1087, "7");
+    }else if(position_applied == "行政专员")
+    {
+        FW_SetValue_w(1087, 级别, np_1087, "10");
+    }else if(position_applied == "会计")
+    {
+        FW_SetValue_w(1087, 级别, np_1087, "8");
+    }
+
+    FW_SetValue_w(1131, 面试者状态, cp, "已入职");
+    FW_SetValue_w(1254, 入职状态, cp, "（已入职）");
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_SetValue_w(1131, 面试者状态, cp, "已入职");
+    is_continue = FW_Dialog1(入职成功，相关资料已自动录入人事档案中！继续跳转到人事档案中查看详细资料吗？);
+    if(is_continue == 0)
+    {
+        return(0);
+    }
+}
+SERVER
+{
+    st0_1183.FormID = 1183;
+    st0_1183.Record = np_1098;
+    return(st0_1183);
+}
+

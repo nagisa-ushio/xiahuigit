@@ -1,0 +1,88 @@
+FIELD
+{
+    .1110.姓名;
+    .1110.GroupID;
+    .1110.工作岗位;
+    .1110.入职日期;
+
+    .1257.UserName;
+
+    .1098.UserName;
+    .1098.姓名;
+
+    .1105.UserName;
+    .1105.姓名;
+    .1105.GroupID;
+    .1105.岗位;
+    .1105.入职日期;
+    .1105.面谈日期;
+    .1105.面谈人;
+    .1105.记录状态;
+}
+VAR
+{
+    int cp, rec_1098, exist_1087us, np;
+    String name_resign, group_resign, post_resign, date_entry, us_current, interviewer, us_resign;
+    Struct2 st2_1098, st2_1105;
+    Struct0 st0_1105;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    name_resign = FW_GetValue(1110, 姓名, cp);
+    group_resign = FW_GetValue(1110, GroupID, cp);
+    post_resign = FW_GetValue(1110, 工作岗位, cp);
+    date_entry = FW_GetValue(1110, 入职日期, cp);
+    us_current = FW_GetUserID(2);
+}
+SERVER
+{
+    exist_1087us = -1;
+    st2_1098 = FW_FindRecords("1098, us_current@UserName", 1);
+    if(st2_1098.mError != 0)
+    {
+        exist_1087us = 0;
+        return(GotoClient);
+    }
+    rec_1098 = st2_1098.RecordNoList.Get[0];
+    interviewer = FW_GetValue(1098, 姓名, rec_1098);
+    us_resign = FW_GetValue(1257, UserName, cp);
+    st2_1105 = FW_FindRecords("1105, us_resign@UserName, interviewer@面谈人", 1);
+    if(st2_1105.mError == 0)
+    {
+        np = st2_1105.RecordNoList.Get[0];
+        return(GotoClient);
+    }
+    np = FW_AddNewPage_w(1105);
+    FW_SetValue_w(1105, UserName, np, us_resign);
+    FW_SetValue_w(1105, 姓名, np, name_resign);
+    FW_SetValue_w(1105, GroupID, np, group_resign);
+    FW_SetValue_w(1105, 岗位, np, post_resign);
+    FW_SetValue_w(1105, 入职日期, np, date_entry);
+    FW_SetValue_w(1105, 面谈人, np, interviewer);
+    FW_SetValue_w(1105, 记录状态, np, "待完成");
+    
+    return(GotoClient);
+}
+CLIENT
+{
+    if(exist_1087us == 0)
+    {
+        FW_Dialog1(当前档案中未录入您的资料，请联系相关人员处理！);
+        return(0);
+    }
+    FW_GotoFormPage(1105, np);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+}
+SERVER
+{
+    st0_1105.FormID = 1105;
+    st0_1105.Record = np;
+    return(st0_1105);
+}

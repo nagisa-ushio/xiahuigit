@@ -1,0 +1,21 @@
+FIELD
+{
+    .1260.处理状态;
+    .1260.问题日期;
+}
+VAR
+{
+    int np;
+    String date_current;
+    Struct0 st0_1260;
+}
+SERVER
+{
+    date_current = FW_GetSysDate(0);
+    np = FW_AddNewPage_w(1260);
+    FW_SetValue_w(1260, 处理状态, np, "待处理");
+    FW_SetValue_w(1260, 问题日期, np, date_current);
+    st0_1260.FormID = 1260;
+    st0_1260.Record = np;
+    return(st0_1260);
+}

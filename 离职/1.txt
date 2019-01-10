@@ -1,256 +1,316 @@
 FIELD
 {
-	.1110.员工状态;
-	.1110.离职类别;
-	.1110.其他;
-	.1110.离职原因;
-	.1110.申请离职日期;
-	.1110.离职信;
-	.1110.本人签署;
-	.1110.签署日期;
-	.1110.状态;
-	.1110.填表日期;
-	.1110.GroupID;
-	.1110.UserName1;
-	.1110.UserName2;
-	.1110.UserName21;
-	.1110.UserName22;
-	.1110.GroupID1;
-	.1110.GroupID2;
-	.1110.GroupID3;
-	.1110.GroupID4;
-	.1110.POST1;
-	.1110.POST2;
-	.1110.POST4;
-	.1110.申请离职日期;
-	.1110.姓名;
-	.1110.当前待处理标记Page;
-	.1110.当前待处理标记Page备用1;
-	.1110.流程一;
-	.1110.流程二;
-	.1110.流程三;
-	.1110.流程四;
-	.1110.流程五;
+    .1110.离职申请状态;
+    .1110.员工状态;
+    .1110.填表日期;
+    .1110.姓名;
+    .1110.性别;
+    .1110.电话;
+    .1110.学历;
+    .1110.专业;
+    .1110.工作岗位;
+    .1110.入职日期;
+    .1110.申请离职日期;
+    .1110.批准离职日期;
+    .1110.离职类别;
+    .1110.其他;
+    .1110.离职原因;
+    .1110.本人签署;
+    .1110.本人签署日期;
 
-	.1087.UserName;
-	.1087.归属范围;
-	.1087.POST;
-	.1087.GroupID;
-	.1087.姓名;
+    .1112.word离职信;
+    .1112.登记表1;
 
-	.1235.事件状态;
-	.1235.处理人姓名;
-	.1235.处理人工号;
-	.1235.处理人职务;
-	.1235.处理人部门;
-	.1235.处理日期;
-	.1235.审批状态;
-	.1235.LinkToFormID;
-	.1235.LinkToFormPage;
-	.1235.提交人姓名;
-	.1235.提交人工号;
-	.1235.内容;
-	.1235.提交日期;
+    .1257.员工提交状态;
+    .1257.主管审批状态;
+    .1257.人事审批状态;
+    .1257.总监审批状态;
+    .1257.机构审批状态;
+    .1257.人事确认状态;
+    .1257.name1;
+    .1257.name2;
+    .1257.name3;
+    .1257.name4;
+    .1257.name5;
+    .1257.UserName;
+    .1257.UserName2;
+    .1257.UserName2备用;
+    .1257.UserName3;
+    .1257.UserName4;
+    .1257.UserName5;
+    .1257.POST1; 
+    .1257.POST2;
+    .1257.POST3;
+    .1257.POST4;
+    .1257.POST5;
+    .1257.1235待处理页;
+    .1257.1235待处理页备用;
 
+    .1087.POST;
+    .1087.UserName;
+    .1087.姓名;
+    .1087.GroupID;
+    .1087.归属范围;
+
+    .1235.事件状态;
+    .1235.处理人姓名;
+    .1235.处理人工号;
+    .1235.处理人职务;
+    .1235.处理人部门;
+    .1235.处理日期;
+    .1235.审批状态;
+    .1235.LinkToFormID;
+    .1235.LinkToFormPage;
+    .1235.提交人姓名;
+    .1235.提交人工号;
+    .1235.内容;
+    .1235.提交日期;
 }
 VAR
 {
-	String 当前工号s,status,status1,jb,qt,resignationLetter,signature,dateiOfSignature,qsrq,qssj,jsrq,jssj,qjgj,sysm,tdr,jjlxdh,zt,SQRQ,US,gd,sCon,提交人归属范围s,post2,post4,username2;
-	int currentpage, rec;
-	Struct2 st2;
-	String 员工状态s, 事件状态s, 处理人姓名s, 处理人工号s, 处理人职务s, 处理人部门s, 处理日期s, 审批状态s, 提交人姓名s, 提交人职务s,提交人工号s, 内容s, 提交日期s, scon, 域名s, 原事件状态s, 原处理日期s;
-	int LinkToFormID_int, LinkToFormPage_int, newPage, markPage, total, i;
-	Struct2 st21;
-	StringList sl01,sl02;
+    String current_us, apply_us, status_staff, status_executive, status_personnel, status_director;
+    String status_organization, date_form, name, sex, phone, education, major, post, name_current;
+    String date_entry, date_resign_applied, date_approve, type_resign, other_content;
+    String reason_resign, signature, date_signature, is_on_job, word_resign, photo_resign;
+    String post_current, post2, post3, post4, post5, group_handle, find_condition, us_handle, name_handle;
+    String range_current, group_current, date_current, field_handle, us_field_handle, status_handle;
+    int cp, is_continue, current_us_in1087, rec_1087, i, total_handle_1087, np;
+    Struct2 st2_1087;
+    StringList sl_field_handle, sl_us_handle;
 }
 CLIENT
 {
-	currentpage =FW_GetCurrentRecNum();
-	员工状态s = FW_GetValue(1110,员工状态,currentpage);
-	if(员工状态s != "在职")
-	{
-		FW_Dialog1(员工状态不是“在职”！无法进行离职申请。);
-		return(0);
-	}
-	status = FW_GetValue(1110,状态,currentpage);
-        if(status != "待提交")
+    FW_FormOpen(1112);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    is_on_job = FW_GetValue(1110, 员工状态, cp);
+    if(is_on_job != "在职")
+    {
+        FW_Dialog1(当前员工非“在职”状态！无法进行离职申请。);
+        return(0);
+    }
+
+    status_staff = FW_GetValue(1257, 员工提交状态, cp);
+    if((status_staff != "（待提交）")&&(status_staff != ""))
+    {
+        if(status_staff != "（已退回）")
         {
-                FW_Dialog1(当前状态无需进行提交，请确认后再点击！);
-                return(0);
+            FW_Dialog1(当前离职申请已进行过提交！);
+            return(0);
         }
-	当前工号s = FW_GetUserID(2);
-	提交人工号s = FW_GetValue(1110, UserName1, currentpage);
-	if(当前工号s != 提交人工号s)
-	{
-                FW_Dialog1(当前帐号不是当前申请离职员工的帐号，请使用本人帐号提交离职申请！);
-                return(0);
-	}
-	qsrq = FW_GetValue(1110,申请离职日期,currentpage);
-	if(qsrq=="")
-	{
-		FW_Dialog1(请填写 "申请离职日期");
-		return(0);
-	}
+    }
 
-	jb = FW_GetValue(1110,离职类别,currentpage);
-	if(jb=="")
-	{
-		FW_Dialog1(请填写 "离职类别");
-		FW_SetValue_w(1110,ReleaseEvent,0,"");
-		return(0);
-	}
+    apply_us = FW_GetValue(1257, UserName, cp);
+    current_us = FW_GetUserID(2);
+    if(current_us != apply_us)
+    {
+        FW_Dialog1(当前登录的账号不是离职员工账号，无法进行离职提交！);
+        return(0);
+    }
 
-	if(jb=="其他")
-	{
-		qt = FW_GetValue(1110,其他,currentpage);
-		if(qt=="")
-		{
-			FW_Dialog1(请填写 "其他");
-			FW_SetValue_w(1110,ReleaseEvent,0,"");
-			return(0);
-		}
-	}
+    name = FW_GetValue(1110, 姓名, cp);
+    if(name == "")
+    {
+        FW_Dialog1(请填写 “姓名”！);
+        return(0);
+    }
 
-	qsrq = FW_GetValue(1110,离职原因,currentpage);
-	if(qsrq=="")
-	{
-		FW_Dialog1(请填写 "离职原因");
-		return(0);
-	}
-	resignationLetter = FW_GetValue(1110,离职信,currentpage);
-	if(resignationLetter=="")
-	{
-		FW_Dialog1(请填写 "离职信");
-		return(0);
-	}
-	signature = FW_GetValue(1110,本人签署,currentpage);
-	if(signature=="")
-	{
-		FW_Dialog1(请填写 "本人签署");
-		return(0);
-	}
-	dateiOfSignature = FW_GetValue(1110,签署日期,currentpage);
-	if(dateiOfSignature=="")
-	{
-		FW_Dialog1(请填写 "签署日期");
-		return(0);
-	}
-	
-	jb = FW_GetValue(1110,离职类别,currentpage);
-	qsrq = FW_GetValue(1110,其他,currentpage);
-	qssj = FW_GetValue(1110,离职原因,currentpage);
-	US = FW_GetUserID(2);
+    sex = FW_GetValue(1110, 性别, cp);
+    if(sex == "")
+    {
+        FW_Dialog1(请填写 "性别"！);
+        return(0);
+    }
+
+    phone = FW_GetValue(1110, 电话, cp);
+    if(phone == "")
+    {
+        FW_Dialog1(请填写 "电话"！);
+        return(0);
+    }
+
+    education = FW_GetValue(1110, 学历, cp);
+    if(education == "")
+    {
+        FW_Dialog1(请填写 "学历"！);
+        return(0);
+    }
+
+    major = FW_GetValue(1110, 专业, cp);
+    if(major == "")
+    {
+        FW_Dialog1(请填写 "专业"！);
+        return(0);
+    }
+
+    post = FW_GetValue(1110, 工作岗位, cp);
+    if(post == "")
+    {
+        FW_Dialog1(请填写 "工作岗位"！);
+        return(0);
+    }
+
+    date_entry = FW_GetValue(1110, 入职日期, cp);
+    if(date_entry == "")
+    {
+        FW_Dialog1(请填写 "入职日期"！);
+        return(0);
+    }
+
+    date_resign_applied = FW_GetValue(1110, 申请离职日期, cp);
+    if(date_resign_applied == "")
+    {
+        FW_Dialog1(请填写 "申请离职日期"！);
+        return(0);
+    }
+
+    type_resign = FW_GetValue(1110, 离职类别, cp);
+    if(type_resign == "")
+    {
+        FW_Dialog1(请填写 "离职类别"！);
+        return(0);
+    }else if(type_resign == "其他")
+    {
+        FW_Dialog1(当离职类别选择其他时，需填写其他说明！);
+        return(0);
+    }
+
+    reason_resign = FW_GetValue(1110, 离职原因, cp);
+    if(reason_resign=="")
+    {
+        FW_Dialog1(请填写 "离职原因"！);
+        return(0);
+    }
+
+    signature = FW_GetValue(1110, 本人签署, cp);
+    if(signature == "")
+    {
+        FW_Dialog1(请填写 "本人签署");
+        return(0);
+    }
+
+    date_signature = FW_GetValue(1110, 本人签署日期, cp);
+    if(date_signature == "")
+    {
+        FW_Dialog1(请填写 "本人签署日期");
+        return(0);
+    }
+
+    word_resign = FW_GetValue(1112, word离职信, cp);
+    if(word_resign == "")
+    {
+        FW_Dialog1(请上传 "word离职信" ！);
+        return(0);
+    }
+
+    photo_resign = FW_GetValue(1112, 登记表1, cp);
+    if(photo_resign == "")
+    {
+        FW_Dialog1(请上传 "离职交接登记表照片" ！);
+        return(0);
+    }
+    is_continue = FW_Dialog1(确认填写无误并进行提交吗？);
+    if(is_continue == 0)
+    {
+        return(0);
+    }
 }
 SERVER
 {
-	SQRQ = FW_GetSysDate(0);
+    name_current = FW_GetValue(1257, name1, cp);
+    date_current = FW_GetSysDate(0);
+    st2_1087 = FW_FindRecords("1087, current_us@UserName", 1);
+    rec_1087 = st2_1087.RecordNoList.Get[0];
+    post_current = FW_GetValue(1087, POST, rec_1087);
+    range_current = FW_GetValue(1087, 归属范围, rec_1087);
+    if((post_current == "主管")||(range_current == "后台"))
+    {
+        post2 = "运营总监";
+        group_handle = "";
+        post4 = post2;
+        post5 = "执行主任";
+        find_condition = "1087, post2@POST";
+    }else if((post_current == "服务总监")||(post_current == "运营总监"))
+    {
+        post2 = "执行主任";
+        group_handle = "";
+        post4 = post2;
+        post5 = post2;
+        find_condition = "1087, post2@POST";
+    }else if(range_current == "前线")
+    {
+        group_current = FW_GetValue(1087, GroupID, rec_1087);
+        post2 = "主管";
+        group_handle = group_current;
+        post4 = "运营总监";
+        post5 = "执行主任";
+        find_condition = "1087, post2@POST, group_current@GroupID";
+    }
+    sl_field_handle = [1257, "1235待处理页", "1235待处理页备用"];
+    sl_us_handle = [1257, "UserName2", "UserName2备用"];
+    st2_1087 = FW_FindRecords(find_condition, 0);
+    total_handle_1087 = st2_1087.count;
+    for(i=0; i<total_handle_1087; i++)
+    {
+        rec_1087 = st2_1087.RecordNoList.Get[i];
+        us_handle = FW_GetValue(1087, UserName, rec_1087);
+        name_handle = FW_GetValue(1087, 姓名, rec_1087);
+        field_handle = sl_field_handle.Get[i];
+        us_field_handle = sl_us_handle.Get[i];
+        status_handle = "待" + post2 + "审批";
 
-	sCon="1087,US@UserName";
-	st2=FW_FindRecords(sCon,1);
-	rec=st2.RecordNoList.Get[0];
-	提交人归属范围s=FW_GetValue(1087,归属范围,rec);
-        提交人职务s = FW_GetValue(1087,POST,rec);
-	gd = FW_GetValue(1087,GroupID,rec);
-        if(提交人职务s == "主管")
-        {
-                post2 = "服务总监";
-                处理人部门s = "";
-                post4 = "执行主任";
-        }else if((提交人职务s == "服务总监")||(提交人职务s == "运营总监"))
-        {
-                post2 = "执行主任";
-                处理人部门s = "";
-        }else if(提交人归属范围s == "前线")
-	{
-		post2 = "主管";
-                处理人部门s = gd;
-                post4 = "运营总监";
-	}else if(提交人归属范围s == "后台")
-	{
-		post2 = "运营总监";	
-                处理人部门s = "";
-                post4 = "运营总监";
-	}
-        审批状态s = "待" + post2 + "审批";
-	FW_SetValue_w(1110,填表日期,currentpage,SQRQ);
-	FW_SetValue_w(1110,UserName1,currentpage,US);
-	FW_SetValue_w(1110,GroupID1,currentpage,gd);
-	FW_SetValue_w(1110,GroupID2,currentpage,处理人部门s);
-	FW_SetValue_w(1110,POST1,currentpage,提交人职务s);
-	FW_SetValue_w(1110,POST2,currentpage,post2);
-	FW_SetValue_w(1110,POST4,currentpage,post4);
-	FW_SetValue_w(1110,状态,currentpage,审批状态s);
-	status1 = "(已提交)";
-        FW_SetValue_w(1110,流程一,currentpage,status1);
-	return(GotoClient);
+        np = FW_AddNewPage_w(1235);
+        FW_SetValue_w(1257, field_handle, cp, np);
+        FW_SetValue_w(1257, us_field_handle, cp, us_handle);
+
+        FW_SetValue_w(1235, 事件状态, np, "待处理");
+        FW_SetValue_w(1235, 处理人姓名, np, name_handle);
+        FW_SetValue_w(1235, 处理人工号, np, us_handle);
+        FW_SetValue_w(1235, 处理人职务, np, post2);
+        FW_SetValue_w(1235, 处理人部门, np, group_handle);
+        FW_SetValue_w(1235, 处理日期, np, date_current);
+        FW_SetValue_w(1235, 审批状态, np, status_handle);
+        FW_SetValue_w(1235, LinkToFormID, np, "1110");
+        FW_SetValue_w(1235, LinkToFormPage, np, cp);
+        FW_SetValue_w(1235, 提交人姓名, np, name_current);
+        FW_SetValue_w(1235, 提交人工号, np, apply_us);
+        FW_SetValue_w(1235, 内容, np, "离职申请");
+        FW_SetValue_w(1235, 提交日期, np, date_current);
+    }
+    FW_SetValue_w(1257, 员工提交状态, cp, "（已提交）");
+    FW_SetValue_w(1257, POST2, cp, post2);
+    FW_SetValue_w(1257, 主管审批状态, cp, "（待审批）");
+    FW_SetValue_w(1257, 人事审批状态, cp, "（待审批）");
+    FW_SetValue_w(1257, 总监审批状态, cp, "（待审批）");
+    FW_SetValue_w(1257, POST4, cp, post4);
+    FW_SetValue_w(1257, 机构审批状态, cp, "（待审批）");
+    FW_SetValue_w(1257, 人事确认状态, cp, "（待确认）");
+    FW_SetValue_w(1257, POST5, cp, post5);
+
+    FW_SetValue_w(1110, 离职申请状态, cp, status_handle);
+    FW_SetValue_w(1110, 填表日期, cp, date_current);
+    return(GotoClient);
 }
 CLIENT
 {
-	FW_SetValue_w(1110,填表日期,currentpage,SQRQ);
-	FW_SetValue_w(1110,UserName1,currentpage,US);
-	FW_SetValue_w(1110,GroupID1,currentpage,gd);
-	FW_SetValue_w(1110,GroupID2,currentpage,处理人部门s);
-	FW_SetValue_w(1110,POST1,currentpage,提交人职务s);
-	FW_SetValue_w(1110,POST2,currentpage,post2); 
-	FW_SetValue_w(1110,POST4,currentpage,post4);
-	FW_SetValue_w(1110,状态,currentpage,审批状态s);
-        FW_SetValue_w(1110,流程一,currentpage,status1);
-}        
-SERVER
-{
-	事件状态s = "待处理";
-	处理日期s = "";
-	LinkToFormID_int = 1110;
-	LinkToFormPage_int = currentpage;
-	提交人姓名s = FW_GetValue(1110, 姓名, currentpage);
-	内容s = "离职申请";
-	提交日期s = FW_GetValue(1110,申请离职日期,currentpage);
-	处理人职务s = post2;
-	sl01 = [ 2, "当前待处理标记Page", "当前待处理标记Page备用1", "当前待处理标记Page备用2" ];
-	sl02 = [1134, "UserName21", "UserName22" ];
-	if (处理人部门s != "")
-	{
-		scon = "1087,post2@POST,处理人部门s@GroupID";
-	}
-	else if (处理人部门s == "")
-	{
-		scon = "1087,post2@POST";
-	}
-	st21 = FW_FindRecords(scon, 0);
-	total = st21.count;
 
-	for (i = 0; i < total; i++)
-	{
-		rec = st21.RecordNoList.Get[i];
-		域名s = sl01.Get[i];
-                username2 = sl02.Get[i];
-		处理人工号s = FW_GetValue(1087, UserName, rec);
-		处理人姓名s = FW_GetValue(1087, 姓名, rec);
-		处理人部门s = FW_GetValue(1087,GroupID,rec);
+    FW_SetValue_w(1257, 员工提交状态, cp, "（已提交）");
+    FW_SetValue_w(1257, POST2, cp, post2);
+    FW_SetValue_w(1257, 主管审批状态, cp, "（待审批）");
+    FW_SetValue_w(1257, 人事审批状态, cp, "（待审批）");
+    FW_SetValue_w(1257, 总监审批状态, cp, "（待审批）");
+    FW_SetValue_w(1257, POST4, cp, post4);
+    FW_SetValue_w(1257, 机构审批状态, cp, "（待审批）");
+    FW_SetValue_w(1257, 人事确认状态, cp, "（待确认）");
+    FW_SetValue_w(1257, POST5, cp, post5);
 
-		newPage = FW_AddNewPage_w(1235);
-		FW_SetValue_w(1110, 域名s, currentpage, newPage);
-                FW_SetValue_w(1110, username2, currentpage, 处理人工号s);
-
-		FW_SetValue_w(1235, 事件状态, newPage, 事件状态s);
-		FW_SetValue_w(1235, 处理人姓名, newPage, 处理人姓名s);
-		FW_SetValue_w(1235, 处理人工号, newPage, 处理人工号s);
-		FW_SetValue_w(1235, 处理人职务, newPage, 处理人职务s);
-		FW_SetValue_w(1235, 处理人部门, newPage, 处理人部门s);
-		FW_SetValue_w(1235, 处理日期, newPage, 处理日期s);
-		FW_SetValue_w(1235, 审批状态, newPage, 审批状态s);
-		FW_SetValue_w(1235, LinkToFormID, newPage, LinkToFormID_int);
-		FW_SetValue_w(1235, LinkToFormPage, newPage, LinkToFormPage_int);
-		FW_SetValue_w(1235, 提交人姓名, newPage, 提交人姓名s);
-		FW_SetValue_w(1235, 提交人工号, newPage, 提交人工号s);
-		FW_SetValue_w(1235, 内容, newPage, 内容s);
-		FW_SetValue_w(1235, 提交日期, newPage, SQRQ);
-
-		FW_SetValue_w(1110,GroupID2,currentpage,处理人部门s);
-	}
-	return(GotoClient);
+    FW_SetValue_w(1110, 离职申请状态, cp, status_handle);
+    FW_SetValue_w(1110, 填表日期, cp, date_current);
+    FW_Dialog1(离职申请提交成功！);
 }
-CLIENT
-{
-	FW_Dialog1(离职申请提交成功！);
-}                                                                     

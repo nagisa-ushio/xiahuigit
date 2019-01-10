@@ -1,28 +1,25 @@
 FIELD
 {
     .1110.离职申请状态;
+    .1110.机构意见;
+    .1110.机构签名;
+    .1110.机构签名日期;
 
-    .1257.人事审批状态;
     .1257.总监审批状态;
     .1257.机构审批状态;
     .1257.name1;
     .1257.name3;
     .1257.name4;
     .1257.name5;
+    .1257.name6;
     .1257.UserName;
     .1257.UserName3;
     .1257.UserName4;
     .1257.UserName5;
-    .1257.POST3; 
+    .1257.POST3;
     .1257.POST4;
     .1257.POST5;
     .1257.1235待处理页;
-
-    .1087.POST;
-    .1087.UserName;
-    .1087.姓名;
-    .1087.GroupID;
-    .1087.归属范围;
 
     .1235.事件状态;
     .1235.处理人姓名;
@@ -40,32 +37,53 @@ FIELD
 }
 VAR
 {
-    String status_personnel, status_majordomo, us_current, username4, approval_str, post_handle;
-    String date_apply, name_resign, us_resign, date_current, status_approval, us_handle, name_handle;
-    int cp, approval_int, pending_page, np, rec_1087;
+    String status_majordomo, status_org, us_current, username5, opinion_org, signature_org;
+    String date_signature, approval_str, post_handle, us_handle, name_handle;
+    String date_apply, name_resign, us_resign, date_current, status_approval;
+    int cp, approval_int, pending_page, np;
     Struct0 st0_dialog1;
-    Struct2 st2_1087;
 }
 CLIENT
 {
     cp = FW_GetCurrentRecNum();
     us_current = FW_GetUserID(2);
-    username4 = FW_GetValue(1257, UserName4, cp);
-    if(us_current != username4)
+    username5 = FW_GetValue(1257, UserName5, cp);
+    if(us_current != username5)
     {
         FW_Dialog1(当前登录账号没有审批此流程的权限！);
         return(0);
     }
 
-    status_personnel = FW_GetValue(1257, 人事审批状态, cp);
     status_majordomo = FW_GetValue(1257, 总监审批状态, cp);
-    if(status_personnel != "（已审批）")
+    status_org = FW_GetValue(1257, 机构审批状态, cp);
+    if(status_majordomo != "（已审批）")
     {
         FW_Dialog1(无法审批，暂未到达此流程！);
         return(0);
-    }else if(status_majordomo == "（已审批）")
+    }else if(status_org == "（已审批）")
     {
         FW_Dialog1(此流程已审批过！);
+        return(0);
+    }
+
+    opinion_org = FW_GetValue(1110, 机构意见, cp);
+    if(opinion_org == "")
+    {
+        FW_Dialog1(请填写 "机构意见"！);
+        return(0);
+    }
+
+    signature_org = FW_GetValue(1110, 机构签名, cp);
+    if(signature_org == "")
+    {
+        FW_Dialog1(请填写 "机构签名"!);
+        return(0);
+    }
+
+    date_signature = FW_GetValue(1110, 机构签名日期, cp);
+    if(date_signature == "")
+    {
+        FW_Dialog1(请填写 "机构签名日期"!);
         return(0);
     }
 
@@ -92,24 +110,21 @@ SERVER
     date_apply = FW_GetValue(1235, 提交日期, pending_page);
     if(approval_str == "通过")
     {
-        post_handle = FW_GetValue(1257, POST5, cp);
-        st2_1087 = FW_FindRecords("1087, post_handle@POST", 1);
-        rec_1087 = st2_1087.RecordNoList.Get[0];
-        us_handle = FW_GetValue(1087, UserName, rec_1087);
-        name_handle = FW_GetValue(1087, 姓名, rec_1087);
-        status_approval = "待" + post_handle +  "审批";
-
-        FW_SetValue_w(1257, name5, cp, name_handle);
-        FW_SetValue_w(1257, UserName5, cp, us_handle);
-        FW_SetValue_w(1257, 总监审批状态, cp, "（已审批）");
-    }else
-    {
         post_handle = FW_GetValue(1257, POST3, cp);
         us_handle = FW_GetValue(1257, UserName3, cp);
         name_handle = FW_GetValue(1257, name3, cp);
+        status_approval = "待人事最后确认离职";
+
+        FW_SetValue_w(1257, name6, cp, name_handle);
+        FW_SetValue_w(1257, 机构审批状态, cp, "（已审批）");
+    }else
+    {
+        post_handle = FW_GetValue(1257, POST4, cp);
+        us_handle = FW_GetValue(1257, UserName4, cp);
+        name_handle = FW_GetValue(1257, name4, cp);
         status_approval = "退回待重新审批";
 
-        FW_SetValue_w(1257, 人事审批状态, cp, "（已退回）");
+        FW_SetValue_w(1257, 总监审批状态, cp, "（已退回）");
     }
     name_resign = FW_GetValue(1257, name1, cp);
     us_resign = FW_GetValue(1257, UserName, cp);
@@ -119,11 +134,11 @@ SERVER
     FW_SetValue_w(1257, 1235待处理页, cp, np);
 
     FW_SetValue_w(1235, 事件状态, np, "待处理");
+    FW_SetValue_w(1235, 审批状态, np, status_approval);
     FW_SetValue_w(1235, 处理人姓名, np, name_handle);
     FW_SetValue_w(1235, 处理人工号, np, us_handle);
     FW_SetValue_w(1235, 处理人职务, np, post_handle);
     FW_SetValue_w(1235, 处理日期, np, date_current);
-    FW_SetValue_w(1235, 审批状态, np, status_approval);
     FW_SetValue_w(1235, LinkToFormID, np, 1110);
     FW_SetValue_w(1235, LinkToFormPage, np, cp);
     FW_SetValue_w(1235, 提交人姓名, np, name_resign);
@@ -131,7 +146,7 @@ SERVER
     FW_SetValue_w(1235, 内容, np, "离职申请");
     FW_SetValue_w(1235, 提交日期, np, date_apply);
 
-    FW_SetValue_w(1257, UserName4, cp, us_current);
+    FW_SetValue_w(1257, UserName5, cp, us_current);
 
     FW_SetValue_w(1110, 离职申请状态, cp, status_approval);
     return(GotoClient);
@@ -141,16 +156,15 @@ CLIENT
     FW_SetValue_w(1110, 离职申请状态, cp, status_approval);
 
     FW_SetValue_w(1257, 1235待处理页, cp, np);
-    FW_SetValue_w(1257, UserName4, cp, us_current);
+    FW_SetValue_w(1257, UserName5, cp, us_current);
     if(approval_str == "通过")
     {
-        FW_SetValue_w(1257, name5, cp, name_handle);
-        FW_SetValue_w(1257, UserName5, cp, us_handle);
-        FW_SetValue_w(1257, 总监审批状态, cp, "（已审批）");
-        FW_Dialog1(审批成功！);
+        FW_SetValue_w(1257, name6, cp, name_handle);
+        FW_SetValue_w(1257, 机构审批状态, cp, "（已审批）");
+        FW_Dialog1(审批成功!);
     }else
     {
-        FW_SetValue_w(1257, 人事审批状态, cp, "（已退回）");
+        FW_SetValue_w(1257, 总监审批状态, cp, "（已退回）");
         FW_Dialog1(已退回此申请！);
     }
 }

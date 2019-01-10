@@ -1,0 +1,48 @@
+FIELD
+{
+    .1258.处理状态;
+    .1258.反馈日期;
+}
+VAR
+{
+    int np;
+    String state_handle, date_current;
+    Struct2 st2_1258;
+    Struct0 st0_1258;
+}
+SERVER
+{
+    state_handle = "待提交";
+    date_current = FW_GetSysDate(0);
+    st2_1258 = FW_FindRecords("1258, state_handle@处理状态", 1);
+    if(st2_1258.mError == 0)
+    {
+        np = st2_1258.RecordNoList.Get[0];
+        FW_SetValue_w(1258, 反馈日期, np, date_current);
+    }else
+    {
+        np = FW_AddNewPage_w(1258);
+        FW_Dialog1(np);
+        FW_SetValue_w(1258, 处理状态, np, "待提交");
+        FW_SetValue_w(1258, 反馈日期, np, date_current);
+    }
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_GotoFormPage(1258, np);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+
+}
+SERVER
+{
+    st0_1258.FormID = 1258;
+    st0_1258.Record = np;
+    return(st0_1258);
+}

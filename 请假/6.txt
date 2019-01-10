@@ -62,9 +62,12 @@ FIELD
 }
 VAR
 {
-    String 审批状态S,查找处理人条件S,处理人工号S,处理人姓名S,提交人姓名S,提交人工号S,提交日期S,处理人职务S,处理人部门S,处理日期S,US,USS,str,zt,Srch1,jb,username,process;
+    String 审批状态S,查找处理人条件S,处理人工号S,处理人姓名S,提交人姓名S,提交人工号S;
+    String 提交日期S,处理人职务S,处理人部门S,处理日期S,US,USS,str,zt,Srch1,jb,username,process;
     int 处理人记录页I,当前待处理标记I,新纪录I,cp,flag,red;
-    double sqsj,yqjlj,ndqjlj,ysjlj,ndsjlj,ybjlj,ndbjlj,gzsj,D年假共计,D本年度年假,D跨年度可休年假,D已休年假,D申请中年假,D月哺乳假,D月产假,D月婚假,D月丧假,D月照顾假,D月其他请假,D月其他所有请假,D年度哺乳假,D年度产假,D年度婚假,D年度丧假,D年度照顾假,D年度其他请假,D年度其他所有请假;
+    double sqsj,yqjlj,ndqjlj,ysjlj,ndsjlj,ybjlj,ndbjlj,gzsj,D年假共计,D本年度年假;
+    double D已休年假,D申请中年假,D月哺乳假,D月产假,D月婚假,D月丧假,D月照顾假,D月其他请假,D月其他所有请假,;
+    double D年度哺乳假,D年度产假,D年度婚假,D年度丧假,D年度照顾假,D年度其他请假,D年度其他所有请假;
     Struct2 st02,st21;
 }
 CLIENT
@@ -76,7 +79,7 @@ CLIENT
     str = CURRENT.sVALUE;
     if(str == "0")
     {
-        Goto(-1);
+        return(0);
     }else if(str== "1")
     {
         处理日期S = FW_GetSysDate(0);
@@ -95,7 +98,7 @@ CLIENT
         查找处理人条件S = "1087,处理人工号S@UserName";
     }
     US = FW_GetUserID(2);
-    FW_Dialog1(正在进行审批中，请按 继续 并等待完成提示。);
+    FW_Dialog1(正在审批中...请按“继续”并等待完成提示。);
 }
 SERVER
 {
@@ -273,7 +276,7 @@ CLIENT
     if(flag==2)
     {
         FW_Dialog1(未找到该申请人的人员档案，请联系相关负责人先添加!);	
-        Goto(-1);
+        return(0);
     }
     FW_SetValue_w(1138,UserName6,cp,US);
     FW_SetValue_w(1138,状态,cp,审批状态S);

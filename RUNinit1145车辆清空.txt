@@ -1,0 +1,28 @@
+FIELD
+{
+    .1145.社区;
+    .1145.预约事宜;
+    .1145.预约日期;
+    .1145.开始使用时间;
+    .1145.结束使用时间;
+    .1145.出发地;
+    .1145.目的地;
+    .1145.联系方式;
+}
+VAR
+{
+    int cp;
+}
+
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    FW_SetValue_w(1145,预约日期,cp,"");
+    FW_SetValue_w(1145,开始使用时间,cp,"");
+    FW_SetValue_w(1145,结束使用时间,cp,"");
+    FW_SetValue_w(1145,出发地,cp,"");
+    FW_SetValue_w(1145,目的地,cp,"");
+    FW_SetValue_w(1145,联系方式,cp,"");
+    FW_SetValue_w(1145,社区,cp,"");
+    FW_SetValue_w(1145,预约事宜,cp,"");
+}

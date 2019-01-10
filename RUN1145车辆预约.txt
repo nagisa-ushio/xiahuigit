@@ -2,7 +2,6 @@ FIELD
 {
     .1145.车牌号;
     .1145.状态;
-    .1145.申请日期;
     .1145.社区;
     .1145.预约事宜;
     .1145.预约日期;
@@ -12,6 +11,7 @@ FIELD
     .1145.目的地;
     .1145.联系方式;
     .1145.Field14;
+
     .1156.是否已隐藏;
     .1156.社区;
     .1156.预约事宜;
@@ -26,240 +26,177 @@ FIELD
     .1156.结束使用时间;
     .1156.出发地;
     .1156.目的地;
+
     .1098.姓名;
     .1098.现属部门;
 
 }
 VAR
 {
-    String s社区,yysy,bm,kh,yyrq,bksy,zt,yhzh,yfkhye,sh,fkfs,je,rq,dw,cgsl,dj,str2,sCon,zkssj,zjssj,
-        US,Con,ctr,sm,xm,groupid,ctkssj,ctjssj,khdrq,starting,starting2,destination,destination2,lxfs;
-    int cp, is_continue, i,np,rec,cc,red,flag;
-    Struct2 st2,st21;
-    double yykssj,yyjssj,kssj,jssj,pd,pp;
+    String s社区, s预约事宜, s车牌号, s预约日期, s开始时间, s车辆状态, s申请日期, s结束时间, str2;
+    String s1156开始时间, s1156结束时间, current_us, tips, current_name, current_groupid;
+    String starting, destination, phone, s1156申请人姓名;
+    int cp, is_continue, i, np, rec, total_1156, red, flag;
+    Struct2 st2, st21;
+    double d开始时长, d结束时长, d1156开始时长, d1156结束时长, d预约分钟数, d预约分钟数标准;
 }
 CLIENT
 {
-    cp =FW_GetCurrentRecNum();
-    bm = FW_GetValue(1145,车牌号,cp);
-    if(bm=="")
+    cp = FW_GetCurrentRecNum();
+    s车牌号 = FW_GetValue(1145,车牌号,cp);
+    if(s车牌号 == "")
     {
         FW_Dialog1(请填写 "车牌号");
-        Goto(-1);
+        return(0);
     }
 
     s社区 = FW_GetValue(1145,社区,cp);
     if(s社区=="")
     {
         FW_Dialog1(请填写 "社区");
-        Goto(-1);
+        return(0);
     }
-    yysy = FW_GetValue(1145,预约事宜,cp);
-    if(yysy=="")
+    s预约事宜 = FW_GetValue(1145,预约事宜,cp);
+    if(s预约事宜=="")
     {
         FW_Dialog1(请填写 "预约事宜");
-        Goto(-1);
+        return(0);
     }
 
-    yyrq = FW_GetValue(1145,预约日期,cp);
-    if(yyrq=="")
+    s预约日期 = FW_GetValue(1145,预约日期,cp);
+    if(s预约日期=="")
     {
         FW_Dialog1(请填写 "预约日期");
-        Goto(-1);
+        return(0);
     }
-    khdrq = FW_GetSysDate(0);
-    if(khdrq > yyrq)
+    s申请日期 = FW_GetSysDate(0);
+    if(s申请日期 > s预约日期)
     {
         FW_Dialog1(不能预约已经过去的时间);
-        Goto(-1);		
+        return(0);		
     }
 
-    bksy = FW_GetValue(1145,开始使用时间,cp);
-    if(bksy=="")
+    s开始时间 = FW_GetValue(1145,开始使用时间,cp);
+    if(s开始时间=="")
     {
         FW_Dialog1(请填写 "开始使用时间");
-        Goto(-1);
+        return(0);
     }
     str2 = "00:00";
-    yykssj = FW_SpanDateTime(bksy, str2, 1);	
-    dw = FW_GetValue(1145,结束使用时间,cp);
-    if(dw=="")
+    d开始时长 = FW_SpanDateTime(s开始时间, str2, 1);	
+    s结束时间 = FW_GetValue(1145,结束使用时间,cp);
+    if(s结束时间=="")
     {
         FW_Dialog1(请填写 "结束使用时间");
-        Goto(-1);
+        return(0);
     }
     starting = FW_GetValue(1145,出发地,cp);
     if(starting=="")
     {
         FW_Dialog1(请填写 "出发地");
-        Goto(-1);
+        return(0);
     }
     destination = FW_GetValue(1145,目的地,cp);
     if(destination=="")
     {
         FW_Dialog1(请填写 "目的地");
-        Goto(-1);
+        return(0);
     }
-    lxfs = FW_GetValue(1145,联系方式,cp);
-    if(lxfs=="")
+    phone = FW_GetValue(1145,联系方式,cp);
+    if(phone=="")
     {
         FW_Dialog1(请填写 "联系方式");
-        Goto(-1);
+        return(0);
     }
-    yyjssj = FW_SpanDateTime(dw, str2, 1);
-    pd = FW_SpanDateTime(dw, bksy, 1);
-    pp = 60.00;
-    if (pd < pp)
+    d结束时长 = FW_SpanDateTime(s结束时间, str2, 1);
+    d预约分钟数 = FW_SpanDateTime(s结束时间, s开始时间, 1);
+    d预约分钟数标准 = 60.00;
+    if (d预约分钟数 < d预约分钟数标准)
     {
         FW_Dialog1(预约时间至少需要一小时);
-        Goto(-1);		
+        return(0);
     }
-    zt = FW_GetValue(1145,状态,cp);
-    if(zt!="可预约")
+    s车辆状态 = FW_GetValue(1145,状态,cp);
+    if(s车辆状态!="可预约")
     {
         FW_Dialog1(该车辆不可预约，请选择其他车辆);
-        Goto(-1);
+        return(0);
     }
-    if(yykssj > yyjssj)
+    if(d开始时长 > d结束时长)
     {
         FW_Dialog1(预约的开始时间大于预约的结束时间);
-        Goto(-1);
+        return(0);
     }
     is_continue = FW_Dialog1(确认信息填写无误并继续进行预约吗？);
     if(is_continue == 0)
     {
-        Goto(-1);
+        return(0);
     }
-    US = FW_GetUserID(2);
+    current_us = FW_GetUserID(2);
 }
 SERVER
 {
-    rq = FW_GetSysDate(0);
-    flag=0;
+    flag = 0;
 //校验预约时间是否冲突
-    sCon="1156, bm@车牌号,yyrq@预约日期";
-    st2=FW_FindRecords(sCon,0);
-    if(st2.mError!=0)
+    st2=FW_FindRecords("1156, s车牌号@车牌号, s预约日期@预约日期", 0);
+    if(st2.mError == 0)
     {
-//FW_Dialog1(没有找到记录);
-        flag=1;
-        //return(GotoClient);	
-    }
-    if(flag != 1)
-    {
-        cc=st2.count;
-//FW_Dialog1(cc);
-        for(i=0;i<cc;i++)
+        total_1156=st2.count;
+        for(i=0; i<total_1156; i++)
         {
-            red=st2.RecordNoList.Get[i];
-            zkssj=FW_GetValue(1156,开始使用时间,red);
-            kssj = FW_SpanDateTime(zkssj, str2, 1);	
-            zjssj=FW_GetValue(1156,结束使用时间,red);
-            jssj = FW_SpanDateTime(zjssj, str2, 1);	
-            ctr = FW_GetValue(1156,申请人姓名,red);
-            ctkssj=FW_GetValue(1156,开始使用时间,red);
-            ctjssj=FW_GetValue(1156,结束使用时间,red);
-//FW_Dialog1(开始进入情况比对);
-            if((kssj < yykssj) && (yykssj < jssj))
+            red = st2.RecordNoList.Get[i];
+            s1156开始时间 = FW_GetValue(1156,开始使用时间,red);
+            d1156开始时长 = FW_SpanDateTime(s1156开始时间, str2, 1);
+            s1156结束时间 = FW_GetValue(1156,结束使用时间,red);
+            d1156结束时长 = FW_SpanDateTime(s1156结束时间, str2, 1);
+            s1156申请人姓名 = FW_GetValue(1156,申请人姓名,red);
+            if((d1156开始时长 < d开始时长) && (d开始时长 < d1156结束时长))
             {
-                //FW_Dialog1(情况1);
                 flag=2;
-                break;
-            }else if((kssj < yyjssj) && (yyjssj < jssj))
+                return(GotoClient);
+            }else if((d1156开始时长 < d结束时长) && (d结束时长 < d1156结束时长))
             {
-                //FW_Dialog1(情况2);
                 flag=2;
-                break;		
-            }else if((kssj >= yykssj) && (jssj <= yyjssj))
+                return(GotoClient);
+            }else if((d1156开始时长 >= d开始时长) && (d1156结束时长 <= d结束时长))
             {
-                //FW_Dialog1(情况3);
                 flag=2;
-                break;		
+                return(GotoClient);
             }
         }
     }
-    if(flag >1)
-    {
-        return(GotoClient);
-    }
+
 //取得申请人的姓名
-    Con="1098,US@UserName";
-    st21=FW_FindRecords(Con,1);
-    if(st21.mError!=0)
-    {
-        flag=3;
-        return(GotoClient);
-    }
-    rec=st21.RecordNoList.Get[0];
-    xm = FW_GetValue(1098,姓名,rec);
-    groupid = FW_GetValue(1098,现属部门,rec);
-    np = FW_AddNewPage_w( 1156 );
+    st21 = FW_FindRecords("1098, current_us@UserName", 1);
+    rec = st21.RecordNoList.Get[0];
+    current_name = FW_GetValue(1098,姓名,rec);
+    current_groupid = FW_GetValue(1098,现属部门,rec);
+    np = FW_AddNewPage_w(1156);
     FW_SetValue_w(1156,是否已隐藏,np,"否");
-    FW_SetValue_w(1156,车牌号,np,bm);
+    FW_SetValue_w(1156,车牌号,np,s车牌号);
     FW_SetValue_w(1156,社区,np,s社区);
-    FW_SetValue_w(1156,预约事宜,np,yysy);
-    FW_SetValue_w(1156,申请人工号,np,US);
-    FW_SetValue_w(1156,申请人姓名,np,xm);
-    FW_SetValue_w(1156,部门,np,groupid);
-    FW_SetValue_w(1156,申请日期,np,rq);
-    FW_SetValue_w(1156,预约日期,np,yyrq);
-    FW_SetValue_w(1156,开始使用时间,np,bksy);
-    FW_SetValue_w(1156,结束使用时间,np,dw);
+    FW_SetValue_w(1156,预约事宜,np,s预约事宜);
+    FW_SetValue_w(1156,申请人工号,np,current_us);
+    FW_SetValue_w(1156,申请人姓名,np,current_name);
+    FW_SetValue_w(1156,部门,np,current_groupid);
+    FW_SetValue_w(1156,申请日期,np,s申请日期);
+    FW_SetValue_w(1156,预约日期,np,s预约日期);
+    FW_SetValue_w(1156,开始使用时间,np,s开始时间);
+    FW_SetValue_w(1156,结束使用时间,np,s结束时间);
     FW_SetValue_w(1156,出发地,np,starting);
     FW_SetValue_w(1156,目的地,np,destination);
-    FW_SetValue_w(1156,联系方式,np,lxfs);
+    FW_SetValue_w(1156,联系方式,np,phone);
     FW_SetValue_w(1156,状态,np,"预约成功待通知司机");
-    
-    FW_SetValue_w(1145,预约日期,cp,"");
-    FW_SetValue_w(1145,开始使用时间,cp,"");
-    FW_SetValue_w(1145,结束使用时间,cp,"");
-    FW_SetValue_w(1145,出发地,cp,"");
-    FW_SetValue_w(1145,目的地,cp,"");
-    FW_SetValue_w(1145,联系方式,cp,"");
-    FW_SetValue_w(1145,社区,cp,"");
-    FW_SetValue_w(1145,预约事宜,cp,"");
     return(GotoClient);
 }
 CLIENT
 {
     if(flag == 2)
     {
-        sm = "该预约与"+ctr+ctkssj+"至"+ctjssj+"的预约时间段存在冲突";
-        FW_Dialog1(sm);
-        Goto(-1);
+        tips = "该预约与"+s1156申请人姓名+s1156开始时间+"至"+s1156结束时间+"的预约时间段存在冲突";
+        FW_Dialog1(tips);
+        return(0);
     }
-    FW_GotoFormPage(1156, np);
-}
-SERVER
-{
-    return(GotoClient);
-}
-CLIENT
-{
-    FW_SetValue_w(1156,是否已隐藏,np,"否");
-    FW_SetValue_w(1156,预约事宜,np,yysy);
-    FW_SetValue_w(1156,车牌号,np,bm);
-    FW_SetValue_w(1156,社区,np,s社区);
-    FW_SetValue_w(1156,申请人工号,np,US);
-    FW_SetValue_w(1156,申请人姓名,np,xm);
-    FW_SetValue_w(1156,部门,np,groupid);
-    FW_SetValue_w(1156,申请日期,np,rq);
-    FW_SetValue_w(1156,预约日期,np,yyrq);
-    FW_SetValue_w(1156,开始使用时间,np,bksy);
-    FW_SetValue_w(1156,结束使用时间,np,dw);
-    FW_SetValue_w(1156,状态,np,"预约成功待通知司机");
-    FW_SetValue_w(1156,出发地,np,starting);
-    FW_SetValue_w(1156,目的地,np,destination);
-    FW_SetValue_w(1156,联系方式,np,lxfs);
-
-    FW_SetValue_w(1145,预约日期,cp,"");
-    FW_SetValue_w(1145,开始使用时间,cp,"");
-    FW_SetValue_w(1145,结束使用时间,cp,"");
-    FW_SetValue_w(1145,出发地,cp,"");
-    FW_SetValue_w(1145,目的地,cp,"");
-    FW_SetValue_w(1145,联系方式,cp,"");
-    FW_SetValue_w(1145,社区,cp,"");
-    FW_SetValue_w(1145,预约事宜,cp,"");
     FW_SetValue_w(1145, Field14, cp, "ClientListWinRefresh");
     FW_Dialog1(预约成功！);
 }

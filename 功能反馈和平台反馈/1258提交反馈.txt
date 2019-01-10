@@ -1,0 +1,60 @@
+FIELD
+{
+    .1258.处理状态;
+    .1258.反馈日期;
+    .1258.处理日期;
+    .1258.反馈主题;
+    .1258.反馈内容;
+}
+VAR
+{
+    int cp;
+    String status_handle, subject, content, date_current;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    status_handle = FW_GetValue(1258, 处理状态, cp);
+    if(status_handle == "已处理")
+    {
+        FW_Dialog1(此反馈已处理过，无需重复提交!);
+        return(0);
+    }else if(status_handle == "处理中")
+    {
+        FW_Dialog1(此反馈正在处理中，无需重复提交！);
+        return(0);
+    }
+
+    subject = FW_GetValue(1258, 反馈主题, cp);
+    if(subject == "")
+    {
+        FW_Dialog1(反馈主题不能为空！);
+        return(0);
+    }
+    FW_SetValue_w(1258, 反馈主题, cp, subject);
+    
+    content = FW_GetValue(1258, 反馈内容, cp);
+    if(content == "")
+    {
+        FW_Dialog1(反馈内容不能为空！);
+        return(0);
+    }
+    FW_SetValue_w(1258, 反馈内容, cp, content);
+    date_current = FW_GetSysDate(0);
+}
+SERVER
+{
+    FW_SetValue_w(1258, 反馈主题, cp, subject);
+    FW_SetValue_w(1258, 反馈内容, cp, content);
+    FW_SetValue_w(1258, 处理状态, cp, "已提交");
+    FW_SetValue_w(1258, 处理日期, cp, "待确认");
+    FW_SetValue_w(1258, 反馈日期, cp, date_current);
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_SetValue_w(1258, 处理状态, cp, "已提交");
+    FW_SetValue_w(1258, 处理日期, cp, "待确认");
+    FW_SetValue_w(1258, 反馈日期, cp, date_current);
+    FW_Dialog1(反馈提交成功！);
+}
