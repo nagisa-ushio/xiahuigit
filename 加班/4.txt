@@ -1,0 +1,228 @@
+FIELD
+{
+	.1139.姓名;
+	.1139.申请日期;
+	.1139.状态;
+	.1139.UserName1;
+	.1139.UserName2;
+	.1139.UserName3;
+	.1139.UserName4;
+	.1139.POST1;
+	.1139.GroupID1;
+	.1139.POST2;
+	.1139.GroupID2;
+	.1139.POST3;
+	.1139.GroupID3;
+	.1139.POST4;
+	.1139.GroupID4;
+	.1139.当前待处理标记Page;
+	.1139.当前待处理标记Page备用1;
+	.1139.当前待处理标记Page备用2;
+	.1139.预计加班起始日期;
+	.1139.预计加班起始时间;
+	.1139.预计加班结束日期;
+	.1139.预计加班结束时间;
+	.1139.预计加班共计小时数;
+	.1139.实际加班起始日期;
+	.1139.实际加班起始时间;
+	.1139.实际加班结束日期;
+	.1139.实际加班结束时间;
+	.1139.实际加班共计小时数;
+	.1087.姓名;
+	.1087.UserName;
+	.1087.POST;
+	.1235.事件状态;
+	.1235.处理人姓名;
+	.1235.处理人工号;
+	.1235.处理人职务;
+	.1235.处理人部门;
+	.1235.处理日期;
+	.1235.审批状态;
+	.1235.LinkToFormID;
+	.1235.LinkToFormPage;
+	.1235.提交人姓名;
+	.1235.提交人工号;
+	.1235.内容;
+	.1235.提交日期;
+	.1143.UserName;
+	.1143.月度加班累计;
+	.1143.季度加班累计;
+	.1143.年度加班累计;
+	.1143.在职加班累计;
+	.1143.可调休共计;
+	.1143.本季度可调休;
+	.1143.月调休可透支时间;
+	.1143.个人季度加班上限;
+	.1143.上月调休透支时间;
+}
+VAR
+{
+	String US, USS, zt, str, Srch1, 当前待处理标记I2S, 当前用户工号S, 审批操作S, 审批状态S, 查找处理人条件S, 处理人工号S, 处理人姓名S, 提交人姓名S, 提交人工号S, 申请日期S, 处理人职务S, 处理人部门S, 处理日期S;
+	Struct2 st21, st2;
+	int cp, flag, rec, i, 查找处理人总数I, 当前页I, 当前待处理标记I, 当前待处理标记I2, 新纪录I;
+	double jbsj, ydjb, jdjb, ndjb, zzjb, txsj, grsx, jdjbz, kjsj, bjdtx, D月调休可透支时间, D月调休已透支, wjsj, D抵扣上月透支时间剩余, D预计月调休可透支时间,ling, D预计月调休已透支, D预计可调休共计,D上月透支时间;
+}
+CLIENT
+{
+	flag = 0;
+	cp = FW_GetCurrentRecNum();
+	//str="1";
+	str = CURRENT.sVALUE;
+	if (str == "0")
+	{
+		//FW_Dialog1(等待);
+		return (0);
+	}
+	if (str == "1")
+	{
+		flag = 1;
+		zt = "已通过";
+		//FW_Dialog1(通过);
+	}
+	当前页I = FW_GetCurrentRecNum();
+	if (str == "3")
+	{
+		flag = 3;
+		提交人姓名S = FW_GetValue(1139, 姓名, 当前页I);
+		提交人工号S = FW_GetValue(1139, UserName1, 当前页I);
+		申请日期S = FW_GetValue(1139, 申请日期, 当前页I);
+
+		处理人职务S = FW_GetValue(1139, POST1, 当前页I);
+		处理人部门S = FW_GetValue(1139, GroupID1, 当前页I);
+		处理日期S = FW_GetSysDate(0);
+		zt = "待加班人确认";
+		//FW_Dialog1(拒绝);
+	}
+	处理日期S = FW_GetSysDate(0);
+	US = FW_GetUserID(2);
+	USS = FW_GetValue(1139, UserName1, cp);
+	jbsj = FW_GetValue(1139, 实际加班共计小时数, cp);
+}
+SERVER
+{
+	当前待处理标记I = FW_GetValue(1139, 当前待处理标记Page, cp);
+	当前待处理标记I2 = FW_GetValue(1139, 当前待处理标记Page备用1, cp);
+	当前待处理标记I2S = FW_GetValue(1139, 当前待处理标记Page备用1, cp);
+	FW_SetValue_w(1235, 事件状态, 当前待处理标记I, "已处理");
+	FW_SetValue_w(1235, 处理日期, 当前待处理标记I, 处理日期S);
+	if (当前待处理标记I2S != "")
+	{
+		FW_SetValue_w(1235, 事件状态, 当前待处理标记I2, "已处理");
+		FW_SetValue_w(1235, 处理日期, 当前待处理标记I2, 处理日期S);
+		FW_SetValue_w(1139, 当前待处理标记Page备用1, 当前页I, "");
+	}
+	//做加班时间计算
+	if (flag == 1)
+	{
+		Srch1 = "1143,USS@UserName";
+		st21 = FW_FindRecords(Srch1, 1);
+		if (st21.mError != 0)
+		{
+			flag = 2;
+			return (GotoClient);
+		}
+		rec = st21.RecordNoList.Get[0];
+
+		//上月透支时间计算
+		ling=0.00;
+		D上月透支时间 = FW_GetValue(1143,上月调休透支时间,rec);
+		D抵扣上月透支时间剩余 = jbsj;
+		if(D上月透支时间 > ling)
+		{
+			if(D抵扣上月透支时间剩余 <= D上月透支时间)
+			{
+				D上月透支时间 = D上月透支时间 - D抵扣上月透支时间剩余;
+				D抵扣上月透支时间剩余 = ling;
+			}
+			else if(D抵扣上月透支时间剩余 > D上月透支时间)
+			{
+				D抵扣上月透支时间剩余 = D抵扣上月透支时间剩余 -D上月透支时间;
+				D上月透支时间 = ling;
+			}
+		}
+		FW_SetValue_w(1143,上月调休透支时间,rec,D上月透支时间);
+
+		//个人调休透支时间计算
+		if(D抵扣上月透支时间剩余 <= ling){
+		}else
+		{
+			D月调休可透支时间 = FW_GetValue(1143, 月调休可透支时间, rec);
+			D月调休已透支 = 7.5 - D月调休可透支时间;
+			D抵扣上月透支时间剩余 = D抵扣上月透支时间剩余;
+			if (D抵扣上月透支时间剩余 <= D月调休已透支)
+			{
+				D月调休可透支时间 = D月调休可透支时间 + D抵扣上月透支时间剩余;
+			}
+			else if (D抵扣上月透支时间剩余 > D月调休已透支)
+			{
+				D月调休可透支时间 = 7.5;
+			}
+			FW_SetValue_w(1143, 月调休可透支时间, rec, D月调休可透支时间);
+		}
+
+		//可调休共计和本季度可调休计算
+		txsj = FW_GetValue(1143, 可调休共计, rec);
+		bjdtx = FW_GetValue(1143, 本季度可调休, rec);
+		txsj = txsj + jbsj;
+		bjdtx = bjdtx + jbsj;
+
+		ydjb = FW_GetValue(1143, 月度加班累计, rec);
+		ydjb = ydjb + jbsj;
+		jdjb = FW_GetValue(1143, 季度加班累计, rec);
+		jdjb = jdjb + jbsj;
+		ndjb = FW_GetValue(1143, 年度加班累计, rec);
+		ndjb = ndjb + jbsj;
+		zzjb = FW_GetValue(1143, 在职加班累计, rec);
+		zzjb = zzjb + jbsj;
+		FW_SetValue_w(1143, 月度加班累计, rec, ydjb);
+		FW_SetValue_w(1143, 季度加班累计, rec, jdjb);
+		FW_SetValue_w(1143, 年度加班累计, rec, ndjb);
+		FW_SetValue_w(1143, 在职加班累计, rec, zzjb);
+		FW_SetValue_w(1143, 可调休共计, rec, txsj);
+		FW_SetValue_w(1143, 本季度可调休, rec, bjdtx);
+		FW_SetValue_w(1235, 审批状态, 当前待处理标记I, zt);
+		if (当前待处理标记I2S != "")
+		{
+			FW_SetValue_w(1235, 审批状态, 当前待处理标记I2, zt);
+		}
+	}
+	else if (flag == 3)
+	{
+		新纪录I = FW_AddNewPage_w(1235);
+		FW_SetValue_w(1139, 当前待处理标记Page, 当前页I, 新纪录I);
+		FW_SetValue_w(1235, 处理人工号, 新纪录I, 提交人工号S);
+		FW_SetValue_w(1235, 处理人姓名, 新纪录I, 提交人姓名S);
+		FW_SetValue_w(1235, 处理人部门, 新纪录I, 处理人部门S);
+		FW_SetValue_w(1235, 处理人职务, 新纪录I, 处理人职务S);
+		FW_SetValue_w(1235, 事件状态, 新纪录I, "待处理");
+		FW_SetValue_w(1235, 审批状态, 新纪录I, zt);
+		FW_SetValue_w(1235, LinkToFormID, 新纪录I, "1139");
+		FW_SetValue_w(1235, LinkToFormPage, 新纪录I, 当前页I);
+		FW_SetValue_w(1235, 提交人姓名, 新纪录I, 提交人姓名S);
+		FW_SetValue_w(1235, 提交人工号, 新纪录I, 提交人工号S);
+		FW_SetValue_w(1235, 内容, 新纪录I, "加班申请单");
+		FW_SetValue_w(1235, 提交日期, 新纪录I, 申请日期S);
+	}
+	FW_SetValue_w(1139, UserName4, cp, US);
+	FW_SetValue_w(1139, 状态, cp, zt);
+	return (GotoClient);
+}
+CLIENT
+{
+	FW_SetValue_w(1139, UserName4, cp, US);
+	FW_SetValue_w(1139, 状态, cp, zt);
+	if (flag == 2)
+	{
+		FW_Dialog1(未找到该申请人的人员档案，请联系相关负责人先添加 !);
+		return (0);
+	}
+	else if (flag == 1)
+	{
+		FW_Dialog1(此申请单现已通过！);
+	}
+	else if (flag == 3)
+	{
+		FW_Dialog1(已进行拒绝！);
+	}
+}
+ 

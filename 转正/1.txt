@@ -1,0 +1,209 @@
+FIELD
+{
+	.1102.试用部门;
+	.1102.入职时间;
+	.1102.试用职务;
+	.1102.申请转正时间;
+	.1102.填表日期;
+	.1102.工作小结;
+	.1102.申请人签名;
+	.1102.员工状态;
+        
+	.1134.状态;
+	.1134.POST1;
+	.1134.POST2;
+	.1134.UserName1;
+	.1134.姓名;
+	.1134.GroupID1;
+	.1134.GroupID2;
+	.1134.当前待处理标记Page;
+	.1134.当前待处理标记Page备用1;
+
+	.1087.UserName;
+	.1087.归属范围;
+	.1087.POST;
+	.1087.GroupID;
+	.1087.姓名;
+
+	.1235.事件状态;
+	.1235.处理人姓名;
+	.1235.处理人工号;
+	.1235.处理人职务;
+	.1235.处理人部门;
+	.1235.处理日期;
+	.1235.审批状态;
+	.1235.LinkToFormID;
+	.1235.LinkToFormPage;
+	.1235.提交人姓名;
+	.1235.提交人工号;
+	.1235.内容;
+	.1235.提交日期;
+}
+VAR
+{
+	String trialDepartment,hiredate,trialPosition,fullMember,fillInDate,workSummary,signature,zt, applydate, str, post, cache1, cache2;
+	int currentPage, flag, total, i, LinkToFormID_int, LinkToFormPage_int, newPage, rec;
+	String 事件状态s, 处理人姓名s, 处理人工号s, 处理人职务s, 处理人部门s, 处理日期s, 审批状态s, 提交人姓名s, 提交人工号s, 提交人职务s, 内容s, 提交日期s, scon, 域名s, 归属范围s, 提交人部门s;
+	Struct2 st21;
+        StringList sl01;
+}
+CLIENT
+{
+        zt = FW_GetValue(1102,员工状态,currentPage);
+	if(zt != "试用期")
+	{
+		FW_Dialog1(员工状态不在试用期，无法进行转正申请！);
+		return(0);
+	}
+	
+	trialDepartment = FW_GetValue(1102,试用部门,currentPage);
+	if(trialDepartment=="")
+	{
+		FW_Dialog1(请填写 "试用部门");
+		return(0);
+	}
+	hiredate = FW_GetValue(1102,入职时间,currentPage);
+	if(hiredate=="")
+	{
+		FW_Dialog1(请填写 "入职时间");
+		return(0);
+	}
+	trialPosition = FW_GetValue(1102,试用职务,currentPage);
+	if(trialPosition == "")
+	{
+		FW_Dialog1(请填写 "试用职务");
+		return(0);
+	}
+	fullMember = FW_GetValue(1102,申请转正时间,currentPage);
+	if(fullMember=="")
+	{
+		FW_Dialog1(请填写 "申请转正时间");
+		return(0);
+	}
+	fillInDate = FW_GetValue(1102,填表日期,currentPage);
+	if(fillInDate=="")
+	{
+		FW_Dialog1(请填写 "填表日期");
+		return(0);
+	}
+	workSummary = FW_GetValue(1102,工作小结,currentPage);
+	if(workSummary=="")
+	{
+		FW_Dialog1(请填写 "工作小结");
+		return(0);
+	}
+	signature = FW_GetValue(1102,申请人签名,currentPage);
+	if(signature == "")
+	{
+		FW_Dialog1(请填写 "申请人签名");
+		return(0);
+	}
+	str = CURRENT.sVALUE;
+	if (str == "0")
+	{
+		return (0);
+	}
+
+	applydate = FW_GetSysDate(0);
+	currentPage = FW_GetCurrentRecNum();
+	提交人工号s = FW_GetUserID(2);
+	提交人姓名s = FW_GetValue(1134, 姓名, currentPage);
+	事件状态s = "待处理";
+	处理日期s = "";
+	LinkToFormID_int = 1134;
+	LinkToFormPage_int = currentPage;
+	内容s = "转正申请";
+	提交日期s = applydate;
+}
+SERVER
+{
+        st21 = FW_FindRecords("1087,提交人工号s@UserName",1);
+        if(st21.mError != 0)
+        {
+                flag = 1;
+                return(GotoClient);
+        }
+        rec = st21.RecordNoList.Get[0];
+        提交人职务s = FW_GetValue(1087,POST,rec);
+        归属范围s = FW_GetValue(1087,归属范围,rec);
+        提交人部门s = FW_GetValue(1087,GroupID,rec);
+        if(提交人职务s == "主管")
+        {
+	        处理人职务s = "服务总监";
+                处理人部门s = "";
+        }else if(归属范围s == "前线")
+        {
+                处理人职务s = "主管";
+                处理人部门s = 提交人部门s;
+        }else if(归属范围s == "后台")
+        {
+                处理人职务s = "运营总监";
+                处理人部门s = "";
+        }
+        审批状态s = "待" + 处理人职务s + "审批";
+        FW_SetValue_w(1134,UserName1,currentPage,提交人工号s);
+        FW_SetValue_w(1134,GroupID1,currentPage,提交人部门s);
+        FW_SetValue_w(1134,POST1,currentPage,提交人职务s);
+        FW_SetValue_w(1134,GroupID2,currentPage,处理人部门s);
+        FW_SetValue_w(1134,POST2,currentPage,处理人职务s);
+	FW_SetValue_w(1134, 状态, currentPage, 审批状态s);
+
+        处理人部门s = FW_GetValue(1134,GroupID2,currentPage);
+        if(处理人部门s != "")
+        {
+                st21 = FW_FindRecords("1087,处理人职务s@POST,处理人部门s@GroupID",1);
+        }else{
+                st21 = FW_FindRecords("1087,处理人职务s@POST",1);
+        }
+        if(st21.mError != 0)
+        {
+                flag = 2;
+                return(GotoClient);
+        }
+        total = st21.count;
+        sl01 = [1134, "当前待处理标记Page", "当前待处理标记Page备用1" ];
+        for (i = 0; i < total; i++)
+        {
+                rec = st21.RecordNoList.Get[i];
+                域名s = sl01.Get[i];
+                处理人工号s = FW_GetValue(1087, UserName, rec);
+                处理人姓名s = FW_GetValue(1087, 姓名, rec);
+
+                newPage = FW_AddNewPage_w(1235);
+                FW_SetValue_w(1134, 域名s, currentPage, newPage);
+                FW_SetValue_w(1235, 事件状态, newPage, 事件状态s);
+                FW_SetValue_w(1235, 处理人姓名, newPage, 处理人姓名s);
+                FW_SetValue_w(1235, 处理人工号, newPage, 处理人工号s);
+                FW_SetValue_w(1235, 处理人职务, newPage, 处理人职务s);
+                FW_SetValue_w(1235, 处理人部门, newPage, 处理人部门s);
+                FW_SetValue_w(1235, 处理日期, newPage, 处理日期s);
+                FW_SetValue_w(1235, 审批状态, newPage, 审批状态s);
+                FW_SetValue_w(1235, LinkToFormID, newPage, LinkToFormID_int);
+                FW_SetValue_w(1235, LinkToFormPage, newPage, LinkToFormPage_int);
+                FW_SetValue_w(1235, 提交人姓名, newPage, 提交人姓名s);
+                FW_SetValue_w(1235, 提交人工号, newPage, 提交人工号s);
+                FW_SetValue_w(1235, 内容, newPage, 内容s);
+                FW_SetValue_w(1235, 提交日期, newPage, 提交日期s);
+        }
+        return (GotoClient);
+}
+CLIENT
+{
+        if(flag == 1)
+        {
+                FW_Dialog1(failed to search applicantNo.！);
+                return(0);
+        }else if(flag == 2)
+        {
+                FW_Dialog1(failed to search nextLevel!);
+                return(0);
+        }
+        FW_SetValue_w(1134,UserName1,currentPage,提交人工号s);
+        FW_SetValue_w(1134,GroupID1,currentPage,提交人部门s);
+        FW_SetValue_w(1134,POST1,currentPage,提交人职务s);
+        FW_SetValue_w(1134,GroupID2,currentPage,处理人部门s);
+        FW_SetValue_w(1134,POST2,currentPage,处理人职务s);
+	FW_SetValue_w(1134, 状态, currentPage, 审批状态s);
+	FW_Dialog1(转正申请提交成功！);
+}
+ 

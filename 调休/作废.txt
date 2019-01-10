@@ -1,0 +1,245 @@
+FIELD
+{
+        .1044.UserName1;
+        .1044.UserName3;
+        .1044.UserName4;
+        .1044.状态;
+        .1044.调休共计;
+        .1044.当前待处理标记Page;
+        .1044.当前待处理标记Page备用1;
+        .1044.将透支时间;
+        .1143.可调休共计;
+        .1143.月调休可透支时间;
+        .1143.本季度可调休;
+        .1143.季度已调休累计;
+        .1143.年度已调休累计;
+        .1143.在职已调休累计;
+	.1143.弹性调休时间;
+	.1143.弹性调休剩余次数;
+        .1143.申请中调休;
+}
+VAR
+{
+        int cp,flag,rec,pendingmarking,pendingmarking2,elasticnumber;
+        double standard,elastictime,overrafttiming,overdraftTime,overrafttime2,presentrest,adjustablerest,quartelyrestnow,quartelyrestused,yearlyrestused,totallyrestused,applyingtime;
+        String us,username1,username3,username4,status,condition;
+        Struct2 st21;
+}
+CLIENT
+{
+        us = FW_GetUserID(2);
+        cp = FW_GetCurrentRecNum();
+        status = FW_GetValue(1044,状态,cp);
+        username1 = FW_GetValue(1044,UserName1,cp);
+        username3 = FW_GetValue(1044,UserName3,cp);
+        username4 = FW_GetValue(1044,UserName4,cp);
+}
+SERVER
+{
+        if((status == "未通过作废")||(status == "已通过作废")||(status == "已作废"))
+        {
+                flag = 4;
+                return(GotoClient);
+        }else if(status == "待提交")
+        {
+                flag = 7;
+                return(GotoClient);
+        }
+        pendingmarking = FW_GetValue(1044,当前待处理标记Page,cp);
+        pendingmarking2 = FW_GetValue(1044,当前待处理标记Page备用1,cp);
+        if(status != "已通过")
+        {
+                if(us == username1)
+                {
+                        flag = 1;
+                        condition = "1143,username1@UserName";
+                        st21=FW_FindRecords(condition,1);
+                        if(st21.mError!=0)
+                        {
+                                flag=3;
+                                return(GotoClient);
+                        }
+                        rec = st21.RecordNoList.Get[0];
+                        FW_SetValue_w(1235,事件状态,pendingmarking,"未通过作废");
+                        if(pendingmarking2 > 0)
+                        {
+                                FW_SetValue_w(1235,事件状态,pendingmarking2,"未通过作废");
+                        }
+                        FW_SetValue_w(1044,状态,cp,"未通过作废");
+			FW_SetValue_w(1044,UserName1,cp,"未通过作废");
+                        overdraftTime = FW_GetValue(1143,月调休可透支时间,rec);
+                        adjustablerest = FW_GetValue(1143,可调休共计,rec);
+                        quartelyrestnow = FW_GetValue(1143,本季度可调休,rec);
+                        presentrest = FW_GetValue(1044,调休共计,cp);
+                        quartelyrestused = FW_GetValue(1143,季度已调休累计,rec);
+                        quartelyrestused = quartelyrestused - presentrest;
+                        FW_SetValue_w(1143,季度已调休累计,rec,quartelyrestused);
+                        
+                        elastictime = FW_GetValue(1143,弹性调休时间,rec);
+                        elasticnumber = FW_GetValue(1143,弹性调休剩余次数,rec);
+                        if((elasticnumber < 2)&&(presentrest < elastictime))
+                        {
+                                elasticnumber = elasticnumber + 1;
+                                FW_SetValue_w(1143,弹性调休剩余次数,rec,elasticnumber);
+                        }
+
+                        standard = 7.50;
+                        adjustablerest = adjustablerest + presentrest;
+                        quartelyrestnow = quartelyrestnow + presentrest;
+                        if(overdraftTime >= standard){
+                        }else if(overdraftTime < standard)
+                        {
+                                overrafttime2 = overdraftTime + presentrest;
+                                if(overrafttime2 > standard)
+                                {
+                                        overrafttime2 = 7.50;
+                                }
+                                FW_SetValue_w(1143,月调休可透支时间,rec,overrafttime2);
+                        }
+                        FW_SetValue_w(1143,本季度可调休,rec,quartelyrestnow);
+                        FW_SetValue_w(1143,可调休共计,rec,adjustablerest);
+                        
+                        applyingtime = FW_GetValue(1143,申请中调休,rec);
+                        applyingtime = applyingtime - presentrest;
+                        if(applyingtime < 0)
+                        {
+                                applyingtime = 0;
+                        }
+                        FW_SetValue_w(1143,申请中调休,rec,applyingtime);
+                        return(GotoClient);
+                }else if(us != username1)
+                {
+                        flag = 2;
+                        return(GotoClient);
+                }
+        }else if(status == "已通过")
+        {       
+                if((us == username3)||(us == username4))
+                {
+                        condition = "1143,username1@UserName";
+                        st21=FW_FindRecords(condition,1);
+                        if(st21.mError!=0)
+                        {
+                                flag=3;
+                                return(GotoClient);
+                        }
+                        flag = 5;
+                        if(pendingmarking > 0)
+                        {
+                                FW_SetValue_w(1235,事件状态,pendingmarking,"已通过作废");
+                        }
+                        FW_SetValue_w(1044,状态,cp,"已通过作废");
+                        rec=st21.RecordNoList.Get[0];
+                        presentrest = FW_GetValue(1044,调休共计,cp);
+                        adjustablerest = FW_GetValue(1143,可调休共计,rec);
+                        quartelyrestnow = FW_GetValue(1143,本季度可调休,rec);
+                        quartelyrestused = FW_GetValue(1143,季度已调休累计,rec);
+                        yearlyrestused = FW_GetValue(1143,年度已调休累计,rec);
+                        totallyrestused = FW_GetValue(1143,在职已调休累计,rec);
+                        quartelyrestused = quartelyrestused - presentrest;
+                        yearlyrestused = yearlyrestused - presentrest;
+                        totallyrestused = totallyrestused - presentrest;
+                        if(quartelyrestused < 0)
+                        {
+                                quartelyrestused = 0;
+                        }
+                        if(yearlyrestused < 0)
+                        {
+                                yearlyrestused = 0;
+                        }
+                        if(totallyrestused < 0)
+                        {
+                                totallyrestused = 0;
+                        }
+                        elastictime = FW_GetValue(1143,弹性调休时间,rec);
+                        elasticnumber = FW_GetValue(1143,弹性调休剩余次数,rec);
+                        if((elasticnumber < 2)&&(presentrest < elastictime))
+                        {
+                                elasticnumber = elasticnumber + 1;
+                                FW_SetValue_w(1143,弹性调休剩余次数,rec,elasticnumber);
+                        }
+                        overdraftTime = FW_GetValue(1143,月调休可透支时间,rec);
+                        standard = 7.50;
+                        adjustablerest = adjustablerest + presentrest;
+                        quartelyrestnow = quartelyrestnow + presentrest;
+                        if(overdraftTime >= standard){
+                        }else if(overdraftTime < standard)
+                        {
+                                overrafttime2 = overdraftTime + presentrest;
+                                if(overrafttime2 > standard)
+                                {
+                                        overrafttime2 = 7.50;
+                                }
+                                FW_SetValue_w(1143,月调休可透支时间,rec,overrafttime2);
+                        }
+                        FW_SetValue_w(1143,本季度可调休,rec,quartelyrestnow);
+                        FW_SetValue_w(1143,可调休共计,rec,adjustablerest);
+                        FW_SetValue_w(1143,季度已调休累计,rec,quartelyrestused);
+                        FW_SetValue_w(1143,年度已调休累计,rec,yearlyrestused);
+                        FW_SetValue_w(1143,在职已调休累计,rec,totallyrestused);
+                }else
+                {
+                        flag = 6;
+                }
+                return(GotoClient);
+        }
+}
+CLIENT
+{
+        if(flag == 1)
+        {
+                if((elasticnumber < 2)&&(presentrest < elastictime))
+                {
+                        FW_SetValue_w(1143,弹性调休剩余次数,rec,elasticnumber);
+                }
+                FW_SetValue_w(1235,事件状态,pendingmarking,"未通过作废");
+                if(pendingmarking2 > 0)
+                {
+                        FW_SetValue_w(1235,事件状态,pendingmarking2,"未通过作废");
+                }
+                FW_SetValue_w(1044,状态,cp,"未通过作废");
+		FW_SetValue_w(1044,UserName1,cp,"未通过作废");
+                if(overdraftTime < standard)
+                {
+                        FW_SetValue_w(1143,月调休可透支时间,rec,overrafttime2);
+                }
+                FW_SetValue_w(1143,本季度可调休,rec,quartelyrestnow);
+                FW_SetValue_w(1143,可调休共计,rec,adjustablerest);
+                FW_SetValue_w(1143,申请中调休,rec,applyingtime);
+                FW_Dialog1(已将此次申请中的调休单作废，并恢复该申请人相应申请中的调休时间！);
+        }else if(flag == 2)
+        {
+                FW_Dialog1(您不是此申请单的申请人，请联系申请人作废！);
+        }else if(flag == 3)
+        {
+                FW_Dialog1(暂未找到你的考勤数据信息，请联系相关人员添加！);
+        }else if(flag == 4)
+        {
+                FW_Dialog1(此申请单已作废，请勿重复操作！);
+        }else if(flag == 5)
+        {
+                if((elasticnumber < 2)&&(presentrest < elastictime))
+                {
+                        FW_SetValue_w(1143,弹性调休剩余次数,rec,elasticnumber);
+                }
+                if(overdraftTime < standard)
+                {
+                        FW_SetValue_w(1143,月调休可透支时间,rec,overrafttime2);
+                }
+                FW_SetValue_w(1143,本季度可调休,rec,quartelyrestnow);
+                FW_SetValue_w(1143,可调休共计,rec,adjustablerest);
+                if(pendingmarking > 0)
+                {
+                        FW_SetValue_w(1235,事件状态,pendingmarking,"已通过作废");
+                }
+                FW_SetValue_w(1044,状态,cp,"已通过作废");
+                FW_Dialog1(已将此次已通过的调休申请单作废，并恢复该申请人相应申请的调休时间！);
+        }else if(flag == 6)
+        {
+                FW_Dialog1(已通过的申请单只有上级才可以进行作废取消，请联系相关的负责人操作！);
+        }else if(flag == 7)
+        {
+                FW_Dialog1(待提交的申请单无需作废，您可以直接修改申请信息再进行提交或留待下一次申请提交。);
+        }
+        FW_SetValue_w(1044,ReleaseEvent,0,"");
+}

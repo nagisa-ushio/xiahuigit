@@ -1,0 +1,106 @@
+FIELD
+{
+	.1105.状态;
+	.1105.GroupID;
+	.1105.岗位;
+	.1105.入职日期;
+	.1105.UserName;
+	.1105.面谈人;
+	
+	.1104.姓名;
+	.1104.UserName;
+
+	.1098.现属部门;
+	.1098.现任岗位;
+	.1098.入职日期;
+
+	.1087.姓名;
+	.1087.UserName;
+	.1087.GroupID;
+}
+VAR
+{
+	String sNoBar, Srch, sCode, sCon, username, currentUsername, mtr, GD, post, xm, date;
+	int i, np, flag, cc, rec, currentPage;
+	Struct0 st01;
+	Struct2 st20, st2;
+}
+CLIENT
+{
+	i=FW_FormOpen(1105);	
+}
+SERVER
+{
+	return(GotoClient);
+}
+CLIENT
+{
+	currentPage = FW_GetCurrentRecNum();
+	username=FW_GetValue(1104,UserName,currentPage);
+}
+SERVER
+{
+	flag=0;
+	np=-1;
+	Srch="1105,username@UserName";
+	st20=FW_FindRecords(Srch,0);
+	if(st20.mError==0)
+	{
+		cc=st20.count;
+		for(i=0;i<cc;i++)
+		{
+			np=st20.RecordNoList.Get[i];
+			sCode=FW_GetValue(1105,状态,np);
+			if(sCode=="待提交")
+			{
+				flag=1;
+				break;
+			}
+		}
+	}
+	if(flag>0)
+	{
+		return(GotoClient);
+	}
+	GD = FW_GetValue(1098,现属部门,currentPage);
+	post = FW_GetValue(1098,现任岗位,currentPage);
+	xm = FW_GetValue(1104,姓名,currentPage);
+	date = FW_GetValue(1098,入职日期,currentPage);
+	np = FW_AddNewPage_w( 1105 );
+	currentUsername = FW_GetUserID(2);
+	st20 = FW_FindRecords("1087,currentUsername@UserName",1);
+	if(st20.mError == 0)
+	{
+		rec = st20.RecordNoList.Get[i];
+		mtr = FW_GetValue(1087,姓名,rec);
+		FW_SetValue_w(1105,面谈人,np,mtr);
+	}
+	FW_SetValue_w(1105, 状态, np,"待提交");
+	FW_SetValue_w(1105, GroupID, np,GD);
+	FW_SetValue_w(1105, 姓名, np,xm);
+	FW_SetValue_w(1105, UserName, np,username);
+	FW_SetValue_w(1105, 入职日期, np,date);
+	return(GotoClient);
+}
+CLIENT
+{
+	if(flag<1)
+	{
+		if(st20.mError == 0)
+		{
+			FW_SetValue_w(1105,面谈人,np,mtr);
+		}
+		FW_SetValue_w(1105, 状态, np,"待提交");
+		FW_SetValue_w(1105, GroupID, np,GD);
+		FW_SetValue_w(1105, 姓名, np,xm);
+		FW_SetValue_w(1105, UserName, np,username);
+		FW_SetValue_w(1105, 入职日期, np,date);
+	}
+	FW_SetValue_w(1104,ReleaseEvent,0,"");
+}
+SERVER
+{
+	st01.FormID=1105;
+	st01.Record=np;
+	return(st01);
+}

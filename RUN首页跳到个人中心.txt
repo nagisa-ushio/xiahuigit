@@ -1,0 +1,50 @@
+FIELD
+{
+    .1143.UserName;
+}
+VAR
+{
+    String US;
+    Struct0 st00;
+    Struct2 st2;
+    int record_page,is_exist;
+}
+CLIENT
+{
+    US=FW_GetUserID(2);	
+}
+SERVER
+{
+    is_exist = 1;
+    st2=FW_FindRecords("1143,US@UserName",1);
+    if(st2.mError != 0)
+    {
+        is_exist = 0;
+        return(GotoClient);
+    }
+    record_page = st2.RecordNoList.Get[0];
+    return(GotoClient);
+}
+CLIENT
+{
+    if(is_exist == 0)
+    {
+        FW_Dialog1(当前登录用户的人事档案未找到，请联系相关人员添加！);
+        return(0);
+    }
+    FW_GotoFormPage(1182,record_page);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+
+}
+SERVER
+{
+    st00.FormID = 1182;
+    st00.Record = record_page;
+    return(st00);
+}

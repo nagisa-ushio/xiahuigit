@@ -1,0 +1,131 @@
+FIELD
+{
+	.1044.状态;
+	.1044.GroupID;
+	.1044.GroupID1;
+	.1044.GroupID3;
+	.1044.UserName1;
+	.1044.POST4;
+	.1044.POST3;
+	.1044.POST1;
+	.1087.UserName;
+	.1087.GroupID;
+	.1087.姓名;
+	.1087.POST;
+	.1087.归属范围;
+}
+VAR
+{
+	String  srch, scode, scon, username, groupid, name,selfpost,post3,post4,scope;
+	int i, newpage, flag, sum, rec;
+	Struct0 st01;
+	Struct2 st20, st2;
+}
+CLIENT
+{
+	i=FW_FormOpen(1044);	
+}
+SERVER
+{
+	return(GotoClient);
+}
+CLIENT
+{
+	username=FW_GetUserID(2);
+}
+SERVER
+{
+	scon="1087,username@UserName";
+	st2=FW_FindRecords(scon,1);
+	rec=st2.RecordNoList.Get[0];
+	groupid=FW_GetValue(1087,GroupID,rec);
+	name=FW_GetValue(1087,姓名,rec);
+    	selfpost=FW_GetValue(1087,POST,rec);
+   	scope=FW_GetValue(1087,归属范围,rec);
+
+	flag=0;
+	newpage=-1;
+	srch="1044, username@UserName1";
+	st20=FW_FindRecords(srch,0);
+	if(st20.mError==0)
+	{
+		sum=st20.count;
+		for(i=0;i<sum;i++)
+		{
+			newpage=st20.RecordNoList.Get[i];
+			scode=FW_GetValue(1044,状态,newpage);
+			if(scode=="待提交")
+			{
+				flag=1;
+				break;
+			}
+		}
+	}
+	if(flag>0)
+	{
+		return(GotoClient);
+	}
+	newpage = FW_AddNewPage_w( 1044 );
+	if(scope=="前线")
+	{   	
+		flag=-1;
+		post3 = "主管";
+		post4 = "服务总监";
+	}
+	if(scope=="后台")
+	{
+		post3 = "运营总监";
+		post4 = "运营总监";	
+	}
+	if(selfpost=="主管")
+	{   
+		flag=0;
+		post3 = "服务总监";
+		post4 = "服务总监";	
+	}
+	if((selfpost=="服务总监") || (selfpost=="运营总监"))
+	{   
+		flag=0;
+		post3="执行主任";
+		post4="执行主任";
+	}
+	if(flag==-1)
+	{
+		FW_SetValue_w(1044,GroupID3,newpage,groupid);
+	}
+	FW_SetValue_w(1044,POST1,newpage,selfpost);
+	FW_SetValue_w(1044,POST3,newpage,post3);
+	FW_SetValue_w(1044,POST4,newpage,post4);
+	FW_SetValue_w(1044, 状态, newpage,"待提交");
+	FW_SetValue_w(1044, GroupID, newpage,groupid);
+	FW_SetValue_w(1044, GroupID1, newpage,groupid);
+	FW_SetValue_w(1044, 姓名, newpage,name);
+	FW_SetValue_w(1044, UserName1, newpage,username);
+	return(GotoClient);
+}
+CLIENT
+{
+	if(flag<1)
+	{
+		if(flag==-1)
+	        {
+		        FW_SetValue_w(1044,GroupID3,newpage,groupid);
+
+	        }
+                FW_SetValue_w(1044,POST1,newpage,selfpost);
+                FW_SetValue_w(1044,POST3,newpage,post3);
+                FW_SetValue_w(1044,POST4,newpage,post4);
+                FW_SetValue_w(1044, 状态, newpage,"待提交");
+                FW_SetValue_w(1044, GroupID, newpage,groupid);
+                FW_SetValue_w(1044, GroupID1, newpage,groupid);
+                FW_SetValue_w(1044, 姓名, newpage,name);
+                FW_SetValue_w(1044, UserName1, newpage,username);
+        }
+	FW_SetValue_w(1182,ReleaseEvent,0,"");
+}
+SERVER
+{
+	st01.FormID=1044;
+	st01.Record=newpage;
+	return(st01);
+}                       

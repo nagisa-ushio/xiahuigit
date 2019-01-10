@@ -1,0 +1,286 @@
+FIELD
+{
+    .1138.姓名;
+    .1138.申请日期;	
+    .1138.状态;
+    .1138.UserName1;
+    .1138.UserName5;
+    .1138.UserName6;
+    .1138.POST5;
+    .1138.GroupID5;
+    .1138.POST6;
+    .1138.GroupID6;
+    .1138.当前待处理标记Page;
+    .1138.请假共计;
+    .1138.假别;
+
+    .1087.UserName;
+    .1087.POST;
+
+    .1235.事件状态;
+    .1235.处理人姓名;
+    .1235.处理人工号;
+    .1235.处理人职务;
+    .1235.处理人部门;
+    .1235.处理日期;
+    .1235.审批状态;
+    .1235.LinkToFormID;
+    .1235.LinkToFormPage;
+    .1235.提交人姓名;
+    .1235.提交人工号;
+    .1235.内容;
+    .1235.提交日期;
+
+    .1143.月请假累计;
+    .1143.年度请假累计;
+    .1143.月事假累计;
+    .1143.年度事假累计;
+    .1143.月病假累计;
+    .1143.年度病假累计;
+    .1143.月其他所有请假;
+    .1143.年度其他所有请假;
+    .1143.年假共计;
+    .1143.本年度年假;
+    .1143.跨年度可休年假;
+    .1143.已休年假;
+    .1143.申请中年假;
+
+    .1144.月哺乳假;
+    .1144.月产假;
+    .1144.月婚假;
+    .1144.月丧假;
+    .1144.月照顾假;
+    .1144.月其他请假;
+    .1144.年度哺乳假;
+    .1144.年度产假;
+    .1144.年度婚假;
+    .1144.年度丧假;
+    .1144.年度照顾假;
+    .1144.年度其他请假;
+
+    .1168.工作时长;
+}
+VAR
+{
+    String 审批状态S,查找处理人条件S,处理人工号S,处理人姓名S,提交人姓名S,提交人工号S,提交日期S,处理人职务S,处理人部门S,处理日期S,US,USS,str,zt,Srch1,jb,username,process;
+    int 处理人记录页I,当前待处理标记I,新纪录I,cp,flag,red;
+    double sqsj,yqjlj,ndqjlj,ysjlj,ndsjlj,ybjlj,ndbjlj,gzsj,D年假共计,D本年度年假,D跨年度可休年假,D已休年假,D申请中年假,D月哺乳假,D月产假,D月婚假,D月丧假,D月照顾假,D月其他请假,D月其他所有请假,D年度哺乳假,D年度产假,D年度婚假,D年度丧假,D年度照顾假,D年度其他请假,D年度其他所有请假;
+    Struct2 st02,st21;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    USS = FW_GetValue(1138,UserName1,cp);
+    sqsj = FW_GetValue(1138,请假共计,cp);
+    jb = FW_GetValue(1138,假别,cp);
+    str = CURRENT.sVALUE;
+    if(str == "0")
+    {
+        Goto(-1);
+    }else if(str== "1")
+    {
+        处理日期S = FW_GetSysDate(0);
+        审批状态S = "已通过";
+        查找处理人条件S = "1087,处理人职务S@POST";
+    }else if(str == "3")
+    {
+        提交人姓名S = FW_GetValue(1138,姓名,cp);
+        提交人工号S = FW_GetValue(1138,UserName1,cp);
+        提交日期S = FW_GetValue(1138,申请日期,cp);
+        处理人部门S = FW_GetValue(1138,GroupID5,cp);
+        处理人职务S = FW_GetValue(1138,POST5,cp);
+        处理日期S = FW_GetSysDate(0);
+        审批状态S = "待" + 处理人职务S + "审批";
+        处理人工号S = FW_GetValue(1138,UserName5,cp);
+        查找处理人条件S = "1087,处理人工号S@UserName";
+    }
+    US = FW_GetUserID(2);
+    FW_Dialog1(正在进行审批中，请按 继续 并等待完成提示。);
+}
+SERVER
+{
+    st02 = FW_FindRecords(查找处理人条件S,1);
+    处理人记录页I = st02.RecordNoList.Get[0];
+    处理人姓名S = FW_GetValue(1087,姓名,处理人记录页I);
+    if(str == "1")
+    {
+        处理人工号S = FW_GetValue(1087,UserName,处理人记录页I);
+    }
+
+    当前待处理标记I = FW_GetValue(1138,当前待处理标记Page,cp);
+    FW_SetValue_w(1235,事件状态,当前待处理标记I,"已处理");
+    FW_SetValue_w(1235,处理日期,当前待处理标记I,处理日期S);
+    if(str=="1")
+    {
+        gzsj = FW_GetValue(1168,工作时长,0);
+        Srch1="1143,USS@UserName";
+        st21=FW_FindRecords(Srch1,1);
+        if(st21.mError!=0)
+        {
+            flag=2;
+            return(GotoClient);
+        }
+        red=st21.RecordNoList.Get[0];
+        if(jb == "年假")
+        {
+            D已休年假 = FW_GetValue(1143,已休年假,red);
+            D已休年假 = D已休年假 + sqsj;
+            FW_SetValue_w(1143,已休年假,red,D已休年假);
+
+            D申请中年假 = FW_GetValue(1143,申请中年假,red);
+            D申请中年假 = D申请中年假 - sqsj;
+            FW_SetValue_w(1143,申请中年假,red,D申请中年假);
+        }else if(jb != "年假")
+        {
+            if(jb=="事假")
+            {
+                ysjlj = FW_GetValue(1143,月事假累计,red);
+                ysjlj = ysjlj + sqsj;
+                ndsjlj = FW_GetValue(1143,年度事假累计,red);
+                ndsjlj = ndsjlj + sqsj;
+                FW_SetValue_w(1143,月事假累计,red,ysjlj);
+                FW_SetValue_w(1143,年度事假累计,red,ndsjlj);
+            }else if(jb=="病假")
+            {
+                ybjlj = FW_GetValue(1143,月病假累计,red);
+                ybjlj = ybjlj + sqsj;
+                ndbjlj = FW_GetValue(1143,年度病假累计,red);
+                ndbjlj = ndbjlj + sqsj;
+                FW_SetValue_w(1143,月病假累计,red,ybjlj);
+                FW_SetValue_w(1143,年度病假累计,red,ndbjlj);
+            }else if(jb == "哺乳假")
+            {
+                D月哺乳假 = FW_GetValue(1144,月哺乳假,red);
+                D月哺乳假 = D月哺乳假 + sqsj;
+                D年度哺乳假 = FW_GetValue(1144,年度哺乳假,red);
+                D年度哺乳假 = D年度哺乳假  + sqsj;
+                D月其他所有请假 = FW_GetValue(1143,月其他所有请假,red);
+                D月其他所有请假 = D月其他所有请假 + sqsj;
+                D年度其他所有请假 = FW_GetValue(1143,年度其他所有请假,red);
+                D年度其他所有请假 = D年度其他所有请假 + sqsj;
+                FW_SetValue_w(1143,月其他所有请假,red,D月其他所有请假);
+                FW_SetValue_w(1143,年度其他所有请假,red,D年度其他所有请假);
+                FW_SetValue_w(1144,月哺乳假,red,D月哺乳假);
+                FW_SetValue_w(1144,年度哺乳假,red,D年度哺乳假);
+            }else if(jb == "产假")
+            {
+                D月产假 = FW_GetValue(1144,月产假,red);
+                D月产假 = D月产假 + sqsj;
+                D年度产假 = FW_GetValue(1144,年度产假,red);
+                D年度产假 = D年度产假  + sqsj;
+                D月其他所有请假 = FW_GetValue(1143,月其他所有请假,red);
+                D月其他所有请假 = D月其他所有请假 + sqsj;
+                D年度其他所有请假 = FW_GetValue(1143,年度其他所有请假,red);
+                D年度其他所有请假 = D年度其他所有请假 + sqsj;
+                FW_SetValue_w(1143,月其他所有请假,red,D月其他所有请假);
+                FW_SetValue_w(1143,年度其他所有请假,red,D年度其他所有请假);
+                FW_SetValue_w(1144,月产假,red,D月产假);
+                FW_SetValue_w(1144,年度产假,red,D年度产假);
+            }else if(jb == "婚假")
+            {
+                D月婚假 = FW_GetValue(1144,月婚假,red);
+                D月婚假 = D月婚假 + sqsj;
+                D年度婚假 = FW_GetValue(1144,年度婚假,red);
+                D年度婚假 = D年度婚假  + sqsj;
+                D月其他所有请假 = FW_GetValue(1143,月其他所有请假,red);
+                D月其他所有请假 = D月其他所有请假 + sqsj;
+                D年度其他所有请假 = FW_GetValue(1143,年度其他所有请假,red);
+                D年度其他所有请假 = D年度其他所有请假 + sqsj;
+                FW_SetValue_w(1143,月其他所有请假,red,D月其他所有请假);
+                FW_SetValue_w(1143,年度其他所有请假,red,D年度其他所有请假);
+                FW_SetValue_w(1144,月婚假,red,D月婚假);
+                FW_SetValue_w(1144,年度婚假,red,D年度婚假);
+            }else if(jb == "丧假")
+            {
+                D月丧假 = FW_GetValue(1144,月丧假,red);
+                D月丧假 = D月丧假 + sqsj;
+                D年度丧假 = FW_GetValue(1144,年度丧假,red);
+                D年度丧假 = D年度丧假  + sqsj;
+                D月其他所有请假 = FW_GetValue(1143,月其他所有请假,red);
+                D月其他所有请假 = D月其他所有请假 + sqsj;
+                D年度其他所有请假 = FW_GetValue(1143,年度其他所有请假,red);
+                D年度其他所有请假 = D年度其他所有请假 + sqsj;
+                FW_SetValue_w(1143,月其他所有请假,red,D月其他所有请假);
+                FW_SetValue_w(1143,年度其他所有请假,red,D年度其他所有请假);
+                FW_SetValue_w(1144,月丧假,red,D月丧假);
+                FW_SetValue_w(1144,年度丧假,red,D年度丧假);
+            }else if(jb == "照顾假")
+            {
+                D月照顾假 = FW_GetValue(1144,月照顾假,red);
+                D月照顾假 = D月照顾假 + sqsj;
+                D年度照顾假 = FW_GetValue(1144,年度照顾假,red);
+                D年度照顾假 = D年度照顾假  + sqsj;
+                D月其他所有请假 = FW_GetValue(1143,月其他所有请假,red);
+                D月其他所有请假 = D月其他所有请假 + sqsj;
+                D年度其他所有请假 = FW_GetValue(1143,年度其他所有请假,red);
+                D年度其他所有请假 = D年度其他所有请假 + sqsj;
+                FW_SetValue_w(1143,月其他所有请假,red,D月其他所有请假);
+                FW_SetValue_w(1143,年度其他所有请假,red,D年度其他所有请假);
+                FW_SetValue_w(1144,月照顾假,red,D月照顾假);
+                FW_SetValue_w(1144,年度照顾假,red,D年度照顾假);
+            }else if(jb == "其他")
+            {
+                D月其他请假 = FW_GetValue(1144,月其他请假,red);
+                D月其他请假 = D月其他请假 + sqsj;
+                D年度其他请假 = FW_GetValue(1144,年度其他请假,red);
+                D年度其他请假 = D年度其他请假  + sqsj;
+                D月其他所有请假 = FW_GetValue(1143,月其他所有请假,red);
+                D月其他所有请假 = D月其他所有请假 + sqsj;
+                D年度其他所有请假 = FW_GetValue(1143,年度其他所有请假,red);
+                D年度其他所有请假 = D年度其他所有请假 + sqsj;
+                FW_SetValue_w(1143,月其他所有请假,red,D月其他所有请假);
+                FW_SetValue_w(1143,年度其他所有请假,red,D年度其他所有请假);
+                FW_SetValue_w(1144,月其他请假,red,D月其他请假);
+                FW_SetValue_w(1144,年度其他请假,red,D年度其他请假);
+            }
+            if((jb=="事假")||(jb=="病假"))
+            {
+                sqsj = sqsj/gzsj;
+            }
+            yqjlj = FW_GetValue(1143,月请假累计,red);
+            yqjlj = yqjlj + sqsj;
+            ndqjlj = FW_GetValue(1143,年度请假累计,red);
+            ndqjlj = ndqjlj + sqsj;
+            FW_SetValue_w(1143,月请假累计,red,yqjlj);
+            FW_SetValue_w(1143,年度请假累计,red,ndqjlj);
+        }
+        FW_SetValue_w(1235,审批状态,当前待处理标记I,审批状态S);
+    }else if(str == "3")
+    {
+        新纪录I = FW_AddNewPage_w(1235);
+        FW_SetValue_w(1235,事件状态,新纪录I,"待处理");
+        FW_SetValue_w(1235,处理日期,当前待处理标记I,处理日期S);
+        FW_SetValue_w(1138,当前待处理标记Page,cp,新纪录I);
+        FW_SetValue_w(1235,提交人姓名,新纪录I,提交人姓名S);
+        FW_SetValue_w(1235,提交人工号,新纪录I,提交人工号S);
+        FW_SetValue_w(1235,提交日期,新纪录I,提交日期S);
+        FW_SetValue_w(1235,内容,新纪录I,"请假申请");
+        FW_SetValue_w(1235,LinkToFormID,新纪录I,"1138");
+        FW_SetValue_w(1235,LinkToFormPage,新纪录I,cp);
+        FW_SetValue_w(1235,处理人姓名,新纪录I,处理人姓名S);
+        FW_SetValue_w(1235,处理人工号,新纪录I,处理人工号S);
+        FW_SetValue_w(1235,处理人职务,新纪录I,处理人职务S);
+        FW_SetValue_w(1235,处理人部门,新纪录I,处理人部门S);
+        FW_SetValue_w(1235,审批状态,新纪录I,审批状态S);
+    }
+
+    FW_SetValue_w(1138,UserName6,cp,US);
+    FW_SetValue_w(1138,状态,cp,审批状态S);
+    return(GotoClient);
+}
+CLIENT
+{
+    if(flag==2)
+    {
+        FW_Dialog1(未找到该申请人的人员档案，请联系相关负责人先添加!);	
+        Goto(-1);
+    }
+    FW_SetValue_w(1138,UserName6,cp,US);
+    FW_SetValue_w(1138,状态,cp,审批状态S);
+    if(str == "1")
+    {
+        FW_Dialog1(此申请单现已通过！);
+    }else
+        FW_Dialog1(已进行拒绝！);
+    }
+}

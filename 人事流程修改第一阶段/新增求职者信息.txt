@@ -1,0 +1,55 @@
+FIELD
+{
+        .1252.状态;
+        .1252.面试;
+        .1252.编号;
+
+        .1189.求职人员编号前缀;
+        .1189.求职人员编号数字;
+}
+VAR
+{
+        int isFind,np,bhsz;
+        String status, bhqz, qzbh;
+        Struct2 st2;
+        Struct0 st0;
+}
+SERVER
+{
+        isFind = 0;
+        status = "求职者简单信息记录待完善";
+        st2 = FW_FindRecords("1252,status@状态",1);
+        if(st2.mError == 0)
+        {
+                isFind = 1;
+                np = st2.RecordNoList.Get[0]; 
+                return(GotoClient);
+        }
+        np = FW_AddNewPage_w(1252);
+        bhqz=FW_GetValue(1189,求职人员编号前缀,0);
+	bhsz=FW_GetValue(1189,求职人员编号数字,0);
+	bhsz = bhsz + 1;
+	FW_SetValue_w(1189, 求职人员编号数字, 0,bhsz);
+	qzbh =FW_GetValue(1189,求职人员编号数字,0);
+	qzbh = bhqz + qzbh;
+	FW_SetValue_w(1252,编号,np,qzbh);
+        FW_SetValue_w(1252,状态,np,"求职者简单信息记录待完善");
+        FW_SetValue_w(1252,面试,np,"面试");
+        return(GotoClient);
+}
+CLIENT
+{
+        if(isFind == 0)
+        {
+                FW_SetValue_w(1252,编号,np,qzbh);
+                FW_SetValue_w(1252,状态,np,"求职者简单信息记录待完善");
+                FW_SetValue_w(1252,面试,np,"面试");
+        }
+}
+SERVER
+{
+        st0.FormID = 1252;
+        st0.Record = np;
+        return(st0);
+}
+

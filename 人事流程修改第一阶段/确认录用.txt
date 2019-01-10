@@ -1,0 +1,270 @@
+ FIELD
+{
+        .1254.待处理标记页;
+
+	.1100.姓名;
+	.1100.性别;
+	.1100.出生日期;
+	.1100.籍贯;
+	.1100.婚姻状况;
+	.1100.政治面貌;
+	.1100.户口所在地;
+	.1100.毕业时间;	
+	.1100.视力;
+	.1100.所学专业;
+	.1100.学历;
+	.1100.现住址;
+	.1100.计算机水平;
+	.1100.其他语言;
+	.1100.其他资格证书;
+	.1100.工作起始时间1;
+	.1100.工作截止时间1;
+	.1100.工作单位1;
+	.1100.岗位职责1;
+	.1100.教育起始时间1;
+	.1100.教育截止时间1;
+	.1100.学校名称1;
+	.1100.所学专业1;
+	.1100.工作起始时间2;
+	.1100.工作截止时间2;
+	.1100.工作单位2;
+	.1100.岗位职责2;
+	.1100.教育起始时间2;
+	.1100.教育截止时间2;
+	.1100.学校名称2;
+	.1100.所学专业2;
+	.1100.工作起始时间3;
+	.1100.工作截止时间3;
+	.1100.工作单位3;
+	.1100.岗位职责3;
+	.1100.教育起始时间3;
+	.1100.教育截止时间3;
+	.1100.学校名称3;
+	.1100.所学专业3;
+
+	.1101.姓名;
+	.1101.性别;
+	.1101.出生日期;
+	.1101.籍贯;	
+	.1101.婚姻状况;
+	.1101.政治面貌;
+	.1101.户口所在地;
+	.1101.毕业时间;
+	.1101.视力;
+	.1101.所学专业;
+	.1101.学历;
+	.1101.常住地址;
+	.1101.计算机水平;
+	.1101.外语语种;
+	.1101.其他资格证书;
+	.1101.工作起始时间1;
+	.1101.工作截止时间1;
+	.1101.工作单位1;
+	.1101.岗位职责1;
+	.1101.教育起始时间1;
+	.1101.教育截止时间1;
+	.1101.学校名称1;
+	.1101.所学专业1;
+	.1101.工作起始时间2;
+	.1101.工作截止时间2;
+	.1101.工作单位2;
+	.1101.岗位职责2;
+	.1101.教育起始时间2;
+	.1101.教育截止时间2;
+	.1101.学校名称2;
+	.1101.所学专业2;
+	.1101.工作起始时间3;
+	.1101.工作截止时间3;
+	.1101.工作单位3;
+	.1101.岗位职责3;
+	.1101.教育起始时间3;
+	.1101.教育截止时间3;
+	.1101.学校名称3;
+	.1101.所学专业3;
+	.1100.状态;
+}
+VAR
+{
+	String  jb,qt,qsrq,qssj,jsrq,jssj,qjgj,sysm,tdr,jjlxdh,zt,str,fw,dzyx,byyx,
+		sxzy,xl,xw,xzz,jsjsp,yysp,qtyy,ywsgzg,qtzgzs,gzqssj1,gzjzsj1,gzdw1,
+		gwzz1,jyqssj1,jyjzsj1,xxmc1,sxzy1,gzqssj2,gzjzsj2,gzdw2,gwzz2,jyqssj2,
+		jyjzsj2,xxmc2,sxzy2,gzqssj3,gzjzsj3,gzdw3,gwzz3,jyqssj3,jyjzsj3,xxmc3,sxzy3,zt1;
+	int cp, rec,i,np,flag;
+	Struct2 st2,po;
+	Struct0 st01;
+}
+CLIENT
+{
+	i=FW_FormOpen(1100);	
+}
+SERVER
+{
+	return(GotoClient);
+}
+CLIENT
+{
+	i=FW_FormOpen(1101);	
+}
+SERVER
+{
+	return(GotoClient);
+}
+CLIENT
+{
+	i=FW_FormOpen(1098);	
+}
+SERVER
+{
+	return(GotoClient);
+}
+CLIENT
+{
+	cp =FW_GetCurrentRecNum();
+	zt1 = FW_GetValue(1100,状态,cp);
+	if(zt1 != "运营总监同意录入")
+	{
+		FW_Dialog1(总监暂未同意录用，请查看状态!);
+		return(0);
+	}
+        flag = FW_GetValue(1254,待处理标记页,cp);
+
+	jb = FW_GetValue(1100,姓名,cp);
+	qt = FW_GetValue(1100,性别,cp);
+ 	qsrq= FW_GetValue(1100,出生日期,cp);
+ 	qssj= FW_GetValue(1100,籍贯,cp);
+	jssj = FW_GetValue(1100,婚姻状况,cp);
+	qjgj = FW_GetValue(1100,政治面貌,cp);
+	sysm = FW_GetValue(1100,户口所在地,cp);
+	tdr = FW_GetValue(1100,毕业时间,cp);
+	zt = FW_GetValue(1100,视力,cp);
+	sxzy = FW_GetValue(1100,所学专业,cp);
+	xl = FW_GetValue(1100,学历,cp);
+	xzz = FW_GetValue(1100,现住址,cp);
+	jsjsp = FW_GetValue(1100,计算机水平,cp);
+	qtyy = FW_GetValue(1100,其他语言,cp);
+	qtzgzs = FW_GetValue(1100,其他资格证书,cp);
+	gzqssj1 = FW_GetValue(1100,工作起始时间1,cp);
+	gzjzsj1 = FW_GetValue(1100,工作截止时间1,cp);
+	gzdw1 = FW_GetValue(1100,工作单位1,cp);
+	gwzz1 = FW_GetValue(1100,岗位职责1,cp);
+	jyqssj1 = FW_GetValue(1100,教育起始时间1,cp);
+	jyjzsj1 = FW_GetValue(1100,教育截止时间1,cp);
+	xxmc1 = FW_GetValue(1100,学校名称1,cp);
+	sxzy1 = FW_GetValue(1100,所学专业1,cp);
+	gzqssj2 = FW_GetValue(1100,工作起始时间2,cp);
+	gzjzsj2 = FW_GetValue(1100,工作截止时间2,cp);
+	gzdw2 = FW_GetValue(1100,工作单位2,cp);
+	gwzz2 = FW_GetValue(1100,岗位职责2,cp);
+	jyqssj2 = FW_GetValue(1100,教育起始时间2,cp);
+	jyjzsj2 = FW_GetValue(1100,教育截止时间2,cp);
+	xxmc2 = FW_GetValue(1100,学校名称2,cp);
+	sxzy2 = FW_GetValue(1100,所学专业2,cp);
+	gzqssj3 = FW_GetValue(1100,工作起始时间3,cp);
+	gzjzsj3 = FW_GetValue(1100,工作截止时间3,cp);
+	gzdw3 = FW_GetValue(1100,工作单位3,cp);
+	gwzz3 = FW_GetValue(1100,岗位职责3,cp);
+	jyqssj3 = FW_GetValue(1100,教育起始时间3,cp);
+	jyjzsj3 = FW_GetValue(1100,教育截止时间3,cp);
+	xxmc3 = FW_GetValue(1100,学校名称3,cp);
+	sxzy3 = FW_GetValue(1100,所学专业3,cp);
+}
+SERVER
+{
+        FW_SetValue_w(1235,事件状态,flag,"已处理");
+
+	np = FW_AddNewPage_w( 1101 );
+	FW_SetValue_w(1101,姓名,np,jb);
+	FW_SetValue_w(1101,性别,np,qt);
+ 	FW_SetValue_w(1101,出生日期,np,qsrq);
+ 	FW_SetValue_w(1101,籍贯,np,qssj);
+	FW_SetValue_w(1101,婚姻状况,np,jssj);
+	FW_SetValue_w(1101,政治面貌,np,qjgj);
+	FW_SetValue_w(1101,户口所在地,np,sysm);
+	FW_SetValue_w(1101,毕业时间,np,tdr);
+	FW_SetValue_w(1101,视力,np,zt);
+	FW_SetValue_w(1101,所学专业,np,sxzy);
+	FW_SetValue_w(1101,学历,np,xl);
+	FW_SetValue_w(1101,常住地址,np,xzz);
+	FW_SetValue_w(1101,计算机水平,np,jsjsp);
+	FW_SetValue_w(1101,外语语种,np,qtyy);
+	FW_SetValue_w(1101,其他资格证书,np,qtzgzs);
+	FW_SetValue_w(1101,工作起始时间1,np,gzqssj1);
+	FW_SetValue_w(1101,工作截止时间1,np,gzjzsj1);
+	FW_SetValue_w(1101,工作单位1,np,gzdw1);
+	FW_SetValue_w(1101,岗位职责1,np,gwzz1);
+	FW_SetValue_w(1101,教育起始时间1,np,jyqssj1);
+	FW_SetValue_w(1101,教育截止时间1,np,jyjzsj1);
+	FW_SetValue_w(1101,学校名称1,np,xxmc1);
+	FW_SetValue_w(1101,所学专业1,np,sxzy1);
+	FW_SetValue_w(1101,工作起始时间2,np,gzqssj2);
+	FW_SetValue_w(1101,工作截止时间2,np,gzjzsj2);
+	FW_SetValue_w(1101,工作单位2,np,gzdw2);
+	FW_SetValue_w(1101,岗位职责2,np,gwzz2);
+	FW_SetValue_w(1101,教育起始时间2,np,jyqssj2);
+	FW_SetValue_w(1101,教育截止时间2,np,jyjzsj2);
+	FW_SetValue_w(1101,学校名称2,np,xxmc2);
+	FW_SetValue_w(1101,所学专业2,np,sxzy2);
+	FW_SetValue_w(1101,工作起始时间3,np,gzqssj3);
+	FW_SetValue_w(1101,工作截止时间3,np,gzjzsj3);
+	FW_SetValue_w(1101,工作单位3,np,gzdw3);
+	FW_SetValue_w(1101,岗位职责3,np,gwzz3);
+	FW_SetValue_w(1101,教育起始时间3,np,jyqssj3);
+	FW_SetValue_w(1101,教育截止时间3,np,jyjzsj3);
+	FW_SetValue_w(1101,学校名称3,np,xxmc3);
+	FW_SetValue_w(1101,所学专业3,np,sxzy3);
+	FW_SetValue_w(1098,员工状态,np,"试用信息表待完善");
+	FW_SetValue_w(1100,状态,cp,"已录用");
+	return(GotoClient);
+}
+CLIENT
+{	   
+//FW_Dialog1(3);
+	FW_SetValue_w(1101,姓名,np,jb);
+	FW_SetValue_w(1101,性别,np,qt);
+ 	FW_SetValue_w(1101,出生日期,np,qsrq);
+ 	FW_SetValue_w(1101,籍贯,np,qssj);
+	FW_SetValue_w(1101,婚姻状况,np,jssj);
+	FW_SetValue_w(1101,政治面貌,np,qjgj);
+	FW_SetValue_w(1101,户口所在地,np,sysm);
+	FW_SetValue_w(1101,毕业时间,np,tdr);
+	FW_SetValue_w(1101,视力,np,zt);
+	FW_SetValue_w(1101,所学专业,np,sxzy);
+	FW_SetValue_w(1101,学历,np,xl);
+	FW_SetValue_w(1101,常住地址,np,xzz);
+	FW_SetValue_w(1101,计算机水平,np,jsjsp);
+	FW_SetValue_w(1101,外语语种,np,qtyy);
+	FW_SetValue_w(1101,其他资格证书,np,qtzgzs);
+	FW_SetValue_w(1101,工作起始时间1,np,gzqssj1);
+	FW_SetValue_w(1101,工作截止时间1,np,gzjzsj1);
+	FW_SetValue_w(1101,工作单位1,np,gzdw1);
+	FW_SetValue_w(1101,岗位职责1,np,gwzz1);
+	FW_SetValue_w(1101,教育起始时间1,np,jyqssj1);
+	FW_SetValue_w(1101,教育截止时间1,np,jyjzsj1);
+	FW_SetValue_w(1101,学校名称1,np,xxmc1);
+	FW_SetValue_w(1101,所学专业1,np,sxzy1);
+	FW_SetValue_w(1101,工作起始时间2,np,gzqssj2);
+	FW_SetValue_w(1101,工作截止时间2,np,gzjzsj2);
+	FW_SetValue_w(1101,工作单位2,np,gzdw2);
+	FW_SetValue_w(1101,岗位职责2,np,gwzz2);
+	FW_SetValue_w(1101,教育起始时间2,np,jyqssj2);
+	FW_SetValue_w(1101,教育截止时间2,np,jyjzsj2);
+	FW_SetValue_w(1101,学校名称2,np,xxmc2);
+	FW_SetValue_w(1101,所学专业2,np,sxzy2);
+	FW_SetValue_w(1101,工作起始时间3,np,gzqssj3);
+	FW_SetValue_w(1101,工作截止时间3,np,gzjzsj3);
+	FW_SetValue_w(1101,工作单位3,np,gzdw3);
+	FW_SetValue_w(1101,岗位职责3,np,gwzz3);
+	FW_SetValue_w(1101,教育起始时间3,np,jyqssj3);
+	FW_SetValue_w(1101,教育截止时间3,np,jyjzsj3);
+	FW_SetValue_w(1101,学校名称3,np,xxmc3);
+	FW_SetValue_w(1101,所学专业3,np,sxzy3);
+	FW_SetValue_w(1098,员工状态,np,"待完善");
+	FW_SetValue_w(1100,状态,cp,"已录用");
+	FW_Dialog1(录用成功！即将进入试用信息表填写。);
+}  
+SERVER
+{
+	st01.FormID=1184;
+	st01.Record=np;
+	return(st01);
+}       

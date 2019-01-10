@@ -1,0 +1,238 @@
+FIELD
+{
+	.1044.状态;
+	.1044.UserName3;
+	.1044.POST4;
+	.1044.UserName1;
+	.1044.姓名;
+	.1044.UserName2;
+	.1044.调休共计;
+	.1044.GroupID2;
+	.1044.POST2;
+	.1044.申请日期;
+	.1087.UserName;
+	.1087.归属范围;
+	.1087.POST;
+	.1087.GroupID;
+	.1087.姓名;
+	.1044.GroupID4;
+	.1044.事由说明;
+	.1044.当前待处理标记Page;
+	.1044.当前待处理标记Page备用1;
+
+	.1235.事件状态;
+	.1235.处理人姓名;
+	.1235.处理人工号;
+	.1235.处理人职务;
+	.1235.处理人部门;
+	.1235.处理日期;
+	.1235.审批状态;
+	.1235.LinkToFormID;
+	.1235.LinkToFormPage;
+	.1235.提交人姓名;
+	.1235.提交人工号;
+	.1235.内容;
+	.1235.提交日期;
+
+	.1143.超过调休时长;
+	.1143.弹性调休时间;
+	.1143.弹性调休剩余次数;
+	.1143.最低调休时间;
+	.1143.月调休可透支时间;
+	.1143.季度已调休累计;
+	.1143.年度已调休累计;
+	.1143.在职已调休累计;
+        .1143.申请中调休;
+}
+
+VAR
+{   
+	String username,currentstatus,status,username1,cache1,cache2,post;
+	int currentpage,flag,recordpage,rest_times,弹性调休剩余次数s;
+	double 调休共计s,cache3,cache4,applyingtime;
+	double 季度已调休累计s,年度已调休累计s,在职已调休累计s,月调休可透支时间s,cache,弹性调休时间s,dbz;
+	String 事件状态s,处理人姓名s,处理人工号s,处理人职务s,处理人部门s,处理日期s,审批状态s,提交人姓名s,提交人工号s,内容s,提交日期s,scon,
+		原事件状态s,原处理日期s,原处理人工号s;
+	int LinkToFormID_int,LinkToFormPage_int,newPage,rec,markPage,markPage2,cacheint;
+	Struct2 st21,st2;
+}
+
+CLIENT
+{   
+	cache1 = "待";
+	cache2 = "审批";
+	currentpage = FW_GetCurrentRecNum();
+	username = FW_GetUserID(2);
+	调休共计s= FW_GetValue(1044,调休共计,currentpage);
+	username1 = FW_GetValue(1044,UserName1,currentpage);
+	
+
+	currentstatus = CURRENT.sVALUE;
+	if(currentstatus=="0"){
+		return(0);}
+
+
+	if(currentstatus=="1"){
+		post = FW_GetValue(1044,POST4,currentpage);
+		status = cache1+post+cache2;}
+
+
+	if(currentstatus=="3"){
+		status = "待替代人同意";}
+}
+
+SERVER
+{   
+	原事件状态s="已处理";
+	原处理日期s=FW_GetSysDate(0);
+
+	markPage = FW_GetValue(1044,当前待处理标记Page,currentpage);
+
+	事件状态s="待处理";
+	处理日期s = "";
+	审批状态s=status;
+	LinkToFormID_int=1044;
+	LinkToFormPage_int=currentpage;
+	提交人姓名s = FW_GetValue(1044, 姓名, currentpage);
+	提交人工号s = FW_GetValue(1044, UserName1, currentpage);
+	提交日期s=FW_GetValue(1044,申请日期,currentpage);
+	if(currentstatus=="1")
+	{
+		处理人职务s = post;
+		处理人部门s = FW_GetValue(1044,GroupID4,currentpage);
+		scon = "1087,处理人职务s@POST";
+		st21 = FW_FindRecords(scon,1);
+		rec = st21.RecordNoList.Get[0];
+		处理人姓名s = FW_GetValue(1087,姓名,rec);
+		处理人工号s=FW_GetValue(1087,UserName,rec);
+	}else if(currentstatus=="3")
+	{
+		处理人职务s = FW_GetValue(1044,POST2,currentpage);
+		处理人部门s = FW_GetValue(1044,GroupID2,currentpage);
+		处理人工号s = FW_GetValue(1044,UserName2,currentpage);
+		scon = "1087,处理人工号s@UserName";
+		st21 = FW_FindRecords(scon,1);
+		rec = st21.RecordNoList.Get[0];
+		处理人姓名s = FW_GetValue(1087,姓名,rec);
+	}
+	FW_SetValue_w(1235,事件状态,markPage,原事件状态s);
+	FW_SetValue_w(1235,处理日期,markPage,原处理日期s);
+	markPage2 = FW_GetValue(1044,当前待处理标记Page备用1,currentpage);
+	cacheint = markPage2 - markPage;
+        if(cacheint == 1)
+		{
+			FW_SetValue_w(1235,事件状态,markPage2,原事件状态s);
+			FW_SetValue_w(1235,处理日期,markPage2,原处理日期s);
+		}
+	
+	if(currentstatus=="1")
+	{
+		dbz=FW_GetValue(1143,超过调休时长,0);
+//FW_Dialog1(dbz);
+		//FW_Dialog1(同意);	
+		if(调休共计s > dbz )
+		{	
+			FW_SetValue_w(1044,UserName3,currentpage,username);
+			FW_SetValue_w(1044,状态,currentpage,status);
+
+			newPage = FW_AddNewPage_w(1235);
+			FW_SetValue_w(1044,当前待处理标记Page,currentpage,newPage);
+			FW_SetValue_w(1235,事件状态,newPage,事件状态s);
+			FW_SetValue_w(1235,处理人姓名,newPage,处理人姓名s);
+			FW_SetValue_w(1235,处理人工号,newPage,处理人工号s);
+			FW_SetValue_w(1235,处理人职务,newPage,处理人职务s);
+			FW_SetValue_w(1235,处理人部门,newPage,处理人部门s);
+			FW_SetValue_w(1235,处理日期,newPage,处理日期s);
+			FW_SetValue_w(1235,审批状态,newPage,审批状态s);
+			FW_SetValue_w(1235,LinkToFormID,newPage,LinkToFormID_int);
+			FW_SetValue_w(1235,LinkToFormPage,newPage,LinkToFormPage_int);
+			FW_SetValue_w(1235,提交人姓名,newPage,提交人姓名s);
+			FW_SetValue_w(1235,提交人工号,newPage,提交人工号s);
+			FW_SetValue_w(1235,内容,newPage,"调休申请");
+			FW_SetValue_w(1235,提交日期,newPage,提交日期s);
+
+			
+			return(GotoClient);
+		}
+		status="已通过";
+		FW_SetValue_w(1235,事件状态,markPage,原事件状态s);
+		FW_SetValue_w(1235,处理日期,markPage,原处理日期s);
+                FW_SetValue_w(1235,审批状态,markPage,"已通过");
+		if(cacheint == 1)
+		{
+			FW_SetValue_w(1235,事件状态,markPage2,原事件状态s);
+			FW_SetValue_w(1235,处理日期,markPage2,原处理日期s);
+                        FW_SetValue_w(1235,审批状态,markPage2,"已通过");
+		}
+		scon = "1143,username1@UserName";
+		st21 = FW_FindRecords(scon,1);
+		if(st21.mError != 0)
+		{
+			flag = 2;
+			return(GotoClient);	
+		}
+		recordpage = st21.RecordNoList.Get[0];
+		季度已调休累计s = FW_GetValue(1143,季度已调休累计,recordpage);
+		季度已调休累计s = 季度已调休累计s + 调休共计s;
+		年度已调休累计s = FW_GetValue(1143,年度已调休累计,recordpage);
+		年度已调休累计s = 年度已调休累计s + 调休共计s;
+		在职已调休累计s = FW_GetValue(1143,在职已调休累计,recordpage);
+		在职已调休累计s = 在职已调休累计s + 调休共计s;
+		FW_SetValue_w(1143,季度已调休累计,recordpage,季度已调休累计s);
+		FW_SetValue_w(1143,年度已调休累计,recordpage,年度已调休累计s);
+		FW_SetValue_w(1143,在职已调休累计,recordpage,在职已调休累计s);
+                
+                applyingtime = FW_GetValue(1143,申请中调休,recordpage);
+                applyingtime = applyingtime - 调休共计s;
+                if(applyingtime < 0)
+                {
+                        applyingtime = 0;
+                }
+                FW_SetValue_w(1143,申请中调休,recordpage,applyingtime);
+	}else if(currentstatus=="3")
+	{
+		newPage = FW_AddNewPage_w(1235);
+		FW_SetValue_w(1044,当前待处理标记Page,currentpage,newPage);
+		FW_SetValue_w(1235,事件状态,newPage,事件状态s);
+		FW_SetValue_w(1235,处理人姓名,newPage,处理人姓名s);
+		FW_SetValue_w(1235,处理人工号,newPage,处理人工号s);
+		FW_SetValue_w(1235,处理人职务,newPage,处理人职务s);
+		FW_SetValue_w(1235,处理人部门,newPage,处理人部门s);
+		FW_SetValue_w(1235,处理日期,newPage,处理日期s);
+		FW_SetValue_w(1235,审批状态,newPage,审批状态s);
+		FW_SetValue_w(1235,LinkToFormID,newPage,LinkToFormID_int);
+		FW_SetValue_w(1235,LinkToFormPage,newPage,LinkToFormPage_int);
+		FW_SetValue_w(1235,提交人姓名,newPage,提交人姓名s);
+		FW_SetValue_w(1235,提交人工号,newPage,提交人工号s);
+		FW_SetValue_w(1235,内容,newPage,"调休申请");
+		FW_SetValue_w(1235,提交日期,newPage,提交日期s);
+	}
+
+	FW_SetValue_w(1044,UserName3,currentpage,username);
+	FW_SetValue_w(1044,状态,currentpage,status);
+	return(GotoClient);
+}
+
+CLIENT
+{
+	FW_SetValue_w(1044,UserName3,currentpage,username);
+	FW_SetValue_w(1044,状态,currentpage,status);
+        if(currentstatus == "1")
+        {
+                if(调休共计s <= dbz)
+                {
+                        if(flag==2)
+                        {
+                                FW_Dialog1(未找到该申请人的人员档案，请联系相关负责人先添加!);	
+                                return(0);
+                        }
+                        FW_Dialog1(此申请现已通过！);
+                }else
+                {
+                        FW_Dialog1(审批成功！);
+                }
+        }else if(currentstatus == "3")
+        {
+                FW_Dialog1(已进行拒绝！);
+        }
+}                             

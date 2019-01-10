@@ -1,0 +1,261 @@
+FIELD
+{
+    .1044.状态;
+    .1044.调休起始日期;
+    .1044.调休起始时间;
+    .1044.调休结束日期;
+    .1044.调休结束时间;
+    .1044.调休共计;
+    .1044.事由说明;
+    .1044.替代人工号或姓名;
+    .1044.紧急联系电话;
+    .1044.状态;
+    .1044.GroupID;
+    .1044.申请日期;
+    .1044.UserName1;
+    .1044.UserName2;
+    .1044.GroupID1;
+    .1044.GroupID2;
+    .1044.GroupID3;
+    .1044.将透支时间;
+    .1044.剩余透支时间;
+    .1044.考勤年月;
+
+    .1143.弹性调休时间;
+    .1143.弹性调休剩余次数;
+    .1143.最低调休时间;
+    .1143.可调休共计;
+    .1143.月调休可透支时间;
+}
+VAR
+{
+    String status,jb,qt,qsrq,S调休起始年月,S调休起始年,S调休起始月,qssj,jsrq,jssj,sysm,tdr,tdrzm,jjlxdh,zt,SQRQ,US,gd,str,Srch1,Srch2,stxcs,S1,S将透支时间,S剩余透支时间;
+    int cp,rec,flag,txcs,total;
+    double txsj,D弹性调休上限,zdsj,D可调休共计,D月调休可透支时间,D将透支时间,D剩余透支时间;
+    Struct2 st21, st22;
+}
+CLIENT
+{
+    cp =FW_GetCurrentRecNum();
+    status = FW_GetValue(1044,状态,cp);
+    if(status == "已通过")
+    {
+        FW_Dialog1(此申请单已经是通过状态！);
+                return(0);
+    }else if(status != "待提交")
+    {
+        FW_Dialog1(此申请单不在“申请人提交”流程！);
+        return(0);
+    }
+    qsrq = FW_GetValue(1044,调休起始日期,cp);
+    if(qsrq=="")
+    {
+        FW_Dialog1(请填写 "调休起始日期");
+        return(0);
+    }
+    S调休起始年月 = qsrq.Left(7);
+    S调休起始年 = S调休起始年月.Left(4);
+    S调休起始月 = S调休起始年月.Mid(5);
+    S调休起始年月 = S调休起始年 + "年" + S调休起始月 + "月";
+    qssj = FW_GetValue(1044,调休起始时间,cp);
+    if(qssj=="")
+    {
+        FW_Dialog1(请填写 "调休起始时间");
+        return(0);
+    }
+    jsrq = FW_GetValue(1044,调休结束日期,cp);
+    if(jsrq=="")
+    {
+        FW_Dialog1(请填写 "调休结束日期");
+        return(0);
+    }
+    jssj = FW_GetValue(1044,调休结束时间,cp);
+    if(jssj=="")
+    {
+        FW_Dialog1(请填写 "调休结束时间");
+        return(0);
+    }
+    txsj = FW_GetValue(1044,调休共计,cp);
+    if(txsj == 0)
+    {
+        FW_Dialog1(请填写 "调休共计时间");
+        return(0);
+    }else if(txsj <= 0)
+    {
+        FW_Dialog1(“调休共计时间”不能小于或等于0！);
+        return(0);
+    }
+    FW_SetValue_w(1044,调休共计,cp,txsj);
+    sysm = FW_GetValue(1044,事由说明,cp);
+    if(sysm=="")
+    {
+        FW_Dialog1(请填写 "事由说明");
+        return(0);
+    }
+    tdr = FW_GetValue(1044,替代人工号或姓名,cp);
+    if(tdr=="")
+    {
+        FW_Dialog1(请填写 "替代人工号或姓名");
+        return(0);
+    }
+    tdrzm = tdr.Left(2);
+    if(tdrzm == "xh")
+    {
+        FW_Dialog1("当选择填写替代人工号时，工号前两位字母需大写！");
+        return(0);
+    }
+    jjlxdh = FW_GetValue(1044,紧急联系电话,cp);
+    if(jjlxdh=="")
+    {
+        FW_Dialog1(请填写 "紧急联系电话");
+        return(0);
+    }
+    str=CURRENT.sVALUE;
+    if(str=="0")
+    {
+        return(0);		
+    }
+    gd = FW_GetValue(1044,GroupID,cp);
+    US = FW_GetUserID(2);
+}
+SERVER
+{
+    FW_SetValue_w(1044,调休共计,cp,txsj);
+    Srch2="1087,tdr@姓名";
+    st22=FW_FindRecords(Srch2,0);
+    total=st22.count;
+    if(st22.mError!=0)
+    {
+        Srch2="1087,tdr@UserName";
+        st22=FW_FindRecords(Srch2,1);
+        if(st22.mError!=0)
+        {
+            flag=5;
+            return(GotoClient);
+        }
+    }else if(total > 1)
+    {
+        flag=6;
+        return(GotoClient);
+    }
+    Srch1="1143,US@UserName";
+    st21=FW_FindRecords(Srch1,1);
+    if(st21.mError!=0)
+    {
+        flag=1;
+        return(GotoClient);
+    }
+    rec=st21.RecordNoList.Get[0];
+
+//FW_Dialog1(先判断是否有可调休时间);
+    D可调休共计 = FW_GetValue(1143,可调休共计,rec);
+    D月调休可透支时间 = FW_GetValue(1143,月调休可透支时间,rec);
+    D弹性调休上限 = FW_GetValue(1143,弹性调休时间,rec);
+    if(D可调休共计 >= txsj)
+    {
+        if(txsj < D弹性调休上限)
+        {
+            txcs = FW_GetValue(1143,弹性调休剩余次数,rec);
+            if(txcs < 1)
+            {
+                flag=3;	
+                return(GotoClient);
+            }else
+            {
+                flag = 4;
+                return(GotoClient);
+            }
+        }
+    }else if(D可调休共计 < txsj)
+    {
+        if(D可调休共计 < 0)
+        {
+            D可调休共计 = 0;
+        }
+        D将透支时间 = txsj - D可调休共计;
+        D剩余透支时间 = D月调休可透支时间 - D将透支时间;
+        D可调休共计 = D可调休共计 + D月调休可透支时间;
+        if(D可调休共计 >= txsj)
+        {
+                if(txsj < D弹性调休上限)
+                {
+                    txcs = FW_GetValue(1143,弹性调休剩余次数,rec);
+                    if(txcs < 1)
+                {
+                    flag = 3;
+                    return(GotoClient);	
+                }else
+                {       
+                    flag = 7;
+                    FW_SetValue_w(1044,将透支时间,cp,D将透支时间);
+                    FW_SetValue_w(1044,剩余透支时间,cp,D剩余透支时间);
+                    return(GotoClient);
+                }
+                }else
+                {
+                    flag = 8;
+                    FW_SetValue_w(1044,将透支时间,cp,D将透支时间);
+                    FW_SetValue_w(1044,剩余透支时间,cp,D剩余透支时间);
+                    return(GotoClient);
+                }
+        }else if(D可调休共计 < txsj)
+        {
+            flag = 2;
+            FW_SetValue_w(1044,剩余透支时间,cp,D可调休共计);
+        }
+    }
+    FW_SetValue_w(1044,考勤年月,cp,S调休起始年月);
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_SetValue_w(1044,考勤年月,cp,S调休起始年月);
+
+    if(flag==1)
+    {
+        FW_Dialog1(未找到该申请人的人员档案，请联系相关负责人先添加!);	
+        return(0);
+    }else if(flag==2)
+    {
+        FW_SetValue_w(1044,剩余透支时间,cp,D可调休共计);
+        S剩余透支时间 = FW_GetValue(1044,剩余透支时间,cp);
+        S1 = "当月您的可调休共计时间（含当月可透支）还剩 " + S剩余透支时间 + " 小时，不足以抵扣当前申请的调休时间！请重新安排调休时间。";
+        FW_Dialog1(S1);	
+        return(0);
+    }else if(flag==3)
+    {
+        FW_Dialog1(您申请的调休少于3.5个小时为弹性调休时间，但您当前月“弹性调休剩余次数”已用完!);	
+        return(0);
+    }else if(flag==4)
+    {
+        stxcs = txcs.toString;
+        S1 = "您申请的调休少于3.5个小时将申请弹性调休，目前您的弹性调休次数还剩 "+stxcs+" 次。";
+        FW_Dialog1(S1);
+    }else if(flag==5)
+    {
+        FW_Dialog1(未找到该替代人，请核对姓名或工号是否输入正确！);	
+        return(0);
+    }else if(flag==6)
+    {
+        FW_Dialog1(社区中有相同姓名的员工，请填写工号);	
+        return(0);
+    }else if(flag == 7)
+        {
+            FW_SetValue_w(1044,将透支时间,cp,D将透支时间);
+            FW_SetValue_w(1044,剩余透支时间,cp,D剩余透支时间);
+            S将透支时间 = FW_GetValue(1044,将透支时间,cp);
+            S剩余透支时间 = FW_GetValue(1044,剩余透支时间,cp);
+            stxcs = txcs.toString;
+            S1 = "您申请的调休少于 3.5 个小时为弹性调休时间，目前您的弹性调休次数还剩 "+stxcs+" 次，并且将使用到当月透支调休时间 "+S将透支时间+" 小时！使用后当月您还剩 "+S剩余透支时间+" 小时调休可透支时间。";
+            FW_Dialog1(S1);
+        }else if(flag == 8)
+        {
+            FW_SetValue_w(1044,将透支时间,cp,D将透支时间);
+            FW_SetValue_w(1044,剩余透支时间,cp,D剩余透支时间);
+            S将透支时间 = FW_GetValue(1044,将透支时间,cp);
+            S剩余透支时间 = FW_GetValue(1044,剩余透支时间,cp);
+            stxcs = txcs.toString;
+            S1 = "您将使用到当月透支调休时间 "+S将透支时间+" 小时！使用后当月您还剩 "+S剩余透支时间+" 小时调休可透支时间。";
+            FW_Dialog1(S1);
+        }
+} 

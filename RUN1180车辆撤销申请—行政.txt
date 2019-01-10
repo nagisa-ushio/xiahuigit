@@ -1,0 +1,46 @@
+FIELD
+{
+    .1180.状态;	
+    .1180.申请人工号;
+    .1180.车牌号;
+    .1180.状态;
+
+    .1156.是否已隐藏;
+}
+VAR
+{
+    Struct0 st0;
+    String zt,US,sqrgh,cph, apply_us;
+    int cp,flag;
+}
+CLIENT
+{
+    cp = CURRENT.iVALUE;
+    zt = FW_GetValue(1180,状态,cp);
+    cph = FW_GetValue(1180,车牌号,cp);
+    apply_us = FW_GetValue(1180, 申请人工号, cp);
+}
+SERVER
+{
+    cph = "已撤销-" + cph;
+    apply_us = "已撤销-" + apply_us;
+    FW_SetValue_w(1180,车牌号,cp,cph);
+    FW_SetValue_w(1180,申请人工号,cp,apply_us);
+    FW_SetValue_w(1180,状态,cp,"该预约已撤销（行政撤销）");
+    FW_SetValue_w(1156,是否已隐藏,cp,"是");
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_SetValue_w(1180,车牌号,cp,cph);
+    FW_SetValue_w(1180,申请人工号,cp,apply_us);
+    FW_SetValue_w(1180,状态,cp,"该预约已撤销（行政撤销）");
+    FW_SetValue_w(1156,是否已隐藏,cp,"是");
+    FW_Dialog1(该预约已成功撤销！);
+}
+SERVER
+{
+    st0.FormID = 1207;
+    st0.Record = 0;
+    return(st0);
+}

@@ -1,0 +1,100 @@
+FIELD
+{
+        .1252.状态;
+        .1252.姓名;
+        .1252.性别;
+        .1252.联系电话;
+        .1252.学历;
+        .1252.毕业院校;
+        .1252.所学专业;
+        .1252.应聘岗位意向;
+        .1252.面试结果;
+}
+VAR
+{
+        int cp;
+	String status,name,sex,phone,edu,uni,major,intention,result;
+        Struct0 st0;
+}
+CLIENT
+{
+        cp = FW_GetCurrentRecNum();
+        name = FW_GetValue(1252,姓名,cp);
+        if(name == "")
+        {
+                FW_Dialog1(请填写姓名！);
+                return(0);
+        }
+        
+        sex = FW_GetValue(1252,性别,cp);
+        if(sex == "")
+        {
+                FW_Dialog1(请填写性别！);
+                return(0);
+        }
+        
+        phone = FW_GetValue(1252,联系电话,cp);
+        if(phone == "")
+        {
+                FW_Dialog1(请填写联系电话！);
+                return(0);
+        }
+        
+        edu = FW_GetValue(1252,学历,cp);
+        if(edu == "")
+        {
+                FW_Dialog1(请填写学历！);
+                return(0);
+        }
+        
+        uni = FW_GetValue(1252,毕业院校,cp);
+        if(uni == "")
+        {
+                FW_Dialog1(请填写毕业院校！);
+                return(0);
+        }
+        
+        major = FW_GetValue(1252,所学专业,cp);
+        if(major == "")
+        {
+                FW_Dialog1(请填写所学专业！);
+                return(0);
+        }
+        
+        intention = FW_GetValue(1252,应聘岗位意向,cp);
+        if(intention == "")
+        {
+                FW_Dialog1(请填写应聘岗位意向！);
+                return(0);
+        }
+        
+        result = FW_GetValue(1252,面试结果,cp);
+        if(result == "")
+        {
+                FW_Dialog1(请填写面试结果！);
+                return(0);
+        }
+        
+        status = FW_GetValue(1252,状态,cp);
+        if(status == "求职者简单信息记录待完善")
+        {
+                FW_SetValue_w(1252,状态,cp,"求职人员登记表待完善");
+        }
+}
+SERVER
+{
+        if(status == "求职者简单信息记录待完善")
+        {
+                FW_SetValue_w(1252,状态,cp,"求职人员登记表待完善");
+        }
+        return(GotoClient);
+}
+CLIENT
+{
+        FW_Dialog1(保存成功！);
+}
+SERVER
+{
+        st0 = FW_GotoFormPage(1253,0);
+        return(st0);
+}

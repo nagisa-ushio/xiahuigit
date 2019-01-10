@@ -1,0 +1,322 @@
+FIELD
+{
+	.1100.姓名;
+	.1100.性别;
+	.1100.出生日期;
+	.1100.籍贯;
+	.1100.民族;
+	.1100.婚姻状况;
+	.1100.政治面貌;
+	.1100.户口所在地;
+	.1100.毕业时间;
+	.1100.健康状况;
+	.1100.视力;
+	.1100.QQ;
+	.1100.联系电话;
+	.1100.电子邮箱;
+	.1100.毕业院校;
+	.1100.所学专业;
+	.1100.学历;
+	.1100.学位;
+	.1100.现住址;
+	.1100.计算机水平;
+	.1100.英语水平;
+	.1100.其他语言;
+	.1100.有无社工资格;
+	.1100.其他资格证书;
+	.1100.应聘岗位意向;
+	.1100.最低工资要求;
+	.1100.工作起始时间1;
+	.1100.工作截止时间1;
+	.1100.工作单位1;
+	.1100.岗位职责1;
+	.1100.教育起始时间1;
+	.1100.教育截止时间1;
+	.1100.学校名称1;
+	.1100.所学专业1;
+	.1100.实践项目经验;
+	.1100.特长及自我评价;
+	.1100.状态;
+}
+VAR
+{
+	String xm, xb, csrq, jg,mz,hyzk,tp,zzmm,hkszd,bysj,jkzk,sl,qq,lxdh,dzyx,byyx,sxzy,xl,xw,xzz,jsjsp,yysp,qtyy,ywsgzgz,qtzgzs,ypgwyx,zdgzyq,gzqssj,gzjzsj,gzdw,gwzz,jyqssj,jyjzsj,xxmc,sxzy1,sjxmjy,tcjzwpj,zt;
+	int cp;
+	Struct0 st0;
+}
+CLIENT
+{
+	cp =FW_GetCurrentRecNum();
+	xm = FW_GetValue(1100,姓名,cp);
+	if(xm=="")
+	{
+		FW_Dialog1(请填写 "姓名");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	xb = FW_GetValue(1100,性别,cp);
+	if(xb=="")
+	{
+		FW_Dialog1(请填写 "性别");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	csrq = FW_GetValue(1100,出生日期,cp);
+	if(csrq=="")
+	{
+		FW_Dialog1(请填写 "出生日期");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	jg = FW_GetValue(1100,籍贯,cp);
+	if(jg=="")
+	{
+		FW_Dialog1(请填写 "籍贯");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	mz = FW_GetValue(1100,民族,cp);
+	if(mz=="")
+	{
+		FW_Dialog1(请填写 "民族");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	hyzk = FW_GetValue(1100,婚姻状况,cp);
+	if(hyzk=="")
+	{
+		FW_Dialog1(请填写 "婚姻状况");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	zzmm = FW_GetValue(1100,政治面貌,cp);
+	if(zzmm=="")
+	{
+		FW_Dialog1(请填写 "政治面貌");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	hkszd = FW_GetValue(1100,户口所在地,cp);
+	if(hkszd=="")
+	{
+		FW_Dialog1(请填写 "户口所在地");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	bysj = FW_GetValue(1100,毕业时间,cp);
+	if(bysj=="")
+	{
+		FW_Dialog1(请填写 "毕业时间");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	jkzk = FW_GetValue(1100,健康状况,cp);
+	if(jkzk=="")
+	{
+		FW_Dialog1(请填写 "健康状况");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	sl = FW_GetValue(1100,视力,cp);
+	if(sl=="")
+	{
+		FW_Dialog1(请填写 "视力");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	qq = FW_GetValue(1100,QQ,cp);
+	if(qq=="")
+	{
+		FW_Dialog1(请填写 "QQ");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	lxdh = FW_GetValue(1100,联系电话,cp);
+	if(lxdh=="")
+	{
+		FW_Dialog1(请填写 "联系电话");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	dzyx = FW_GetValue(1100,电子邮箱,cp);
+	if(dzyx=="")
+	{
+		FW_Dialog1(请填写 "电子邮箱");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	byyx = FW_GetValue(1100,毕业院校,cp);
+	if(byyx=="")
+	{
+		FW_Dialog1(请填写 "毕业院校");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	sxzy = FW_GetValue(1100,所学专业,cp);
+	if(sxzy=="")
+	{
+		FW_Dialog1(请填写 "所学专业");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	xl = FW_GetValue(1100,学历,cp);
+	if(xl=="")
+	{
+		FW_Dialog1(请填写 "学历");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	xw = FW_GetValue(1100,学位,cp);
+	if(xw=="")
+	{
+		FW_Dialog1(请填写 "学位");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	xzz = FW_GetValue(1100,现住址,cp);
+	if(xzz=="")
+	{
+		FW_Dialog1(请填写 "现住址");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	jsjsp = FW_GetValue(1100,计算机水平,cp);
+	if(jsjsp=="")
+	{
+		FW_Dialog1(请填写 "计算机水平");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	yysp = FW_GetValue(1100,英语水平,cp);
+	if(yysp=="")
+	{
+		FW_Dialog1(请填写 "英语水平");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	qtyy = FW_GetValue(1100,其他语言,cp);
+	if(qtyy=="")
+	{
+		FW_Dialog1(请填写 "其他语言");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	ywsgzgz = FW_GetValue(1100,有无社工资格,cp);
+	if(ywsgzgz=="")
+	{
+		FW_Dialog1(请填写 "有无社工资格证");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	qtzgzs = FW_GetValue(1100,其他资格证书,cp);
+	if(qtzgzs=="")
+	{
+		FW_Dialog1(请填写 "其他资格证书");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	ypgwyx = FW_GetValue(1100,应聘岗位意向,cp);
+	if(ypgwyx=="")
+	{
+		FW_Dialog1(请填写 "应聘岗位意向");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	zdgzyq = FW_GetValue(1100,最低工资要求,cp);
+	if(zdgzyq=="")
+	{
+		FW_Dialog1(请填写 "最低工资要求");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	gzqssj = FW_GetValue(1100,工作起始时间1,cp);
+	if(gzqssj=="")
+	{
+		FW_Dialog1(请填写 "工作起始时间1");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	gzjzsj = FW_GetValue(1100,工作截止时间1,cp);
+	if(gzjzsj=="")
+	{
+		FW_Dialog1(请填写 "工作截止时间1");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	gzdw = FW_GetValue(1100,工作单位1,cp);
+	if(gzdw=="")
+	{
+		FW_Dialog1(请填写 "工作单位1");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	jyqssj = FW_GetValue(1100,教育起始时间1,cp);
+	if(jyqssj=="")
+	{
+		FW_Dialog1(请填写 "教育起始时间1");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	jyjzsj = FW_GetValue(1100,教育截止时间1,cp);
+	if(jyjzsj=="")
+	{
+		FW_Dialog1(请填写 "教育截止时间1");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	xxmc = FW_GetValue(1100,学校名称1,cp);
+	if(xxmc=="")
+	{
+		FW_Dialog1(请填写 "学校名称1");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	sxzy1 = FW_GetValue(1100,所学专业1,cp);
+	if(sxzy1=="")
+	{
+		FW_Dialog1(请填写 "所学专业1");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	sjxmjy = FW_GetValue(1100,实践项目经验,cp);
+	if(sjxmjy=="")
+	{
+		FW_Dialog1(请填写 "实践项目经验");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	tcjzwpj = FW_GetValue(1100,特长及自我评价,cp);
+	if(tcjzwpj=="")
+	{
+		FW_Dialog1(请填写 "特长及自我评价");
+		FW_SetValue_w(1100,ReleaseEvent,0,"");
+		return(0);
+	}
+	
+}
+SERVER
+{
+	zt = FW_GetValue(1100,状态,cp);
+	if(zt == "求职人员登记表待完善")
+	{
+		FW_SetValue_w(1100,状态,cp,"团队角色分析待完善");
+	}
+	return(GotoClient);
+}
+CLIENT
+{
+	if(zt == "求职人员登记表待完善")
+	{
+		FW_SetValue_w(1100,状态,cp,"团队角色分析待完善");
+	}
+}
+SERVER
+{
+	st0.FormID = 1129;
+	st0.Record = cp;
+	return(st0);
+}

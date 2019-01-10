@@ -1,0 +1,186 @@
+FIELD
+{
+    .1138.假别;
+    .1138.请假共计;
+    .1138.状态;
+    .1138.GroupID;
+    .1138.申请日期;
+    .1138.UserName1;
+    .1138.UserName2;
+    .1138.UserName3;
+    .1138.GroupID1;
+    .1138.GroupID2;
+    .1138.GroupID3;
+    .1138.GroupID4;
+    .1138.POST2;
+    .1138.POST1;
+    .1138.POST4;
+    .1138.替代人工号;
+    .1138.Field15;
+
+    .1087.UserName;
+    .1087.归属范围;
+    .1087.POST;
+    .1087.GroupID;
+    .1087.姓名;
+
+    .1143.可休年假;
+    .1143.申请中年假;
+    .1143.更新跨年度年假;
+
+    .1138.姓名;
+    .1138.事由说明;
+    .1138.当前待处理标记Page;
+    .1235.事件状态;
+    .1235.处理人姓名;
+    .1235.处理人工号;
+    .1235.处理人职务;
+    .1235.处理人部门;
+    .1235.处理日期;
+    .1235.审批状态;
+    .1235.LinkToFormID;
+    .1235.LinkToFormPage;
+    .1235.提交人姓名;
+    .1235.提交人工号;
+    .1235.内容;
+    .1235.提交日期;
+}
+VAR
+{
+    String us,scon,applydate,username,groupid,str,scope,selfpost,post,审批状态s,reusername;
+    int correctpage, rec,total, rec_1143;
+    double useable_leave,applying_leava,current_apply,D跨年度年假;
+    Struct2 st21,st22;
+    String 事件状态s,处理人姓名s,处理人工号s,处理人职务s,处理人部门s,处理日期s,提交人姓名s,提交人工号s,内容s,提交日期s,提交人职务s,leave;
+    int LinkToFormID_int,LinkToFormPage_int,newPage;
+}
+CLIENT
+{
+    correctpage = FW_GetCurrentRecNum();
+    str=CURRENT.sVALUE;
+    if(str=="0")
+    {
+        Goto(-1);
+    }
+    applydate = FW_GetSysDate(0);
+    groupid = FW_GetValue(1138,GroupID,correctpage);
+    reusername=FW_GetValue(1138,替代人工号,correctpage);
+    username = FW_GetUserID(2);
+    FW_Dialog1(正在提交中，请按 继续 并等待成功提示。);
+}
+SERVER
+{
+    scon="1087,username@UserName";
+    st21=FW_FindRecords(scon,1);
+    rec=st21.RecordNoList.Get[0];
+    提交人职务s=FW_GetValue(1087,POST,rec);
+    事件状态s="待处理";
+    
+    scon = "1087,reusername@UserName";
+    st21 = FW_FindRecords(scon,1);
+    if(st21.mError == 0)
+    {
+        rec = st21.RecordNoList.Get[0];
+        处理人工号s = reusername;
+        处理人姓名s = FW_GetValue(1087,姓名,rec);
+    }else if(st21.mError!= 0)
+    {
+        scon = "1087,reusername@姓名";
+        st22 = FW_FindRecords(scon,1);
+        rec = st22.RecordNoList.Get[0];
+        处理人工号s = FW_GetValue(1087,UserName,rec);
+        处理人姓名s = reusername;
+    }
+    处理人职务s = FW_GetValue(1087,POST,rec);
+    处理人部门s = FW_GetValue(1087,GroupID,rec);
+    处理日期s = "";
+    审批状态s = "待替代人同意";
+    LinkToFormID_int = 1138;
+    LinkToFormPage_int = correctpage;
+    提交人姓名s = FW_GetValue(1138,姓名,correctpage);
+    提交人工号s = username;
+    内容s = FW_GetValue(1138,事由说明,correctpage);
+    提交日期s = applydate;
+
+    leave = FW_GetValue(1138, 假别, correctpage);
+    if(leave == "年假")
+    {
+        st21 = FW_FindRecords("1143,username@UserName", 1);
+        rec_1143 = st21.RecordNoList.Get[0];
+        useable_leave = FW_GetValue(1143, 可休年假, rec_1143);
+        applying_leava = FW_GetValue(1143, 申请中年假, rec_1143);
+        D跨年度年假 = FW_GetValue(1143, 更新跨年度年假, rec_1143);
+    }
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_FormOpen(1143);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+    if(leave == "年假")
+    {
+        current_apply = FW_GetValue(1138, 请假共计, correctpage);
+        useable_leave = useable_leave - current_apply;
+        applying_leava = applying_leava + current_apply;
+        if(D跨年度年假 > 0)
+        {
+            D跨年度年假 = D跨年度年假 - current_apply;
+            if(D跨年度年假 < 0)
+            {
+                D跨年度年假 = 0;
+            }
+        }
+        FW_SetValue_w(1143, 更新跨年度年假, rec_1143, D跨年度年假);
+        FW_SetValue_w(1143, 可休年假, rec_1143, useable_leave);
+        FW_SetValue_w(1143, 申请中年假, rec_1143, applying_leava);
+    }
+    FW_SetValue_w(1138,申请日期,correctpage,applydate);
+    FW_SetValue_w(1138,UserName1,correctpage,username);
+    FW_SetValue_w(1138,POST1,correctpage,提交人职务s);
+    FW_SetValue_w(1138,UserName2,correctpage,处理人工号s);
+    FW_SetValue_w(1138,GroupID2,correctpage,处理人部门s);
+    FW_SetValue_w(1138,状态,correctpage,审批状态s);
+}
+SERVER
+{
+    if(leave == "年假")
+    {
+        FW_SetValue_w(1143, 更新跨年度年假, rec_1143, D跨年度年假);
+        FW_SetValue_w(1143, 可休年假, rec_1143, useable_leave);
+        FW_SetValue_w(1143, 申请中年假, rec_1143, applying_leava);
+    }
+    FW_SetValue_w(1138,申请日期,correctpage,applydate);
+    FW_SetValue_w(1138,UserName1,correctpage,username);
+    FW_SetValue_w(1138,POST1,correctpage,提交人职务s);
+    FW_SetValue_w(1138,UserName2,correctpage,处理人工号s);
+    FW_SetValue_w(1138,GroupID2,correctpage,处理人部门s);
+    FW_SetValue_w(1138,状态,correctpage,审批状态s);
+
+    newPage = FW_AddNewPage_w(1235);
+    FW_SetValue_w(1138,当前待处理标记Page,correctpage,newPage);
+    FW_SetValue_w(1235,事件状态,newPage,事件状态s);
+    FW_SetValue_w(1235,处理人姓名,newPage,处理人姓名s);
+    FW_SetValue_w(1235,处理人工号,newPage,处理人工号s);
+    FW_SetValue_w(1235,处理人职务,newPage,处理人职务s);
+    FW_SetValue_w(1235,处理人部门,newPage,处理人部门s);
+    FW_SetValue_w(1235,处理日期,newPage,处理日期s);
+    FW_SetValue_w(1235,审批状态,newPage,审批状态s);
+    FW_SetValue_w(1235,LinkToFormID,newPage,LinkToFormID_int);
+    FW_SetValue_w(1235,LinkToFormPage,newPage,LinkToFormPage_int);
+    FW_SetValue_w(1235,提交人姓名,newPage,提交人姓名s);
+    FW_SetValue_w(1235,提交人工号,newPage,提交人工号s);
+    FW_SetValue_w(1235,内容,newPage,"请假申请");
+    FW_SetValue_w(1235,提交日期,newPage,提交日期s);
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_SetValue_w(1138, Field15, correctpage, "ClientListWinRefresh");
+    FW_Dialog1(申请提交成功！);
+}

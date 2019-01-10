@@ -1,0 +1,117 @@
+FIELD
+{
+    .1138.UserName1;
+    .1138.状态;
+    .1138.假别;
+    .1138.请假共计;
+    .1138.当前待处理标记Page;
+
+    .1143.UserName;
+    .1143.可休年假;
+    .1143.申请中年假;
+    .1143.跨年度可休年假;
+    .1143.更新跨年度年假;
+    .1143.跨年度可休年假截止日期;
+
+    .1235.事件状态;
+}
+VAR
+{
+    int cp, rec_1143, mark_page, is_cancel, is_continue;
+    double useable_leave, applying_leave, current_apply_leave, lastyear_leave_fixed, lastyear_leave;
+    String us, username1, status, leave_type, current_date, end_date;
+    Struct2 st20;
+}
+CLIENT
+{
+    us = FW_GetUserID(2);
+    cp = FW_GetCurrentRecNum();
+    status = FW_GetValue(1138, 状态, cp);
+    username1 = FW_GetValue(1138, UserName1, cp);
+    if(status == "待提交")
+    {
+        FW_Dialog1(待提交的申请单无需作废，修改信息后重新提交即可！);
+        Goto(-1);
+    }else if((status == "未通过作废") || (status == "已通过作废"))
+    {
+        FW_Dialog1(此申请单已作废过，无需重复操作！);
+        Goto(-1);
+    }else if(status == "已通过")
+    {
+        FW_Dialog1(已通过的申请单无法进行作废！);
+        Goto(-1);
+    }
+    is_continue = FW_Dialog1(确认进行作废操作吗？);
+    if(is_continue == 0)
+    {
+        Goto(-1);
+    }
+    leave_type = FW_GetValue(1138, 假别, cp);
+}
+SERVER
+{
+    mark_page = FW_GetValue(1138, 当前待处理标记Page, cp);
+    if(us == username1)
+    {
+        is_cancel = 1;
+        if(leave_type == "年假")
+        {
+            current_apply_leave = FW_GetValue(1138, 请假共计, cp);
+            st20 = FW_FindRecords("1143, us@UserName", 1);
+            rec_1143 = st20.RecordNoList.Get[0];
+            useable_leave = FW_GetValue(1143, 可休年假, rec_1143);
+            applying_leave = FW_GetValue(1143, 申请中年假, rec_1143);
+            useable_leave = useable_leave + current_apply_leave;
+            applying_leave = applying_leave - current_apply_leave;
+            current_date = FW_GetSysDate(0);
+            end_date = FW_GetValue(1143, 跨年度可休年假截止日期, rec_1143);
+            lastyear_leave = FW_GetValue(1143, 更新跨年度年假, rec_1143);
+            if(end_date > current_date)
+            {
+                lastyear_leave_fixed = FW_GetValue(1143, 跨年度可休年假, rec_1143);
+                lastyear_leave = lastyear_leave + current_apply_leave;
+                if(lastyear_leave > lastyear_leave_fixed)
+                {
+                    lastyear_leave = lastyear_leave_fixed;
+                }
+            }
+            FW_SetValue_w(1143, 更新跨年度年假, rec_1143, lastyear_leave);
+            FW_SetValue_w(1143, 可休年假, rec_1143, useable_leave);
+            FW_SetValue_w(1143, 申请中年假, rec_1143, applying_leave);
+        }
+        FW_SetValue_w(1235, 事件状态, mark_page, "未通过作废");
+        FW_SetValue_w(1138, 状态, cp, "未通过作废");
+        FW_SetValue_w(1138, UserName1, cp, "未通过作废");
+    }else if (us != username1)
+    {
+        is_cancel = 0;
+    }
+    return (GotoClient);
+}
+CLIENT
+{
+    FW_FormOpen(1143);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+    if (is_cancel == 1)
+    {
+        if(leave_type == "年假")
+        {
+            FW_SetValue_w(1143, 更新跨年度年假, rec_1143, lastyear_leave);
+            FW_SetValue_w(1143, 可休年假, rec_1143, useable_leave);
+            FW_SetValue_w(1143, 申请中年假, rec_1143, applying_leave);
+        }
+        FW_SetValue_w(1138, 状态, cp, "未通过作废");
+        FW_SetValue_w(1138, UserName1, cp, "未通过作废");
+        FW_SetValue_w(1138, Field15, cp, "ClientListWinRefresh");
+        FW_Dialog1(作废成功！);
+    }else if (is_cancel == 0)
+    {
+        FW_Dialog1(您不是此申请单的申请人，作废需要使用此单申请人帐号！);
+    }
+}

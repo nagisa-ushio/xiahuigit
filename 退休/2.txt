@@ -1,0 +1,118 @@
+FIELD
+{
+	.1106.姓名;
+	.1106.状态;
+	.1106.GroupID;
+	.1106.申请日期;
+	.1106.UserName1;
+	.1106.UserName2;
+	.1106.GroupID1;
+	.1106.GroupID2;
+	.1106.GroupID3;
+	.1106.POST1;
+	.1106.POST2;
+	.1106.POST3;
+	.1106.POST4;
+	.1106.当前待处理标记Page;
+	.1106.当前待处理标记Page备用;
+
+	.1087.姓名;
+	.1087.归属范围;
+        .1087.UserName;
+        .1087.POST;
+
+        .1235.事件状态;
+        .1235.处理人姓名;
+        .1235.处理人工号;
+        .1235.处理人职务;
+        .1235.处理人部门;
+        .1235.处理日期;
+        .1235.审批状态;
+        .1235.LinkToFormID;
+        .1235.LinkToFormPage;
+        .1235.提交人姓名;
+        .1235.提交人工号;
+        .1235.内容;
+        .1235.提交日期;
+        .1235.提交人部门;
+        .1235.归属范围;
+}
+VAR
+{
+	String current_us, handle, handle_post, status, handle_gd, handle_data, apply_name, apply_us, apply_data, apply_gd, handle_us, handle_name, apply_affiliation;
+	int cp,rec,np,current_handlePage;
+        Struct2 st20;
+}
+CLIENT
+{
+	cp =FW_GetCurrentRecNum();
+	handle = CURRENT.sVALUE;
+	if(handle=="0")
+	{
+		//FW_Dialog1(等待);
+		return(0);		
+	}
+	if(handle == "1")
+	{
+                handle_gd = "";
+                handle_post = FW_GetValue(1106,POST3,cp);
+		status = "待人事审批";
+	}
+	if(handle == "3")
+	{
+                handle_gd = FW_GetValue(1106,GroupID1,cp);
+                handle_post = FW_GetValue(1106,POST1,cp);
+		status = "待提交";		
+	}
+        current_us = FW_GetUserID(2);
+        handle_data = FW_GetSysDate(0);
+        apply_name = FW_GetValue(1106,姓名,cp);
+        apply_us = FW_GetValue(1106,UserName1,cp);
+        apply_data = FW_GetValue(1106,申请日期,cp);
+        apply_gd = FW_GetValue(1106,GroupID1,cp);
+}
+SERVER
+{
+        if(handle == "1")
+        {
+                st20 = FW_FindRecords("1087,handle_post@POST",1);
+                rec = st20.RecordNoList.Get[0];
+                handle_us = FW_GetValue(1087,UserName,rec);
+                handle_name = FW_GetValue(1087,姓名,rec);
+        }else
+        {
+                handle_us = FW_GetValue(1106,UserName1,cp);
+                handle_name = apply_name;
+        }
+        current_handlePage = FW_GetValue(1106,当前待处理标记Page,cp);
+        apply_affiliation = FW_GetValue(1235,归属范围,current_handlePage);
+        FW_SetValue_w(1235,事件状态,current_handlePage,"已处理");
+        
+        np = FW_AddNewPage_w(1235);
+        FW_SetValue_w(1106,当前待处理标记Page,cp,np);
+        FW_SetValue_w(1235,事件状态,np,"待处理");
+        FW_SetValue_w(1235,处理人姓名,np,handle_name);
+        FW_SetValue_w(1235,处理人工号,np,handle_us);
+        FW_SetValue_w(1235,处理人职务,np,handle_post);
+        FW_SetValue_w(1235,处理人部门,np,handle_gd);
+        FW_SetValue_w(1235,处理日期,np,handle_data);
+        FW_SetValue_w(1235,审批状态,np,status);
+        FW_SetValue_w(1235,LinkToFormID,np,1106);
+        FW_SetValue_w(1235,LinkToFormPage,np,cp);
+        FW_SetValue_w(1235,提交人姓名,np,apply_name);
+        FW_SetValue_w(1235,提交人工号,np,apply_us);
+        FW_SetValue_w(1235,内容,np,"退休申请");
+        FW_SetValue_w(1235,提交日期,np,apply_data);
+        FW_SetValue_w(1235,提交人部门,np,apply_gd);
+        FW_SetValue_w(1235,归属范围,np,handle_post);
+        
+	FW_SetValue_w(1106,UserName2,cp,current_us);
+	FW_SetValue_w(1106,状态,cp,status);
+	return(GotoClient);
+}
+CLIENT
+{
+	FW_SetValue_w(1106,UserName2,cp,current_us);
+	FW_SetValue_w(1106,状态,cp,status);
+        FW_Dialog1(审批成功!);
+}                             

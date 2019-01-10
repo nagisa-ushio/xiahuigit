@@ -1,0 +1,93 @@
+FIELD
+{
+	.1105.面谈日期;
+	.1105.岗位;
+	.1105.面谈人;
+	.1105.重点面谈内容;
+	.1105.其他;
+	.1105.面谈内容记录;
+	.1105.员工主要反馈意见;
+	.1105.后续跟进安排;
+	.1105.状态;
+}
+VAR
+{
+	String gh, gw, tzsj, qssj,mtjlnr,ygzyfkyj,hxgjap, jssj;
+	int cp;
+}
+CLIENT
+{
+	cp =FW_GetCurrentRecNum();
+	gh = FW_GetValue(1105,面谈日期,cp);
+	if(gh=="")
+	{
+		FW_Dialog1(请填写 "面谈日期");
+		FW_SetValue_w(1105,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	gw = FW_GetValue(1105,岗位,cp);
+	if(gw == "")
+	{
+		FW_Dialog1(请填写 "岗位");
+		FW_SetValue_w(1105,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	tzsj = FW_GetValue(1105,面谈人,cp);
+	if(tzsj=="")
+	{
+		FW_Dialog1(请填写 "面谈人");
+		FW_SetValue_w(1105,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	qssj = FW_GetValue(1105,重点面谈内容,cp);
+	if(qssj=="")
+	{
+		FW_Dialog1(请填写 "重点面谈内容");
+		FW_SetValue_w(1105,ReleaseEvent,0,"");
+		return(0);
+	}else if(qssj == "其他")
+        {
+                jssj = FW_GetValue(1105,其他,cp);
+                if(jssj=="")
+                {
+                        FW_Dialog1(请填写 "其他");
+                        FW_SetValue_w(1105,ReleaseEvent,0,"");
+                        return(0);
+                }
+        }
+
+	mtjlnr = FW_GetValue(1105,面谈内容记录,cp);
+	if(mtjlnr=="")
+	{
+		FW_Dialog1(请填写 "面谈内容记录");
+		FW_SetValue_w(1105,ReleaseEvent,0,"");
+		return(0);
+	}
+	ygzyfkyj = FW_GetValue(1105,员工主要反馈意见,cp);
+	if(ygzyfkyj=="")
+	{
+		FW_Dialog1(请填写 "员工主要反馈意见");
+		FW_SetValue_w(1105,ReleaseEvent,0,"");
+		return(0);
+	}
+	hxgjap = FW_GetValue(1105,后续跟进安排,cp);
+	if(hxgjap=="")
+	{
+		FW_Dialog1(请填写 "后续跟进安排");
+		FW_SetValue_w(1105,ReleaseEvent,0,"");
+		return(0);
+	}
+}
+SERVER
+{
+	FW_SetValue_w(1105,状态,cp,"已完善");
+	return(GotoClient);
+}
+CLIENT
+{
+	FW_SetValue_w(1105,状态,cp,"已完善");
+	FW_Dialog1(登记成功);
+}                                

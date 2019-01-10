@@ -1,0 +1,254 @@
+FIELD
+{
+        .1113.签名1;
+        .1113.签名2;
+        .1113.签名3;
+        .1113.签名4;
+        .1113.签名5;
+        .1113.签名6;
+        .1113.签名7;
+        .1113.签名8;
+        .1113.签名9;
+        .1113.签名10;
+        .1113.签名11;
+        .1113.签名12;
+        .1113.主管签名;
+        .1113.总监签名;
+        .1113.行政资料;
+        .1113.时间1;
+        .1113.时间2;
+        .1113.时间3;
+        .1113.时间4;
+        .1113.时间5;
+        .1113.时间6;
+        .1113.时间7;
+        .1113.时间8;
+        .1113.时间9;
+        .1113.时间10;
+        .1113.时间11;
+        .1113.时间12;
+        .1113.时间13;
+        .1113.时间14;
+        .1113.时间15;
+        .1113.主管签名日期;
+        .1113.总监签名日期;
+
+        .1110.流程五;
+        .1110.状态;
+
+}
+VAR
+{
+        int cp;
+        String s签名1, s签名2, s签名3, s签名4, s签名5, s签名6, s签名7, s签名8, s签名9, s签名10, s签名11, s签名12, s行政资料, s总监签名, s主管签名, s时间1, s时间2, s时间3, s时间4, s时间5, s时间6, s时间7, s时间8, s时间9, s时间10, s时间11, s时间12, s时间13, s时间14, s时间15, s主管签名日期, s总监签名日期, status5;
+}
+CLIENT
+{
+        cp = FW_GetCurrentRecNum();
+        s签名1 = FW_GetValue(1113,签名1,cp);
+        if(s签名1 == "")
+        {
+                FW_Dialog1(“电子资料”的交接人签名不能为空！);
+                return(0);
+        }
+        s时间1 = FW_GetValue(1113,时间1,cp);
+        if(s时间1 == "")
+        {
+                FW_Dialog1(“电子资料”的日期不能为空！);
+                return(0);
+        }
+        s签名2 = FW_GetValue(1113,签名2,cp);
+        if(s签名2 == "")
+        {
+                FW_Dialog1(“纸质资料”的交接人签名不能为空！);
+                return(0);
+        }
+        s时间2 = FW_GetValue(1113,时间2,cp);
+        if(s时间2 == "")
+        {
+                FW_Dialog1(“纸质资料”的日期不能为空！);
+                return(0);
+        }
+        s签名3 = FW_GetValue(1113,签名3,cp);
+        if(s签名3 == "")
+        {
+                FW_Dialog1(“社区对象”的交接人签名不能为空！);
+                return(0);
+        }
+        s时间3 = FW_GetValue(1113,时间3,cp);
+        if(s时间3 == "")
+        {
+                FW_Dialog1(“社区对象”的日期不能为空！);
+                return(0);
+        }
+        s签名4 = FW_GetValue(1113,签名4,cp);
+        if(s签名4 == "")
+        {
+                FW_Dialog1(“个案服务”的交接人签名不能为空！);
+                return(0);
+        }
+        s时间4 = FW_GetValue(1113,时间4,cp);
+        if(s时间4 == "")
+        {
+                FW_Dialog1(“个案服务”的日期不能为空！);
+                return(0);
+        }
+        s签名5 = FW_GetValue(1113,签名5,cp);
+        if(s签名5 == "")
+        {
+                FW_Dialog1(“活动交接”的交接人签名不能为空！);
+                return(0);
+        }
+        s时间5 = FW_GetValue(1113,时间1,cp);
+        if(s时间5 == "")
+        {
+                FW_Dialog1(“活动交接”的日期不能为空！);
+                return(0);
+        }
+        s签名6 = FW_GetValue(1113,签名6,cp);
+        if(s签名6 == "")
+        {
+                FW_Dialog1(“项目管理”的交接人签名不能为空！);
+                return(0);
+        }
+        s时间6 = FW_GetValue(1113,时间6,cp);
+        if(s时间6 == "")
+        {
+                FW_Dialog1(“项目管理”的日期不能为空！);
+                return(0);
+        }
+        s签名7 = FW_GetValue(1113,签名7,cp);
+        if(s签名7 == "")
+        {
+                FW_Dialog1(“工作群组”的交接人签名不能为空！);
+                return(0);
+        }
+        s时间7 = FW_GetValue(1113,时间7,cp);
+        if(s时间7 == "")
+        {
+                FW_Dialog1(“工作群组”的日期不能为空！);
+                return(0);
+        }
+        s签名8 = FW_GetValue(1113,签名8,cp);
+        if(s签名8 == "")
+        {
+                FW_Dialog1(“办公用品”的交接人签名不能为空！);
+                return(0);
+        }
+        s时间8 = FW_GetValue(1113,时间8,cp);
+        if(s时间8 == "")
+        {
+                FW_Dialog1(“办公用品”的日期不能为空！);
+                return(0);
+        }
+        s签名9 = FW_GetValue(1113,签名9,cp);
+        if(s签名9 == "")
+        {
+                FW_Dialog1(“工作服”的交接人签名不能为空！);
+                return(0);
+        }
+        s时间9 = FW_GetValue(1113,时间9,cp);
+        if(s时间9 == "")
+        {
+                FW_Dialog1(“工作服”的日期不能为空！);
+                return(0);
+        }
+        s签名10 = FW_GetValue(1113,签名10,cp);
+        if(s签名10 == "")
+        {
+                FW_Dialog1(“工作牌”的交接人签名不能为空！);
+                return(0);
+        }
+        s时间10 = FW_GetValue(1113,时间10,cp);
+        if(s时间10 == "")
+        {
+                FW_Dialog1(“工作牌”的日期不能为空！);
+                return(0);
+        }
+        s签名11 = FW_GetValue(1113,签名11,cp);
+        if(s签名11 == "")
+        {
+                FW_Dialog1(“在借图书”的交接人签名不能为空！);
+                return(0);
+        }
+        s时间11 = FW_GetValue(1113,时间11,cp);
+        if(s时间11 == "")
+        {
+                FW_Dialog1(“在借图书”的日期不能为空！);
+                return(0);
+        }
+        s签名12 = FW_GetValue(1113,签名12,cp);
+        if(s签名12 == "")
+        {
+                FW_Dialog1(“活动剩余物资”的交接人签名不能为空！);
+                return(0);
+        }
+        s时间12 = FW_GetValue(1113,时间12,cp);
+        if(s时间12 == "")
+        {
+                FW_Dialog1(“活动剩余物资”的日期不能为空！);
+                return(0);
+        }
+        s行政资料 = FW_GetValue(1113,行政资料,cp);
+        if(s行政资料 == "")
+        {
+                FW_Dialog1(“行政资料”不能为空！);
+                return(0);
+        }
+        s主管签名 = FW_GetValue(1113,主管签名,cp);
+        if(s主管签名 == "")
+        {
+                FW_Dialog1(“主管签名”不能为空！);
+                return(0);
+        }
+        s主管签名日期 = FW_GetValue(1113,主管签名日期,cp);
+        if(s主管签名日期 == "")
+        {
+                FW_Dialog1(“主管签名”的日期不能为空！);
+                return(0);
+        }
+        s总监签名 = FW_GetValue(1113,总监签名,cp);
+        if(s总监签名 == "")
+        {
+                FW_Dialog1(“总监签名”不能为空！);
+                return(0);
+        }
+        s总监签名日期 = FW_GetValue(1113,总监签名日期,cp);
+        if(s总监签名日期 == "")
+        {
+                FW_Dialog1(“总监签名”的日期不能为空！);
+                return(0);
+        }
+        s时间13 = FW_GetValue(1113,时间13,cp);
+        if(s签名13 == "")
+        {
+                FW_Dialog1(“退工”的日期不能为空！);
+                return(0);
+        }
+        s时间14 = FW_GetValue(1113,时间14,cp);
+        if(s时间14 == "")
+        {
+                FW_Dialog1(“终止劳动关系”的日期不能为空！);
+                return(0);
+        }
+        s时间15 = FW_GetValue(1113,时间15,cp);
+        if(s时间15 == "")
+        {
+                FW_Dialog1(“在职证明”的日期不能为空！);
+                return(0);
+        }
+        status5 = "(已完成)";
+}
+SERVER
+{
+        FW_SetValue_w(1110,状态,cp,"离职流程已完成");
+        FW_SetValue_w(1110,流程五,cp,status5);
+}
+CLIENT
+{
+        FW_SetValue_w(1110,状态,cp,"离职流程已完成");
+        FW_SetValue_w(1110,流程五,cp,status5);
+        FW_Dialog1(离职交接登记完成！);
+}
+
+

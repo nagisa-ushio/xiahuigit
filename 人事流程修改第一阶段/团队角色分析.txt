@@ -1,0 +1,1663 @@
+FIELD
+{
+        .1130.状态;
+        .1130.Total工兵;
+        .1130.Total主席;
+        .1130.Total开路先锋;
+        .1130.Total智多星;
+        .1130.Total八爪鱼;
+        .1130.Total白弹斋主;
+        .1130.Total保姆;
+        .1130.Total精心炮制师;
+
+        .1128.第一;
+        .1128.第二;
+        .1128.第三;
+}
+VAR
+{
+        int cp,max4,max5,max6,a,b,c,d,e,f,g,h;
+        String status,first,second,third,all;
+        Struct0 st0;
+}
+CLIENT
+{
+        cp = FW_GetCurrentRecNum();
+        status = FW_GetValue(1130,状态,cp);
+	if(status == "自我透析评分表查看")
+	{
+                a = FW_GetValue(1130,Total工兵,cp);
+                b = FW_GetValue(1130,Total主席,cp);
+                c = FW_GetValue(1130,Total开路先锋,cp);
+                d = FW_GetValue(1130,Total智多星,cp);
+                e = FW_GetValue(1130,Total八爪鱼,cp);
+                f = FW_GetValue(1130,Total白弹斋主,cp);
+                g = FW_GetValue(1130,Total保姆,cp);
+                h = FW_GetValue(1130,Total精心炮制师,cp);
+                max4 = FW_GetValueMax(a,b);
+                max4 = FW_GetValueMax(max4,c);
+                max4 = FW_GetValueMax(max4,d);
+                max4 = FW_GetValueMax(max4,e);
+                max4 = FW_GetValueMax(max4,f);
+                max4 = FW_GetValueMax(max4,g);
+                max4 = FW_GetValueMax(max4,h);
+                if(max4 == a)
+                {
+                        first = "工兵";
+                        max5 = FW_GetValueMax(b,c);
+                        max5 = FW_GetValueMax(max5,d);
+                        max5 = FW_GetValueMax(max5,e);
+                        max5 = FW_GetValueMax(max5,f);
+                        max5 = FW_GetValueMax(max5,g);
+                        max5 = FW_GetValueMax(max5,h);
+                        if(max5 == b)
+                        {
+                                second = "主席";
+                                max6 = FW_GetValueMax(c,d);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == c)
+                        {
+                                second = "开路先锋";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == d)
+                        {
+                                second = "智多星";
+                                max6 = FW_GetValueMax(b,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third == "保姆";
+                                }else if(max6 = h)
+                                {
+                                        third == "精心炮制师";
+                                }
+                        }else if(max5 == e)
+                        {
+                                second = "八爪鱼";
+                                max6 = FW_GetValueMax(b,c);
+                                max6 = FW_GetValueMax(max6,d);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == f)
+                        {
+                                second = "白弹斋主";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == d)
+                                {
+                                        third == "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == g)
+                        {
+                                second = "保姆";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == h)
+                        {
+                                second = "精心炮制师";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }
+                        }
+                }else if(max4 == b)
+                {
+                        first = "主席";
+                        max5 = FW_GetValueMax(a,c);
+                        max5 = FW_GetValueMax(max5,d);
+                        max5 = FW_GetValueMax(max5,e);
+                        max5 = FW_GetValueMax(max5,f);
+                        max5 = FW_GetValueMax(max5,g);
+                        max5 = FW_GetValueMax(max5,h);
+                        if(max5 == a)
+                        {
+                                second = "工兵";
+                                max6 = FW_GetValueMax(c,d);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == c)
+                        {
+                                second = "开路先锋";
+                                max6 = FW_GetValueMax(a,d);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == d)
+                        {
+                                second = "智多星";
+                                max6 = FW_GetValueMax(a,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == e)
+                        {
+                                second = "八爪鱼";
+                                max6 = FW_GetValueMax(a,c);
+                                max6 = FW_GetValueMax(max6,d);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == f)
+                        {
+                                second = "白弹斋主";
+                                max6 = FW_GetValueMax(a,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == g)
+                        {
+                                second = "保姆";
+                                max6 = FW_GetValueMax(a,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == h)
+                        {
+                                second = "精心炮制师";
+                                max6 = FW_GetValueMax(a,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }
+                        }
+                }else if(max4 == c)
+                {
+                        first = "开路先锋";
+                        max5 = FW_GetValueMax(b,a);
+                        max5 = FW_GetValueMax(max5,d);
+                        max5 = FW_GetValueMax(max5,e);
+                        max5 = FW_GetValueMax(max5,f);
+                        max5 = FW_GetValueMax(max5,g);
+                        max5 = FW_GetValueMax(max5,h);
+                        if(max5 == b)
+                        {
+                                second = "主席";
+                                max6 = FW_GetValueMax(a,d);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == a)
+                        {
+                                second = "工兵";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == d)
+                        {
+                                second = "智多星";
+                                max6 = FW_GetValueMax(b,a);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == e)
+                        {
+                                second = "八爪鱼";
+                                max6 = FW_GetValueMax(b,a);
+                                max6 = FW_GetValueMax(max6,d);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == f)
+                        {
+                                second = "白弹斋主";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == g)
+                        {
+                                second = "保姆";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == h)
+                        {
+                                second = "精心炮制师";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }
+                        }
+                }else if(max4 == d)
+                {
+                        first = "智多星";
+                        max5 = FW_GetValueMax(b,c);
+                        max5 = FW_GetValueMax(max5,a);
+                        max5 = FW_GetValueMax(max5,e);
+                        max5 = FW_GetValueMax(max5,f);
+                        max5 = FW_GetValueMax(max5,g);
+                        max5 = FW_GetValueMax(max5,h);
+                        if(max5 == b)
+                        {
+                                second = "主席";
+                                max6 = FW_GetValueMax(c,a);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == a)
+                        {
+                                second = "工兵";
+                                max6 = FW_GetValueMax(b,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == c)
+                        {
+                                second = "开路先锋";
+                                max6 = FW_GetValueMax(b,a);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == e)
+                        {
+                                second = "八爪鱼";
+                                max6 = FW_GetValueMax(b,c);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == f)
+                        {
+                                second = "白弹斋主";
+                                max6 = FW_GetValueMax(b,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == g)
+                        {
+                                second = "保姆";
+                                max6 = FW_GetValueMax(b,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == h)
+                        {
+                                second = "精心炮制师";
+                                max6 = FW_GetValueMax(b,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }
+                        }
+                }else if(max4 == e)
+                {
+                        first = "八爪鱼";
+                        max5 = FW_GetValueMax(b,c);
+                        max5 = FW_GetValueMax(max5,d);
+                        max5 = FW_GetValueMax(max5,a);
+                        max5 = FW_GetValueMax(max5,f);
+                        max5 = FW_GetValueMax(max5,g);
+                        max5 = FW_GetValueMax(max5,h);
+                        if(max5 == b)
+                        {
+                                second = "主席";
+                                max6 = FW_GetValueMax(a,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == a)
+                        {
+                                second = "工兵";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == d)
+                        {
+                                second = "智多星";
+                                max6 = FW_GetValueMax(b,c);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == c)
+                        {
+                                second = "开路先锋";
+                                max6 = FW_GetValueMax(b,a);
+                                max6 = FW_GetValueMax(max6,d);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == f)
+                        {
+                                second = "白弹斋主";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == g)
+                        {
+                                second = "保姆";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == h)
+                        {
+                                second = "精心炮制师";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,g);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }
+                        }
+                }else if(max4 == f)
+                {
+                        first = "白弹斋主";
+                        max5 = FW_GetValueMax(b,c);
+                        max5 = FW_GetValueMax(max5,d);
+                        max5 = FW_GetValueMax(max5,e);
+                        max5 = FW_GetValueMax(max5,a);
+                        max5 = FW_GetValueMax(max5,g);
+                        max5 = FW_GetValueMax(max5,h);
+                        if(max5 == b)
+                        {
+                                second = "主席";
+                                max6 = FW_GetValueMax(a,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == a)
+                        {
+                                second = "工兵";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == d)
+                        {
+                                second = "智多星";
+                                max6 = FW_GetValueMax(b,c);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == c)
+                        {
+                                second = "开路先锋";
+                                max6 = FW_GetValueMax(b,a);
+                                max6 = FW_GetValueMax(max6,d);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == e)
+                        {
+                                second = "八爪鱼";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == g)
+                        {
+                                second = "保姆";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == h)
+                        {
+                                second = "精心炮制师";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }
+                        }
+                }else if(max4 == g)
+                {
+                        first = "保姆";
+                        max5 = FW_GetValueMax(b,c);
+                        max5 = FW_GetValueMax(max5,d);
+                        max5 = FW_GetValueMax(max5,e);
+                        max5 = FW_GetValueMax(max5,f);
+                        max5 = FW_GetValueMax(max5,a);
+                        max5 = FW_GetValueMax(max5,h);
+                        if(max5 == b)
+                        {
+                                second = "主席";
+                                max6 = FW_GetValueMax(a,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third == "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == a)
+                        {
+                                second = "工兵";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == d)
+                        {
+                                second = "智多星";
+                                max6 = FW_GetValueMax(b,c);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == c)
+                        {
+                                second = "开路先锋";
+                                max6 = FW_GetValueMax(b,a);
+                                max6 = FW_GetValueMax(max6,d);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 = a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == e)
+                        {
+                                second = "八爪鱼";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,f);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == f)
+                        {
+                                second = "白弹斋主";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,h);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == h)
+                                {
+                                        third = "精心炮制师";
+                                }
+                        }else if(max5 == h)
+                        {
+                                second = "精心炮制师";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }
+                        }
+                }else if(max4 == h)
+                {
+                        first = "精心炮制师";
+                        max5 = FW_GetValueMax(b,c);
+                        max5 = FW_GetValueMax(max5,d);
+                        max5 = FW_GetValueMax(max5,e);
+                        max5 = FW_GetValueMax(max5,f);
+                        max5 = FW_GetValueMax(max5,g);
+                        max5 = FW_GetValueMax(max5,a);
+                        if(max5 == b)
+                        {
+                                second = "主席";
+                                max6 = FW_GetValueMax(a,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,f);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }
+                        }else if(max5 == a)
+                        {
+                                second = "工兵";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,f);
+                                if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }
+                        }else if(max5 == d)
+                        {
+                                second = "智多星";
+                                max6 = FW_GetValueMax(b,c);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,f);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }
+                        }else if(max5 == c)
+                        {
+                                second = "开路先锋";
+                                max6 = FW_GetValueMax(b,a);
+                                max6 = FW_GetValueMax(max6,d);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,f);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }
+                        }else if(max5 == e)
+                        {
+                                second = "八爪鱼";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,g);
+                                max6 = FW_GetValueMax(max6,f);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }
+                        }else if(max5 == g)
+                        {
+                                second = "保姆";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,f);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }else if(max6 == f)
+                                {
+                                        third = "白弹斋主";
+                                }
+                        }else if(max5 == f)
+                        {
+                                second = "白弹斋主";
+                                max6 = FW_GetValueMax(b,d);
+                                max6 = FW_GetValueMax(max6,a);
+                                max6 = FW_GetValueMax(max6,c);
+                                max6 = FW_GetValueMax(max6,e);
+                                max6 = FW_GetValueMax(max6,g);
+                                if(max6 == a)
+                                {
+                                        third = "工兵";
+                                }else if(max6 == d)
+                                {
+                                        third = "智多星";
+                                }else if(max6 == c)
+                                {
+                                        third = "开路先锋";
+                                }else if(max6 == e)
+                                {
+                                        third = "八爪鱼";
+                                }else if(max6 == g)
+                                {
+                                        third = "保姆";
+                                }else if(max6 == b)
+                                {
+                                        third = "主席";
+                                }
+                        }
+                }
+	        FW_SetValue_w(1131,状态,cp,"应聘者面试记录待完善");
+                FW_SetValue_w(1128,第一,cp,first);
+                FW_SetValue_w(1128,第二,cp,second);
+                FW_SetValue_w(1128,第三,cp,third);
+
+        }
+}
+SERVER
+{
+        if(status == "自我透析评分表查看")
+        {
+	        FW_SetValue_w(1131,状态,cp,"应聘者面试记录待完善");
+                FW_SetValue_w(1128,第一,cp,first);
+                FW_SetValue_w(1128,第二,cp,second);
+                FW_SetValue_w(1128,第三,cp,third);
+        }
+        return(GotoClient);
+}
+CLIENT
+{
+}
+SERVER
+{
+        st0.FormID = 1128;
+        st0.Record = cp;
+        return(st0);
+}

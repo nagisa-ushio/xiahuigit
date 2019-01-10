@@ -1,0 +1,35 @@
+FIELD
+{
+	.1044.状态;
+	.1044.POST3;
+}
+VAR
+{
+	String zt,post,status;
+	int cp;
+}
+CLIENT
+{
+	cp =FW_GetCurrentRecNum();
+	zt = FW_GetValue(1044,状态,cp);
+        post = FW_GetValue(1044,POST3,cp);
+        status ="待" + post + "审批";
+        if(zt == "已通过")
+        {
+                FW_Dialog1(此申请单已经是通过状态！);
+                return(0);
+        }else if(zt != status)
+        {
+                status = "此申请单不在" + post + "审批流程";
+                FW_Dialog1(status);
+                return(0);
+        }
+}
+SERVER
+{
+	return(GotoClient);
+}
+CLIENT
+{
+	
+}

@@ -1,0 +1,75 @@
+FIELD
+{
+        .1128.姓名;
+
+        .1254.状态;
+        .1254.面试结果;
+        .1254.待处理标记页;
+        
+        .1235.提交日期;
+        .1235.提交人姓名;
+        .1235.处理人工号;
+        .1235.处理人姓名;
+        .1235.审批状态;
+        .1235.内容;
+        .1235.事件状态;
+        .1253.LinkToFormID;
+        .1253.LinkToFormPage;
+}
+VAR
+{
+        int cp, np;
+        String name, status, content, date, result;
+        Struct0 st0;
+}
+CLIENT
+{
+        cp = FW_GetCurrentRecNum();
+        status = FW_GetValue(1254,状态,cp);
+        result = FW_GetValue(1254,面试结果,cp);
+        if((status == "应聘者面试记录待完善")&&(result == "同意录用"))
+        {
+                FW_SetValue_w(1254,状态,cp,"待运营总监审批");
+        }else
+        {
+                FW_Dialog1(状态有误，不能提交给总监审批，请核对状态后再完善提交！);
+                return(0);
+        }
+        name = FW_GetValue(1128,姓名,cp);
+        content = "面试人员（" + name + "）信息待运营总监审批";
+        date = FW_GetSysDate(1);
+}
+SERVER
+{
+        if(status == "应聘者面试记录待完善")
+        {
+                FW_SetValue_w(1254,状态,cp,"待运营总监审批");
+        }
+        np = FW_AddNewPage_w(1235);
+        FW_SetValue_w(1254,待处理标记页,cp,np);
+        FW_SetValue_w(1235,事件状态,np,"待处理");
+        FW_SetValue_w(1235,审批状态,np,"待运营总监审批");
+        FW_SetValue_w(1235,处理人工号,np,"XH016");
+        FW_SetValue_w(1235,处理人姓名,np,"郑华燕");
+        FW_SetValue_w(1235,提交人工号,np,"XH080");
+        FW_SetValue_w(1235,提交人姓名,np,"阮丽云");
+        FW_SetValue_w(1235,提交日期,np,date);
+        FW_SetValue_w(1235,内容,np,content);
+        FW_SetValue_w(1235,LinkToFormID,np,"1100");
+        FW_SetValue_w(1235,LinkToFormPage,np,cp);
+        return(GotoClient);
+}
+CLIENT
+{
+        FW_Dialog1(已提交给运营总监审批！);
+        FW_SetValue_w(1254,ReleaseEvent,0,"");
+}
+SERVER
+{
+        st0.FormID = 1253;
+        st0.Record = 0;
+        return(st0);
+}
+
+
+

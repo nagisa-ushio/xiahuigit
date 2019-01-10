@@ -1,0 +1,83 @@
+FIELD
+{
+	.1110.离职类别;
+	.1110.其他;
+	.1110.离职原因;
+	.1110.申请离职日期;
+	.1110.离职信;
+	.1110.本人签署;
+	.1110.签署日期;
+}
+VAR
+{
+	String jb,qsrq,str,qt,resignationLetter,signature,dateiOfSignature;
+	int cp;
+}
+CLIENT
+{
+	cp =FW_GetCurrentRecNum();
+	qsrq = FW_GetValue(1110,申请离职日期,cp);
+	if(qsrq=="")
+	{
+		FW_Dialog1(请填写 "申请离职日期");
+		return(0);
+	}
+
+	jb = FW_GetValue(1110,离职类别,cp);
+	if(jb=="")
+	{
+		FW_Dialog1(请填写 "离职类别");
+		FW_SetValue_w(1110,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	if(jb=="其他")
+	{
+		qt = FW_GetValue(1110,其他,cp);
+		if(qt=="")
+		{
+			FW_Dialog1(请填写 "其他");
+			FW_SetValue_w(1110,ReleaseEvent,0,"");
+			return(0);
+		}
+	}
+
+	qsrq = FW_GetValue(1110,离职原因,cp);
+	if(qsrq=="")
+	{
+		FW_Dialog1(请填写 "离职原因");
+		return(0);
+	}
+	resignationLetter = FW_GetValue(1110,离职信,cp);
+	if(resignationLetter=="")
+	{
+		FW_Dialog1(请填写 "离职信");
+		return(0);
+	}
+	signature = FW_GetValue(1110,本人签署,cp);
+	if(signature=="")
+	{
+		FW_Dialog1(请填写 "本人签署");
+		return(0);
+	}
+	dateiOfSignature = FW_GetValue(1110,签署日期,cp);
+	if(dateiOfSignature=="")
+	{
+		FW_Dialog1(请填写 "签署日期");
+		return(0);
+	}
+
+	str=CURRENT.sVALUE;
+	if(str=="0")
+	{
+		//FW_Dialog1(等待);
+		return(0);		
+	}
+}        
+SERVER
+{
+	return(GotoClient);
+}
+CLIENT
+{
+}                               

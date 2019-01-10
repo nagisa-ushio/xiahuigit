@@ -1,0 +1,109 @@
+FIELD
+{
+	.1106.性别;
+	.1106.出生日期;
+	.1106.因病退休;
+
+	.1168.男性因病退休读取天数;
+	.1168.女性因病退休读取天数;
+	.1168.申请提前天数;
+	.1168.男性正常退休读取天数;
+	.1168.女性正常退休读取天数;
+}
+VAR
+{
+	String str,xb,csrq,ybtx,dqrq,pd;
+	int cp,flag,tqts,ybb,ybg,zcb,zcg;
+}
+CLIENT
+{
+	cp =FW_GetCurrentRecNum();
+	xb = FW_GetValue(1106,性别,cp);
+	if(xb=="")
+	{
+		FW_Dialog1(请填写 "性别");
+		return(0);
+	}
+	csrq = FW_GetValue(1106,出生日期,cp);
+	if(csrq=="")
+	{
+		FW_Dialog1(请填写 "出生日期");
+		return(0);
+	}
+	ybtx = FW_GetValue(1106,出生日期,cp);
+	str=CURRENT.sVALUE;
+//str="1";
+	if(str=="0")
+	{
+		//FW_Dialog1(等待);
+		return(0);		
+	}
+}
+SERVER
+{
+	flag=0;
+	dqrq = FW_GetSysDate(0);
+	tqts = FW_GetValue(1168,申请提前天数,cp);
+//判断因病退休
+	if(ybtx=="是")
+	{
+		ybb = FW_GetValue(1168,男性因病退休读取天数,cp);
+		ybg = FW_GetValue(1168,女性因病退休读取天数,cp);
+		if(xb == "男")
+		{
+			tqts = ybb - tqts ;
+			pd = FW_SpanDate(csrq,tqts,0);			
+			if(dqrq < pd)
+			{
+				flag=1;
+				return(GotoClient);
+			}	
+		}else if(xb == "女")
+		{
+			tqts = ybg - tqts ;
+			pd = FW_SpanDate(csrq,tqts,0);			
+			if(dqrq < pd)
+			{
+				flag=1;
+				return(GotoClient);
+			}
+		}
+	}	
+//判断正常退休
+	ybb = FW_GetValue(1168,男性正常退休读取天数,cp);
+	ybg = FW_GetValue(1168,女性正常退休读取天数,cp);
+	if(xb == "男")
+	{
+		tqts = ybb - tqts ;
+		pd = FW_SpanDate(csrq,tqts,0);			
+		if(dqrq < pd)
+		{
+			flag=2;
+			return(GotoClient);
+		}	
+	}else if(xb == "女")
+	{
+		tqts = ybg - tqts ;
+		pd = FW_SpanDate(csrq,tqts,0);			
+		if(dqrq < pd)
+		{
+			flag=2;
+			return(GotoClient);
+		}
+	}
+	return(GotoClient);
+}
+CLIENT
+{
+	if(flag == 1)
+	{
+		FW_Dialog1(未达到因病退休规定年龄);
+		return(0);
+	}
+	if(flag == 2)
+	{
+		FW_Dialog1(未达到正常退休规定年龄);
+		return(0);
+	}
+	//FW_Dialog1(判断成功);
+}                                       

@@ -1,0 +1,43 @@
+FIELD
+{
+
+        .1134.状态;
+	.1134.流程一;
+	.1134.流程二;
+	.1134.流程三;
+	.1134.流程四;
+}
+VAR
+{
+        int cp,flag;
+        String status;
+}
+CLIENT
+{
+        cp = FW_GetCurrentRecNum();
+        status = FW_GetValue(1134,状态,cp);
+        if(status == "")
+        {
+                flag = 1;
+                FW_SetValue_w(1134,状态,cp,"待提交");
+                FW_SetValue_w(1134,流程一,currentPage,"（待提交）");
+                FW_SetValue_w(1134,流程二,currentPage,"（待审核）");
+                FW_SetValue_w(1134,流程三,currentPage,"（待审核）");
+                FW_SetValue_w(1134,流程四,currentPage,"（待审核）");
+                
+        }
+}
+SERVER
+{
+        if(flag == 1)
+        {
+                FW_SetValue_w(1134,状态,cp,"待提交");
+                FW_SetValue_w(1134,流程一,currentPage,"（待提交）");
+                FW_SetValue_w(1134,流程二,currentPage,"（待审核）");
+                FW_SetValue_w(1134,流程三,currentPage,"（待审核）");
+                FW_SetValue_w(1134,流程四,currentPage,"（待审核）");
+        }
+}
+
+
+

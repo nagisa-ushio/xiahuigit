@@ -1,0 +1,143 @@
+FIELD
+{
+    .1140.状态;
+    .1140.GroupID;
+    .1140.GroupID1;
+    .1140.GroupID3;
+    .1140.UserName;
+    .1140.UserName1;
+    .1140.UserName2;
+    .1140.UserName3;
+    .1140.POST1;
+    .1140.POST2;
+    .1140.POST3;
+    .1140.POST4;
+    .1140.POST5;
+    .1140.跨年度调休截止日期;
+
+    .1087.UserName;
+    .1087.GroupID;
+    .1087.姓名;
+    .1087.POST;
+    .1087.归属范围;
+}
+VAR
+{
+    String srch, scon, status, username, groupid, name, post3, post4, selfpost, scope, today, year, lastday;
+    int i, newpage, flag, sum, rec, year_int, is_continue;
+    Struct0 st01;
+    Struct2 st21,st22;
+}
+CLIENT
+{
+    is_continue = FW_Dialog1(创建中，请按继续并等待跨年度年假申请单生成。);
+    if(is_continue == 0)
+    {
+        Goto(-1);
+    }
+    username = FW_GetUserID(2);
+    today = FW_GetSysDate(0);
+    year = today.Left(4);
+    year_int = year.toIntege;
+    year_int = year_int + 1;
+    year = year_int.toString;
+    lastday = year + "/" + "06/30";
+}
+SERVER
+{
+    scon="1087,username@UserName";
+    st21=FW_FindRecords(scon,1);
+    rec=st21.RecordNoList.Get[0];            //查找用户记录号
+
+    groupid=FW_GetValue(1087,GroupID,rec);   //获取GroupID
+    name=FW_GetValue(1087,姓名,rec);         //获取姓名
+    scope=FW_GetValue(1087,归属范围,rec);    //获取归属范围
+    selfpost=FW_GetValue(1087,POST,rec);    //获取个人职位
+
+    flag=0;
+    newpage=-1;
+    srch="1140, username@UserName1";
+    st22=FW_FindRecords(srch,0);
+    if(st22.mError==0)
+    {
+        sum=st22.count;
+        for(i=0;i<sum;i++)
+        {
+            newpage=st22.RecordNoList.Get[i];
+            status=FW_GetValue(1140,状态,newpage);       //查找是否有待提交订单
+            if(status=="待提交")
+            {
+                flag=1;
+                return(GotoClient);
+            }
+        }
+    }
+    newpage = FW_AddNewPage_w(1140);
+    if(selfpost=="主管")
+    {
+        flag=0;
+        post3 = "服务总监";
+        post4 = "服务总监";
+    }else if((selfpost=="服务总监") || (selfpost=="运营总监"))
+    {
+        flag=0;
+        post3="执行主任";
+        post4 = "执行主任";
+    }else if(scope=="前线")
+    {
+        flag=-1;
+        post3 = "主管";
+        post4 = "服务总监";
+    }else if(scope=="后台")
+    {
+        post3 = "运营总监";
+        post4 = "运营总监";
+    }
+    if(flag==-1)
+    {
+        FW_SetValue_w(1140,GroupID3,newpage,groupid);
+    }
+    FW_SetValue_w(1140,POST3,newpage,post3);
+    FW_SetValue_w(1140,POST4,newpage,post4);
+    FW_SetValue_w(1140, 状态, newpage,"待提交");
+    FW_SetValue_w(1140, GroupID, newpage,groupid);
+    FW_SetValue_w(1140, GroupID1, newpage,groupid);
+    FW_SetValue_w(1140, 姓名, newpage,name);
+    FW_SetValue_w(1140, UserName1, newpage,username);
+    FW_SetValue_w(1140, 跨年度调休截止日期, newpage,lastday);
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_GotoFormPage(1140,newpage);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+    if(flag<1)
+    {
+        if(flag==-1)
+        {
+            FW_SetValue_w(1140,GroupID3,newpage,groupid);
+        }
+
+        FW_SetValue_w(1140,POST3,newpage,post3);
+        FW_SetValue_w(1140,POST4,newpage,post4);
+
+        FW_SetValue_w(1140, 状态, newpage,"待提交");
+        FW_SetValue_w(1140, GroupID, newpage,groupid);
+        FW_SetValue_w(1140, GroupID1, newpage,groupid);
+        FW_SetValue_w(1140, 姓名, newpage,name);
+        FW_SetValue_w(1140, UserName1, newpage,username);
+        FW_SetValue_w(1140, 跨年度调休截止日期, newpage,lastday);
+    }
+}
+SERVER
+{
+    st01.FormID = 1140;
+    st01.Record = newpage;
+    return(st01);
+}

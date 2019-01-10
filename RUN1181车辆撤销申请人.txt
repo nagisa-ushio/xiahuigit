@@ -1,0 +1,85 @@
+FIELD
+{
+    .1181.状态;	
+    .1181.申请人工号;
+    .1181.车牌号;
+    .1181.状态;
+
+    .1156.是否已隐藏;
+
+    .1087.POST;
+    .1087.UserName;
+}
+VAR
+{
+    String zt,US,post,adminSpecialist,sqrgh,cph;
+    int cp,flag,rec;
+    Struct2 st2;
+    Struct0 st0;
+}
+CLIENT
+{
+    cp =FW_GetCurrentRecNum();
+    zt = FW_GetValue(1181,状态,cp);
+    US = FW_GetUserID(2);
+    post = "行政专员";
+}
+SERVER
+{
+    st2 = FW_FindRecords("1087,post@POST",1);
+    if(st2.mError != 0)
+    {
+        flag = 1;
+    }
+    rec = st2.RecordNoList.Get[0];
+    adminSpecialist = FW_GetValue(1087,UserName,rec);
+    return(GotoClient);
+}
+CLIENT
+{
+    if(zt == "预约成功已通知司机")
+    {
+        if(flag == 1)
+        {
+            FW_Dialog1(“ERROR:No admin specialist's number has been found!” );
+            Goto(-1);
+        }
+        if(US != adminSpecialist)
+        {
+            FW_Dialog1(状态为“预约成功已通知司机”的需联系行政撤销预约通知！);
+            Goto(-1);
+        }
+    }
+    sqrgh = FW_GetValue(1181,申请人工号,cp);
+    if((sqrgh != US)&&(US != adminSpecialist))
+    {
+        FW_Dialog1(无法撤销他人的预约);
+        FW_SetValue_w(1181,ReleaseEvent,0,"");
+        Goto(-1);
+    }
+    cph = FW_GetValue(1181,车牌号,cp);
+}
+SERVER
+{
+    cph = "已撤销-" + cph;
+    sqrgh = "已撤销-" + sqrgh;
+    FW_SetValue_w(1181,车牌号,cp,cph);
+    FW_SetValue_w(1181,状态,cp,"该预约已撤销");
+    FW_SetValue_w(1181,申请人工号,cp,sqrgh);
+    FW_SetValue_w(1156,是否已隐藏,cp,"是");
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_SetValue_w(1181,车牌号,cp,cph);
+    FW_SetValue_w(1181,状态,cp,"该预约已撤销");
+    FW_SetValue_w(1181,申请人工号,cp,sqrgh);
+    FW_SetValue_w(1156,是否已隐藏,cp,"是");
+    FW_Dialog1(该预约已成功撤销！);
+}
+SERVER
+{
+    st0.FormID = 1176;
+    st0.Record = 0;
+    return(st0);
+}

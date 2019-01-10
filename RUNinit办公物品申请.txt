@@ -1,0 +1,35 @@
+FIELD
+{
+    .1098.UserName;
+    .1098.姓名;
+
+    .1202.申请人姓名;
+}
+VAR
+{
+    int current_page, record_page;
+    String current_us, apply_name;
+    Struct2 st20;
+}
+CLIENT
+{
+    FW_FormOpen(1098);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+    current_us = FW_GetUserID(2);
+    st20 = FW_FindRecords("1098,current_us@UserName", 1);
+    record_page = st20.RecordNoList.Get[0];
+    apply_name = FW_GetValue(1098, 姓名, record_page);
+
+    current_page = CURRENT.iVALUE;
+    FW_SetValue_w(1202, 申请人姓名, current_page, apply_name);
+}
+SERVER
+{
+    FW_SetValue_w(1202, 申请人姓名, current_page, apply_name);
+}

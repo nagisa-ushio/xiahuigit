@@ -1,0 +1,127 @@
+FIELD
+{
+	.1111.面谈记录1;
+	.1111.面谈记录2;
+	.1111.面谈记录3;
+	.1111.面谈记录4;
+	.1111.面谈记录5;
+	.1111.面谈记录6;
+	.1111.面谈记录7;
+	.1111.面谈记录8;
+	.1111.面谈记录9;
+	.1111.其他;
+	.1111.面谈人;
+	.1111.申请日期;
+	.1111.离职面谈记录表状态;
+
+        .1110.机构填写状态;
+}
+VAR
+{
+	String gh, tzsj, qssj,mtjlnr,ygzyfkyj,hxgjap, jssj,mtjl6,mtjl7,mtjl8,mtjl9,SQRQ;
+	int cp;
+}
+CLIENT
+{
+	cp =FW_GetCurrentRecNum();
+	gh = FW_GetValue(1111,面谈记录1,cp);
+	if(gh=="")
+	{
+		FW_Dialog1(请填写 "面谈记录1");
+		FW_SetValue_w(1111,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	tzsj = FW_GetValue(1111,面谈人,cp);
+	if(tzsj=="")
+	{
+		FW_Dialog1(请填写 "面谈人");
+		FW_SetValue_w(1111,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	qssj = FW_GetValue(1111,面谈记录2,cp);
+	if(qssj=="")
+	{
+		FW_Dialog1(请填写 "面谈记录2");
+		FW_SetValue_w(1111,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	jssj = FW_GetValue(1111,其他,cp);
+	if(jssj=="")
+	{
+		FW_Dialog1(请填写 "其他");
+		FW_SetValue_w(1111,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	mtjlnr = FW_GetValue(1111,面谈记录3,cp);
+	if(mtjlnr=="")
+	{
+		FW_Dialog1(请填写 "面谈记录3");
+		FW_SetValue_w(1111,ReleaseEvent,0,"");
+		return(0);
+	}
+	ygzyfkyj = FW_GetValue(1111,面谈记录4,cp);
+	if(ygzyfkyj=="")
+	{
+		FW_Dialog1(请填写 "面谈记录4");
+		FW_SetValue_w(1111,ReleaseEvent,0,"");
+		return(0);
+	}
+	hxgjap = FW_GetValue(1111,面谈记录5,cp);
+	if(hxgjap=="")
+	{
+		FW_Dialog1(请填写 "面谈记录5");
+		FW_SetValue_w(1111,ReleaseEvent,0,"");
+		return(0);
+	}
+	mtjl6 = FW_GetValue(1111,面谈记录6,cp);
+	if(mtjl6=="")
+	{
+		FW_Dialog1(请填写 "面谈记录6");
+		FW_SetValue_w(1111,ReleaseEvent,0,"");
+		return(0);
+	}
+	mtjl7 = FW_GetValue(1111,面谈记录7,cp);
+	if(mtjl7=="")
+	{
+		FW_Dialog1(请填写 "面谈记录7");
+		FW_SetValue_w(1111,ReleaseEvent,0,"");
+		return(0);
+	}
+	mtjl8 = FW_GetValue(1111,面谈记录8,cp);
+	if(mtjl8=="")
+	{
+		FW_Dialog1(请填写 "面谈记录8");
+		FW_SetValue_w(1111,ReleaseEvent,0,"");
+		return(0);
+	}
+	mtjl9 = FW_GetValue(1111,面谈记录9,cp);
+	if(mtjl9=="")
+	{
+		FW_Dialog1(请填写 "面谈记录9");
+		FW_SetValue_w(1111,ReleaseEvent,0,"");
+		return(0);
+	}
+	SQRQ = FW_GetValue(1111,申请日期,cp);
+	if(SQRQ=="")
+	{
+		FW_Dialog1(请填写 "申请日期");
+		FW_SetValue_w(1111,ReleaseEvent,0,"");
+		return(0);
+	}
+}
+SERVER
+{
+	FW_SetValue_w(1111,离职面谈记录表状态,cp,"已完成");
+	FW_SetValue_w(1110,机构填写状态,cp,"已填写");
+	return(GotoClient);
+}
+CLIENT
+{
+	FW_SetValue_w(1111,离职面谈记录表状态,cp,"已完成");
+	FW_SetValue_w(1110,机构填写状态,cp,"已填写");
+	FW_Dialog1(登记成功);
+}                                

@@ -1,0 +1,78 @@
+FIELD
+{
+	.1134.主管签字;
+        .1134.主管签字日期;
+        .1134.同意转正;
+	.1134.转正日期;
+	.1134.转岗;
+	.1134.建议岗位;
+	.1134.不同意转正;
+	.1134.辞退;
+	.1134.最后工作日;
+	.1134.试用结果;
+}
+VAR
+{
+	String directorToSign,dateOfSign,syjg,zzrq,jygw,zhgzr;
+	int cp;
+}
+CLIENT
+{
+	cp =FW_GetCurrentRecNum();
+	directorToSign = FW_GetValue(1134,主管签字,cp);
+	if(directorToSign=="")
+	{
+		FW_Dialog1(请填写“主管签字”);
+		return(0);
+	}
+        dateOfSign = FW_GetValue(1134,主管签字日期,cp);
+        if(dateOfSign == "")
+        {
+                FW_Dialog1(请填写“主管签字日期”);
+		return(0);
+        }
+        syjg = FW_GetValue(1134,试用结果,cp);
+        if(syjg=="")
+        {
+                FW_Dialog1(请填写 "试用结果");
+                return(0);
+        }	
+
+        zzrq = FW_GetValue(1134,转正日期,cp);
+        if(syjg=="予以转正")
+        {
+                if(zzrq=="")
+                {
+                        FW_Dialog1(请填写 "转正日期");
+                        return(0);
+                }
+        }
+
+        jygw = FW_GetValue(1134,建议岗位,cp);
+        if(syjg=="转岗试用")
+        {
+                if(jygw=="")
+                {
+                        FW_Dialog1(请填写 "建议岗位");
+                        return(0);
+                }
+        }
+
+        zhgzr = FW_GetValue(1134,最后工作日,cp);
+        if(syjg=="予以辞退")
+        {
+                if(zhgzr=="")
+                {
+                        FW_Dialog1(请填写 "最后工作日");
+                        return(0);
+                }
+        }
+}
+SERVER
+{
+        return(GotoClient);
+}
+CLIENT
+{
+        
+}

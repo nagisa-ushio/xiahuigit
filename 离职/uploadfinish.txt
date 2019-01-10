@@ -1,0 +1,45 @@
+FIELD
+{
+        .1255.0;
+        .1255.1;
+        .1255.2;
+        .1255.3;
+        .1255.4;
+        .1255.5;
+        .1255.6;
+        .1255.7;
+        .1255.8;
+
+        .1113.已上传张数;
+}
+VAR
+{
+        StringList sl01;
+        String domainName, a;
+        int cp, total, i;
+}
+CLIENT
+{
+        cp = FW_GetCurrentRecNum();
+        total = 0;
+}
+SERVER
+{
+        sl01 = [1255,"0","1","2","3","4","5","6","7","8"];
+        for(i = 0;i < 9;i++)
+        {
+                domainName = sl01.Get[i];
+                a = FW_GetValue(1255,domainName,cp);
+                if(a != "")
+                {
+                        total = total + 1;
+                }
+        }
+        a = "已上传" + total + "张";
+        FW_SetValue_w(1113,已上传张数,cp,a);
+        return(GotoClient);
+}
+CLIENT
+{
+        FW_Dialog1(上传成功！);
+}

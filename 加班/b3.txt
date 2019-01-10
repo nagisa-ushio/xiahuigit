@@ -1,0 +1,82 @@
+FIELD
+{
+
+	.1139.状态;
+	.1139.实际加班起始日期;
+	.1139.实际加班起始时间;
+	.1139.实际加班结束日期;
+	.1139.实际加班结束时间;
+	.1139.实际加班共计小时数;
+	.1139.申请日期;
+}
+VAR
+{
+	String zt,qsrq,qssj,jsrq,jssj,qjgj,str;
+	int cp;
+}
+CLIENT
+{
+	cp =FW_GetCurrentRecNum();
+	zt = FW_GetValue(1139,状态,cp);
+        if(zt == "已通过")
+        {
+                FW_Dialog1(此申请单已经是通过状态！);
+                return(0);
+        }else if(zt != "待加班人确认")
+        {
+                FW_Dialog1(此申请单不在“加班人确认加班时间”流程！);
+                return(0);
+        }
+	qsrq = FW_GetValue(1139,实际加班起始日期,cp);
+	if(qsrq=="")
+	{
+		FW_Dialog1(请填写 "实际加班起始日期");
+		return(0);
+	}
+
+	qssj = FW_GetValue(1139,实际加班起始时间,cp);
+	if(qssj=="")
+	{
+		FW_Dialog1(请填写 "实际加班起始时间");
+		return(0);
+	}
+
+	jsrq = FW_GetValue(1139,实际加班结束日期,cp);
+	if(jsrq=="")
+	{
+		FW_Dialog1(请填写 "实际加班结束日期");
+		return(0);
+	}
+
+	jssj = FW_GetValue(1139,实际加班结束时间,cp);
+	if(jssj=="")
+	{
+		FW_Dialog1(请填写 "实际加班结束时间");
+		return(0);
+	}
+
+	qjgj = FW_GetValue(1139,实际加班共计小时数,cp);
+	if(qjgj=="")
+	{
+		FW_Dialog1(请填写 "实际加班共计小时数");
+		return(0);
+	}
+
+	//str="1";
+	str=CURRENT.sVALUE;
+	if(str=="0")
+	{
+		//FW_Dialog1(等待);
+		return(0);		
+	}
+}             
+SERVER
+{
+	//FW_SetValue_w(1139,状态,cp,zt);
+	return(GotoClient);
+}
+CLIENT
+{
+	//FW_SetValue_w(1139,状态,cp,zt);
+	//FW_Dialog1(成功);
+}                          

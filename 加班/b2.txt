@@ -1,0 +1,29 @@
+FIELD
+{
+	.1139.状态;
+	.1139.POST2;
+}
+VAR
+{
+	String zt;
+	int cp;
+
+}
+CLIENT
+{
+	cp = FW_GetCurrentRecNum();
+	zt = FW_GetValue(1139,状态,cp);
+	if(zt=="已通过")
+	{
+		FW_Dialog1(申请单已经是通过状态！);
+		return(0);
+	}
+}
+SERVER
+{
+	return(GotoClient);
+}
+CLIENT
+{
+	
+}

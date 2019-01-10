@@ -1,0 +1,92 @@
+FIELD
+{
+    .1099.申请日期;
+	.1099.状态;
+	.1099.GroupID;
+	.1099.GroupID1;
+	.1099.GroupID2;
+	.1099.UserName1;
+	.1087.UserName;
+	.1087.GroupID;
+	.1087.姓名;
+	.1087.POST;
+	.1087.归属范围;
+	.1099.POST1;
+	.1099.POST2;
+
+}
+VAR
+{
+	String srch, scon, status,username, date, groupid, name,post2,post4,selfpost,scope;
+	int i, newpage, flag, sum, rec;
+	Struct0 st01;
+	Struct2 st22, st21;
+}
+CLIENT
+{
+	i=FW_FormOpen(1099);	
+}
+SERVER
+{
+	return(GotoClient);
+}
+CLIENT
+{
+	username=FW_GetUserID(2);
+}
+SERVER
+{
+	srch="1099, username@UserName1";
+	st22=FW_FindRecords(srch,0);
+	if(st22.mError==0)
+	{
+		sum=st22.count;
+		for(i=0;i<sum;i++)
+		{
+			newpage=st22.RecordNoList.Get[i];
+			status=FW_GetValue(1099,状态,newpage);
+			if(status=="待提交")
+			{
+				flag=1;
+				return(GotoClient);
+			}
+		}
+	}
+        date = FW_GetSysDate(0);
+	scon="1087,username@UserName";
+	st21=FW_FindRecords(scon,1);
+	rec=st21.RecordNoList.Get[0];
+	groupid=FW_GetValue(1087,GroupID,rec);
+	name=FW_GetValue(1087,姓名,rec);
+	selfpost=FW_GetValue(1087,POST,rec);
+
+	newpage = FW_AddNewPage_w(1099);
+        FW_SetValue_w(1099, 申请日期, newpage,date);
+	FW_SetValue_w(1099, 姓名, newpage,name);
+	FW_SetValue_w(1099, GroupID, newpage,groupid);
+	FW_SetValue_w(1099,POST1,newpage,selfpost);
+	FW_SetValue_w(1099, 状态, newpage,"待提交");
+	FW_SetValue_w(1099, GroupID1, newpage,groupid);
+	FW_SetValue_w(1099, UserName1, newpage,username);
+	return(GotoClient);
+}
+CLIENT
+{
+	if(flag<1)
+	{
+        FW_SetValue_w(1099, 申请日期, newpage,date);
+	    FW_SetValue_w(1099, 姓名, newpage,name);
+		FW_SetValue_w(1099, GroupID, newpage,groupid);
+		FW_SetValue_w(1099,POST1,newpage,selfpost);
+		FW_SetValue_w(1099, 状态, newpage,"待提交");
+		FW_SetValue_w(1099, GroupID1, newpage,groupid);
+		FW_SetValue_w(1099, UserName1, newpage,username);
+	}
+	FW_SetValue_w(1157,ReleaseEvent,0,"");
+}
+SERVER
+{
+	st01.FormID=1099;
+	st01.Record=newpage;
+	return(st01);
+}

@@ -1,0 +1,31 @@
+FIELD
+{
+	.1044.状态;
+}
+VAR
+{
+	String zt;
+	int cp;
+}
+CLIENT
+{
+	cp =FW_GetCurrentRecNum();
+	zt = FW_GetValue(1044,状态,cp);
+        if(zt == "已通过")
+        {
+                FW_Dialog1(此申请单已经是通过状态！);
+                return(0);
+        }else if(zt != "待替代人同意")
+        {
+                FW_Dialog1(此申请单不在“替代人同意”流程！);
+                return(0);
+        }
+}
+SERVER
+{
+	return(GotoClient);
+}
+CLIENT
+{
+	
+}

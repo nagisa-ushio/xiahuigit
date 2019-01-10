@@ -1,0 +1,120 @@
+FIELD
+{
+	.1110.机构意见;
+	.1110.机构签名;
+	.1110.机构签名日期;
+
+	.1110.状态;
+	.1110.流程四;
+	.1110.UserName3;
+	.1110.UserName1;
+	.1110.UserName4;
+	.1110.POST3;
+	.1110.POST4;
+	.1110.GroupID3;
+	.1110.GroupID4;
+	.1110.姓名;
+	.1110.填表日期;
+	.1110.当前待处理标记Page;
+	.1110.当前待处理标记Page备用1;
+	.1110.机构填写状态;
+
+	.1087.UserName;
+	.1087.归属范围;
+	.1087.POST;
+	.1087.GroupID;
+	.1087.姓名;
+
+	.1235.事件状态;
+	.1235.处理人姓名;
+	.1235.处理人工号;
+	.1235.处理人职务;
+	.1235.处理人部门;
+	.1235.处理日期;
+	.1235.审批状态;
+	.1235.LinkToFormID;
+	.1235.LinkToFormPage;
+	.1235.提交人姓名;
+	.1235.提交人工号;
+	.1235.内容;
+	.1235.提交日期;
+}
+VAR
+{
+	String opinion,signature,str,dateOfSignature,handlerStatus,post,username4,status4,;
+	int currentpage;
+	String 当前工号s, 事件状态s, 处理人姓名s, 处理人工号s, 处理人职务s, 处理人部门s, 处理日期s, 审批状态s, 提交人姓名s, 提交人工号s, 内容s, 提交日期s, scon, 域名s, 离职面谈表填写状态s,
+	    原事件状态s, 原处理日期s,原审批状态s;
+	int LinkToFormID_int, LinkToFormPage_int, newPage, rec, markPage;
+	Struct2 st21;
+}
+CLIENT
+{
+	currentpage =FW_GetCurrentRecNum();
+        审批状态s = FW_GetValue(1110,状态,currentpage);
+        handlerStatus = FW_GetValue(1110,POST4,currentpage);
+        handlerStatus = "待" + handlerStatus + "审批";
+        if(审批状态s != handlerStatus)
+        {
+                FW_Dialog1(当前审批状态不符合，请确认后再点击！);
+                return(0);
+        }
+        当前工号s = FW_GetUserID(2);
+        username4 = FW_GetValue(1110,UserName4,currentpage);
+        if(当前工号s != username4)
+        {
+                FW_Dialog1(当前帐号的职务与当前所点击流程处理的职务不同，无法进行确认！);
+                return(0);
+        }
+	opinion = FW_GetValue(1110,机构意见,currentpage);
+	if(opinion=="")
+	{
+		FW_Dialog1(请填写 "机构意见");
+		FW_SetValue_w(1110,ReleaseEvent,0,"");
+		return(0);
+	}
+
+	signature = FW_GetValue(1110,机构签名,currentpage);
+	if(signature=="")
+	{
+		FW_Dialog1(请填写 "机构签名");
+		return(0);
+	}
+	currentpage =FW_GetCurrentRecNum();
+	dateOfSignature = FW_GetValue(1110,机构签名日期,currentpage);
+	if(dateOfSignature=="")
+	{
+		FW_Dialog1(请填写 "机构签名日期");
+		return(0);
+	}
+	离职面谈表填写状态s = FW_GetValue(1110,机构填写状态,currentpage);
+	if(离职面谈表填写状态s == "")
+	{
+		FW_Dialog1(请填写“离职员工面谈记录表”！);
+		return(0);
+	}
+	post = FW_GetValue(1110,POST4,currentpage);
+	原审批状态s ="进入离职交接环节";
+	审批状态s ="进入离职交接环节";
+}
+SERVER
+{
+	原事件状态s = "已处理";
+	原处理日期s = FW_GetSysDate(0);
+	
+	markPage = FW_GetValue(1110, 当前待处理标记Page, currentpage);
+	FW_SetValue_w(1235, 事件状态, markPage, 原事件状态s);
+	FW_SetValue_w(1235, 处理日期, markPage, 原处理日期s);
+	FW_SetValue_w(1235, 审批状态, markPage, 原审批状态s);
+	status4 = "(已审核)";
+	FW_SetValue_w(1110, 流程四 currentpage, status4);
+	FW_SetValue_w(1110,状态,currentpage,审批状态s);
+	return(GotoClient);
+}
+CLIENT
+{
+	FW_SetValue_w(1110, 流程四 currentpage, status4);
+	FW_SetValue_w(1110,状态,currentpage,审批状态s);
+	FW_Dialog1(审批成功，进入离职交接环节！);
+}
+ 

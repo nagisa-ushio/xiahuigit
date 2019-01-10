@@ -1,0 +1,192 @@
+FIELD
+{
+    .1212.申请数量;
+    .1212.用途;
+    .1212.申请人备注;
+    .1212.物品编号;
+    .1212.物品名称;
+    .1212.物品类别;
+    .1212.单位;
+    .1212.规格型号;
+    .1212.现有库存;
+    .1212.预计归还日期;
+    .1212.借用日期;
+    .1212.申请人姓名;
+    .1212.社区;
+    .1212.电话;
+
+    .1116.物品使用状态;
+    .1116.UserName;
+    .1116.领用状态;
+    .1116.申请日期;
+    .1116.申请人姓名;
+    .1116.物品编号;
+    .1116.申请数量;
+}
+VAR
+{
+    String S申请数量, S社区, S电话, S借用日期, S预计归还日期, S用途, 申请人工号s, 物品编号s, 申请人备注s, 物品名称s, 物品类别s, 单位s, 规格型号s, 申请日期s, Srch, 申请人姓名s;
+    int currentPage, newPage, 申请数量i, 现有库存i, is_continue, rec, flag;
+    Struct2 st2;
+    Struct0 st01;
+}
+CLIENT
+{
+    currentPage=FW_GetCurrentRecNum();
+
+    申请人姓名s = FW_GetValue(1212,申请人姓名,currentPage);
+    if(申请人姓名s=="")
+    {
+        FW_Dialog1(请填写“姓名”);
+        return(0);
+    }
+
+    S申请数量=FW_GetValue(1212,申请数量,currentPage);
+    if(S申请数量=="")
+    {
+        FW_Dialog1(请填写“申请数量”);
+        return(0);
+    }
+
+    S社区=FW_GetValue(1212,社区,currentPage);
+    if(S社区=="")
+    {
+        FW_Dialog1(请填写“社区”);
+        return(0);
+    }
+
+    S电话=FW_GetValue(1212,电话,currentPage);
+    if(S电话=="")
+    {
+        FW_Dialog1(请填写“电话”);
+        return(0);
+    }
+
+    S借用日期=FW_GetValue(1212,借用日期,currentPage);
+    if(S借用日期 == "")
+    {
+        FW_Dialog1(请填写“借用日期”);
+        return(0);
+    }
+
+    S预计归还日期 = FW_GetValue(1212,预计归还日期,currentPage);
+    if(S预计归还日期=="")
+    {
+        FW_Dialog1(请填写“预计归还日期”！);
+        return(0);
+    }
+
+    S用途 = FW_GetValue(1212,用途,currentPage);
+    if(S用途=="")
+    {
+        FW_Dialog1(请填写“事项”！);
+        return(0);
+    }
+    申请人工号s=FW_GetUserID(2);
+    现有库存i=FW_GetValue(1212,现有库存,currentPage);
+    申请数量i=FW_GetValue(1212,申请数量,currentPage);
+    if(申请数量i>现有库存i)
+    {
+        FW_Dialog1(申请数量超出现有库存范围);
+        return(0);
+    }
+    is_continue = FW_Dialog1(是否确认申请信息填写无误并继续进行提交？);
+    if(is_continue == 0)
+    {
+        Goto(-1);
+    }
+    申请人备注s = FW_GetValue(1212,申请人备注,currentPage);
+    物品编号s=FW_GetValue(1212,物品编号,currentPage);
+    申请人备注s=FW_GetValue(1212,申请人备注,currentPage);
+    物品名称s=FW_GetValue(1212,物品名称,currentPage);
+    物品类别s=FW_GetValue(1212,物品类别,currentPage);
+    单位s=FW_GetValue(1212,单位,currentPage);
+    规格型号s=FW_GetValue(1212,规格型号,currentPage);
+}
+SERVER
+{
+    申请日期s = FW_GetSysDate(0);
+    Srch = "1116,申请日期s@申请日期,物品编号s@物品编号,申请数量i@申请数量,申请人工号s@UserName";
+    st2=FW_FindRecords(Srch,1);
+    if(st2.mError ==0)
+    {
+        flag=1;
+        return(GotoClient);
+    }
+    newPage = FW_AddNewPage_w( 1116 );
+    FW_SetValue_w(1116, 物品编号,newPage,物品编号s);
+    FW_SetValue_w(1116, 申请数量,newPage,申请数量i);
+    FW_SetValue_w(1116, 用途,newPage,S用途);
+    FW_SetValue_w(1116, UserName,newPage,申请人工号s);
+    FW_SetValue_w(1116, 申请人备注,newPage,申请人备注s);
+    FW_SetValue_w(1116, 物品名称,newPage,物品名称s);
+    FW_SetValue_w(1116, 物品类别,newPage,物品类别s);
+    FW_SetValue_w(1116, 单位,newPage,单位s);
+    FW_SetValue_w(1116, 规格型号,newPage,规格型号s);
+    FW_SetValue_w(1116, 领用状态,newPage,"待审核");
+    FW_SetValue_w(1116, 申请日期,newPage,申请日期s);
+    FW_SetValue_w(1116, 申请类型,newPage,"借用");
+    FW_SetValue_w(1116, 预计归还日期,newPage,S预计归还日期);
+    FW_SetValue_w(1116, 申请人姓名,newPage,申请人姓名s);
+    FW_SetValue_w(1116, 社区,newPage,S社区);
+    FW_SetValue_w(1116, 借用日期,newPage,S借用日期);
+    FW_SetValue_w(1116, 电话,newPage,S电话);
+    FW_SetValue_w(1116, 物品使用状态,newPage,"借用待审核");
+
+    FW_SetValue_w(1212, 申请人姓名, currentPage,"");
+    FW_SetValue_w(1212, 申请数量, currentPage,"");
+    FW_SetValue_w(1212, 社区, currentPage,"");
+    FW_SetValue_w(1212, 电话, currentPage,"");
+    FW_SetValue_w(1212, 借用日期, currentPage,"");
+    FW_SetValue_w(1212, 预计归还日期, currentPage,"");
+    FW_SetValue_w(1212, 用途,currentPage,"");
+    FW_SetValue_w(1212, 申请人备注,currentPage,"");
+    return(GotoClient);
+}
+CLIENT
+{
+    if(flag == 1)
+    {
+        FW_Dialog1(已提交过相同的申请！);
+        Goto(-1);
+    }
+    FW_GotoFormPage(1116, newPage);
+}
+SERVER
+{
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_SetValue_w(1116, 物品编号,newPage,物品编号s);
+    FW_SetValue_w(1116, 申请数量,newPage,申请数量i);
+    FW_SetValue_w(1116, 用途,newPage,S用途);
+    FW_SetValue_w(1116, UserName,newPage,申请人工号s);
+    FW_SetValue_w(1116, 申请人备注,newPage,申请人备注s);
+    FW_SetValue_w(1116, 物品名称,newPage,物品名称s);
+    FW_SetValue_w(1116, 物品类别,newPage,物品类别s);
+    FW_SetValue_w(1116, 单位,newPage,单位s);
+    FW_SetValue_w(1116, 规格型号,newPage,规格型号s);
+    FW_SetValue_w(1116, 领用状态,newPage,"待审核");
+    FW_SetValue_w(1116, 申请日期,newPage,申请日期s);
+    FW_SetValue_w(1116, 申请类型,newPage,"借用");
+    FW_SetValue_w(1116, 预计归还日期,newPage,S预计归还日期);
+    FW_SetValue_w(1116, 申请人姓名,newPage,申请人姓名s);
+    FW_SetValue_w(1116, 社区,newPage,S社区);
+    FW_SetValue_w(1116, 借用日期,newPage,S借用日期);
+    FW_SetValue_w(1116, 电话,newPage,S电话);
+    FW_SetValue_w(1116, 物品使用状态,newPage,"借用待审核");
+
+    FW_SetValue_w(1212, 申请人姓名, currentPage,"");
+    FW_SetValue_w(1212, 申请数量, currentPage,"");
+    FW_SetValue_w(1212, 社区, currentPage,"");
+    FW_SetValue_w(1212, 电话, currentPage,"");
+    FW_SetValue_w(1212, 借用日期, currentPage,"");
+    FW_SetValue_w(1212, 预计归还日期, currentPage,"");
+    FW_SetValue_w(1212, 用途,currentPage,"");
+    FW_SetValue_w(1212, 申请人备注,currentPage,"");
+
+    FW_SetValue_w(1212, Field6,currentPage,"ClientListWinRefresh");
+
+    FW_Dialog1(固定物资申请提交成功！);
+}

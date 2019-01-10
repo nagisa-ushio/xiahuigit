@@ -1,0 +1,26 @@
+FIELD
+{
+    .1139.Field2;
+    .1139.预计加班起始日期;
+}
+VAR
+{
+    Struct3 st30_red, st30_black;
+    String start_date;
+}
+SERVER
+{
+    st30_red.Color = 0x000000ff;
+    st30_red.operation = 4;
+    st30_black.Color = 0x00000000;
+    st30_black.operation = 4;
+    start_date = FW_GetValue(1139,预计加班起始日期,961);
+    if(start_date == "")
+    {
+        FW_Dialog1('请填写日期！');
+        FW_FieldPropertySet_w(1139,Field2,st30_red);
+    }else{
+        FW_FieldPropertySet_w(1139,Field2,st30_black);
+        FW_Dialog1('ok');
+    }
+}

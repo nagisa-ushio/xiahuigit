@@ -1,0 +1,86 @@
+FIELD
+{
+        .1099.UserName1;
+        .1099.UserName2;
+        .1099.UserName3;
+        .1099.UserName4;
+        .1099.状态;
+        .1099.当前待处理标记Page;
+        .1235.事件状态;
+}
+VAR
+{
+        int cp,flag,markPage;
+        String us,username1,username2,username3,username4,status;
+}
+CLIENT
+{
+        us = FW_GetUserID(2);
+        cp = FW_GetCurrentRecNum();
+        status = FW_GetValue(1099,状态,cp);
+        username1 = FW_GetValue(1099,UserName1,cp);
+        
+}
+SERVER
+{
+        if(status == "作废")
+        {
+                flag = 4;
+                return(GotoClient);
+        }else if(status != "已通过")
+        {
+                if(us == username1)
+                {
+                                
+                        flag = 1;
+                        FW_SetValue_w(1099,状态,cp,"未通过作废");
+                        FW_SetValue_w(1099,UserName1,cp,"");
+                        markPage = FW_GetValue(1099,当前待处理标记Page,cp);
+                        FW_SetValue_w(1235,事件状态,markPage,"未通过作废");
+                        return(GotoClient);
+                }else if(us != username1)
+                {
+                        flag = 2;
+                        return(GotoClient);
+                }
+        }else if(status == "已通过")
+        {
+                username2 = FW_GetValue(1099,UserName2,cp);
+                username3 = FW_GetValue(1099,UserName3,cp);
+                username4 = FW_GetValue(1099,UserName4,cp);
+                if((us == username2)||if(us == username3)||(us == username4))
+                {
+                        flag = 5;
+                        FW_SetValue_w(1099,状态,cp,"已通过作废");
+                        markPage = FW_GetValue(1099,当前待处理标记Page,cp);
+                        FW_SetValue_w(1235,事件状态,markPage,"已通过作废");
+                }else
+                {
+                        flag = 3;
+                }
+                return(GotoClient);
+        }
+}
+CLIENT
+{
+        if(flag == 1)
+        {
+                FW_SetValue_w(1099,状态,cp,"未通过作废");
+                FW_SetValue_w(1099,UserName1,cp,"");
+                FW_Dialog1(作废成功！);
+        }else if(flag == 2)
+        {
+                FW_Dialog1(您不是此申请单的申请人，请联系申请人作废！);
+        }else if(flag == 3)
+        {
+                FW_Dialog1(此申请单已通过，如需作废请联系上级进行作废操作！);
+        }else if(flag == 4)
+        {
+                FW_Dialog1(此申请单已作废，请勿重复操作！);
+        }else if(flag == 5)
+        {
+                FW_SetValue_w(1099,状态,cp,"已通过作废");
+                FW_Dialog1(作废成功！);
+        }
+        FW_SetValue_w(1099,ReleaseEvent,0,"");
+}

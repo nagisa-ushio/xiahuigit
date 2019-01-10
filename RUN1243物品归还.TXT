@@ -1,0 +1,99 @@
+FIELD
+{
+    .1243.申请数量;
+    .1243.归还数量;
+    .1243.物品编号;
+    .1243.实际归还日期;
+    .1243.物品使用状态;
+    .1114.物品编号;
+    .1114.状态;
+    .1114.现有库存;
+    .1116.物品使用状态;
+    .1116.实际归还日期;
+}
+VAR
+{
+    String 物品编号s,实际归还日期s,物品使用状态s,srch;
+    int 申请数量i,归还数量i,currentPage,recordPage,现有库存i,flag,ret;
+    Struct2 st20;
+    Struct0 st0;
+}
+CLIENT
+{
+    currentPage = FW_GetCurrentRecNum();
+    物品使用状态s = FW_GetValue(1243,物品使用状态,currentPage);
+    if(物品使用状态s == "已归还")
+    {
+        FW_Dialog1(物品已归还);
+        return(0);
+    }else if(物品使用状态s !="借用待归还")
+    {
+        FW_Dialog1(物品使用状态有误！);
+        return(0);
+    }
+    申请数量i= FW_GetValue(1243,申请数量,currentPage);
+    归还数量i= FW_GetValue(1243,归还数量,currentPage);
+    if(归还数量i == 0)
+    {
+        FW_Dialog1(归还数量不能为空！);
+        FW_SetValue_w(1243,ReleaseEvent,0,"");
+        return(0);
+    }else if(归还数量i > 申请数量i)
+    {
+        ret = FW_Dialog1("归还数量"超过了此单的"申请数量"！是否继续？);
+        if(ret == 0)
+        {
+            FW_Dialog1(已取消此次归还！);
+            FW_SetValue_w(1243,ReleaseEvent,0,"");
+            return(0);
+        }
+    }
+    物品编号s= FW_GetValue(1243,物品编号,currentPage);
+    实际归还日期s= FW_GetValue(1243,实际归还日期,currentPage);
+    if(实际归还日期s == "")
+    {
+        FW_Dialog1(实际归还日期不能为空！);
+        FW_SetValue_w(1243,ReleaseEvent,0,"");
+        return(0);
+    }
+    flag = 0;
+}
+SERVER
+{
+    srch="1114,物品编号s@物品编号";
+    st20=FW_FindRecords(srch,1);
+    if(st20.mError == 0)
+    {
+        recordPage=st20.RecordNoList.Get[0];
+        现有库存i=FW_GetValue(1114,现有库存,recordPage);
+        现有库存i=现有库存i+归还数量i;
+        FW_SetValue_w(1114,现有库存,recordPage,现有库存i);
+        FW_SetValue_w(1114,状态,recordPage,"有库存");
+        FW_SetValue_w(1116,物品使用状态,currentPage,"已归还");
+        FW_SetValue_w(1116,实际归还日期,currentPage,实际归还日期s);
+    }else if(st20.mError!=0)
+    {
+        flag = 1;
+    }
+    return(GotoClient);
+}
+CLIENT
+{
+    if(flag == 1)
+    {
+        FW_Dialog1(库存中未找到该归还的物品！);
+        FW_SetValue_w(1243,ReleaseEvent,0,"");
+        return(0);
+    }
+    FW_SetValue_w(1114,现有库存,recordPage,现有库存i);
+    FW_SetValue_w(1114,状态,recordPage,"有库存");
+    FW_SetValue_w(1116,物品使用状态,currentPage,"已归还");
+    FW_SetValue_w(1116,实际归还日期,currentPage,实际归还日期s);
+    FW_Dialog1(归还成功！);
+}
+SERVER
+{
+    st0.FormID = 1242;
+    st0.Record = 0;
+    return(st0);
+} 

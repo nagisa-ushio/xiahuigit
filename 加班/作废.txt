@@ -1,0 +1,79 @@
+FIELD
+{
+        .1139.UserName1;
+        .1139.状态;
+        .1139.当前待处理标记Page;
+        .1139.当前待处理标记Page备用1;
+        .1139.当前待处理标记Page备用2;
+        .1235.事件状态;
+}
+VAR
+{
+        int cp,flag,markPage;
+        String us,username1,status;
+}
+CLIENT
+{
+        us = FW_GetUserID(2);
+        cp = FW_GetCurrentRecNum();
+        status = FW_GetValue(1139,状态,cp);
+        username1 = FW_GetValue(1139,UserName1,cp);
+        markPage = FW_GetValue(1139,当前待处理标记Page,cp);
+}
+SERVER
+{
+        if((status == "已作废")||(status == "未通过作废"))
+        {
+                flag = 4;
+                return(GotoClient);
+        }
+        if(status != "已通过")
+        {
+                if(us == username1)
+                {
+                        flag = 1;
+                        FW_SetValue_w(1139,状态,cp,"未通过作废");
+                        FW_SetValue_w(1139,UserName1,cp,"未通过作废");
+                        FW_SetValue_w(1235,事件状态,markPage,"未通过作废");
+                        markPage = FW_GetValue(1139,当前待处理标记Page备用1,cp);
+                        if(markPage != 0)
+                        {
+                                FW_SetValue_w(1235,事件状态,markPage,"未通过作废");
+                                markPage = FW_GetValue(1139,当前待处理标记Page备用2,cp);
+                                if(markPage != 0)
+                                {
+                                        FW_SetValue_w(1235,事件状态,markPage,"未通过作废");
+                                }
+                        }
+                        return(GotoClient);
+                }else if(us != username1)
+                {
+                        flag = 2;
+                        return(GotoClient);
+                }
+        }
+        if(status == "已通过")
+        {
+                flag = 3;
+                return(GotoClient);
+        }
+}
+CLIENT
+{
+        if(flag == 1)
+        {
+                FW_SetValue_w(1139,状态,cp,"未通过作废");
+                FW_SetValue_w(1139,UserName1,cp,"未通过作废");
+                FW_Dialog1(作废成功！);
+        }else if(flag == 2)
+        {
+                FW_Dialog1(您不是此申请单的申请人，只有申请人可以进行作废！);
+        }else if(flag == 3)
+        {
+                FW_Dialog1(已通过的加班申请单无法进行作废操作！);
+        }else if(flag == 4)
+        {
+                FW_Dialog1(此申请单已作废，请勿重复操作！);
+        }
+        FW_SetValue_w(1139,ReleaseEvent,0,"");
+}

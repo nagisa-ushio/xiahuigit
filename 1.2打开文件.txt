@@ -1,0 +1,17 @@
+FIELD
+{
+    .1139.预计加班起始时间;
+}
+VAR
+{
+    String spath, stype;
+    int is;
+}
+SERVER
+{
+    is = FW_SetValueStatus_w(1139, 961, 预计加班起始时间, ICON0);
+    FW_Dialog1(is);
+
+}
+
+

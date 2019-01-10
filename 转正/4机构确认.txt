@@ -1,0 +1,158 @@
+FIELD
+{
+	.1134.试用结果;
+	.1134.员工状态;
+	.1134.机构意见;
+        .1134.机构盖章日期;
+
+	.1134.流程一;
+	.1134.流程二;
+	.1134.流程三;
+	.1134.流程四;
+	.1134.状态;
+	.1134.POST1;
+	.1134.POST2;
+	.1134.POST3;
+	.1134.POST4;
+	.1134.UserName1;
+	.1134.UserName2;
+	.1134.UserName3;
+	.1134.UserName4;
+	.1134.姓名;
+	.1134.GroupID1;
+	.1134.GroupID2;
+	.1134.GroupID3;
+	.1134.GroupID4;
+
+	.1102.同意转正;
+	.1102.转正日期;
+	.1102.转岗;
+	.1102.建议岗位;
+	.1102.不同意转正;
+	.1102.辞退;
+	.1102.最后工作日;
+
+	.1098.离职日期;
+	.1098.转正日期;
+	.1098.入职岗位;
+
+	.1087.UserName;
+	.1087.归属范围;
+	.1087.POST;
+	.1087.GroupID;
+	.1087.姓名;
+
+	.1134.姓名;
+	.1134.当前待处理标记Page;
+	.1134.当前待处理标记Page备用1;
+	.1235.事件状态;
+	.1235.处理人姓名;
+	.1235.处理人工号;
+	.1235.处理人职务;
+	.1235.处理人部门;
+	.1235.处理日期;
+	.1235.审批状态;
+	.1235.LinkToFormID;
+	.1235.LinkToFormPage;
+	.1235.提交人姓名;
+	.1235.提交人工号;
+	.1235.内容;
+	.1235.提交日期;
+}
+VAR
+{
+	String handlerStatus,username4,organization,dateOfOrganizationStamp, applydate, str, post, syjg,zzrq,jygw,zhgzr,zt;
+	int currentPage, flag, error, markPage, markPage2, i, LinkToFormID_int, LinkToFormPage_int, newPage, rec;
+	String 事件状态s, 处理人姓名s, 当前工号s, 处理人工号s, 处理人职务s, 处理人部门s, 处理日期s, 审批状态s, 提交人姓名s, 提交人工号s, 提交人职务s, 内容s, 提交日期s, scon, 域名s, 归属范围s, 提交人部门s;
+	Struct2 st21;
+        StringList sl01;
+}
+CLIENT
+{
+	currentPage = FW_GetCurrentRecNum();
+        审批状态s = FW_GetValue(1134,状态,currentPage);
+        handlerStatus = FW_GetValue(1134,POST4,currentPage);
+        handlerStatus = "待" + handlerStatus + "审批";
+        if(审批状态s != handlerStatus)
+        {
+                FW_Dialog1(当前审批状态不符合，请确认后再点击！);
+                return(0);
+        }
+        当前工号s = FW_GetUserID(2);
+        username4 = FW_GetValue(1134,UserName4,currentPage);
+        if(当前工号s != username4)
+        {
+                FW_Dialog1(当前帐号的职务与当前所点击流程处理的职务不同，无法进行确认！);
+                return(0);
+        }
+	organization = FW_GetValue(1134,机构意见,currentPage);
+	if(organization=="")
+	{
+		FW_Dialog1(请填写“机构意见”);
+		return(0);
+	}
+        dateOfOrganizationStamp = FW_GetValue(1134,机构盖章日期,currentPage);
+        if(dateOfOrganizationStamp == "")
+        {
+                FW_Dialog1(请填写“机构意见日期”);
+		return(0);
+        }
+	str = CURRENT.sVALUE;
+        审批状态s = "已通过";      
+        zt = FW_GetValue(1134,员工状态,currentPage);
+        syjg = FW_GetValue(1134,试用结果,currentPage);
+        if(syjg=="予以转正")
+        {
+                zzrq = FW_GetValue(1102,转正日期,currentPage);
+                flag=1;
+        }else if(syjg=="转岗试用")
+        {
+        jygw = FW_GetValue(1102,建议岗位,currentPage);
+                flag=2;
+        }else if(syjg=="予以辞退")
+        {
+                zhgzr = FW_GetValue(1102,最后工作日,currentPage);
+                flag=3;
+        }
+	applydate = FW_GetSysDate(0);
+        当前工号s = FW_GetUserID(2);
+}
+SERVER
+{
+        markPage = FW_GetValue(1134,当前待处理标记Page,currentPage);
+        if(str == "1")
+        {
+                if(flag == 1)
+                {
+                        FW_SetValue_w(1134,员工状态,currentPage,"在职");
+                        FW_SetValue_w(1098,转正日期,currentPage,zzrq);
+                }else if(flag == 2)
+                {
+                        FW_SetValue_w(1098,入职岗位,currentPage,jygw);	
+                }else if(flag == 3)
+                {
+                        FW_SetValue_w(1098,离职日期,currentPage,zhgzr);
+                        FW_SetValue_w(1134,员工状态,currentPage,"辞退");	
+                }
+        }
+        FW_SetValue_w(1235,事件状态,markPage,"已处理");
+        FW_SetValue_w(1235,处理日期,markPage,applydate);
+
+        FW_SetValue_w(1134,状态,currentPage,审批状态s);
+        FW_SetValue_w(1134,流程四,currentPage,"（已完成）");
+	return(GotoClient);
+}
+CLIENT
+{
+        if(flag == 1)
+        {
+                FW_SetValue_w(1134,员工状态,currentPage,"在职");	
+        }else if(flag == 3)
+        {
+                FW_SetValue_w(1134,员工状态,currentPage,"辞退");	
+        }
+        FW_SetValue_w(1134,状态,currentPage,审批状态s);
+        FW_SetValue_w(1134,流程四,currentPage,"（已完成）");
+        FW_Dialog1(此转正申请单现已通过！);
+        FW_SetValue_w(1134,ReleaseEvent,0,"");
+}

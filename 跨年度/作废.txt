@@ -1,0 +1,61 @@
+FIELD
+{
+        .1137.UserName1;
+        .1137.状态;
+}
+VAR
+{
+        int cp,flag;
+        String us,username1,status;
+}
+CLIENT
+{
+        us = FW_GetUserID(2);
+        cp = FW_GetCurrentRecNum();
+        status = FW_GetValue(1137,状态,cp);
+        username1 = FW_GetValue(1137,UserName1,cp);
+        
+}
+SERVER
+{
+        if(status == "已作废")
+        {
+                flag = 4;
+                return(GotoClient);
+        }
+        if(status != "已通过")
+        {
+                if(us == username1)
+                {
+                        flag = 1;
+                        FW_SetValue_w(1137,状态,cp,"已作废");
+                        return(GotoClient);
+                }else if(us != username1)
+                {
+                        flag = 2;
+                        return(GotoClient);
+                }
+        }else if(status == "已通过")
+        {
+                flag = 3;
+                return(GotoClient);
+        }
+}
+CLIENT
+{
+        if(flag == 1)
+        {
+                FW_SetValue_w(1137,状态,cp,"已作废");
+                FW_Dialog1(作废成功！);
+        }else if(flag == 2)
+        {
+                FW_Dialog1(您不是此申请单的申请人，请联系申请人作废！);
+        }else if(flag == 3)
+        {
+                FW_Dialog1(此申请单已通过，无法进行作废操作！);
+        }else if(flag == 4)
+        {
+                FW_Dialog1(此申请单已作废，请勿重复操作！);
+        }
+        FW_SetValue_w(1137,ReleaseEvent,0,"");
+}

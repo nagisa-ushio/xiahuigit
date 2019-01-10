@@ -1,0 +1,220 @@
+FIELD
+{
+    .1138.假别;
+    .1138.其他;
+    .1138.请假起始日期;
+    .1138.请假起始时间;
+    .1138.请假结束日期;
+    .1138.请假结束时间;
+    .1138.请假共计;
+    .1138.事由说明;
+    .1138.替代人工号;
+    .1138.紧急联系电话;
+    .1138.状态;
+    .1138.GroupID;
+    .1138.申请日期;
+    .1138.UserName1;
+    .1138.UserName2;
+    .1138.GroupID1;
+    .1138.GroupID2;
+    .1138.GroupID3;
+    .1143.已休年假;
+    .1143.可休年假;
+    .1143.跨年度可休年假截止日期;
+    .1143.更新跨年度年假;
+}
+VAR
+{
+    String jb,qt,qsrq,qssj,jsrq,jssj,qjgj,sysm,tdr,tdrzm,jjlxdh,zt,SQRQ,US,gd,str,Srch1,Srch2,
+        dqrq,jzrq,jzrqnf;
+    int cp,flag,flag已过截止,rec,total,jzrqint,flag预扣年假;
+    Struct2 st21,st22;
+    double sqsj,kxnj,kndkxnj,kxgj,already_used;
+}
+CLIENT
+{
+    cp =FW_GetCurrentRecNum();
+    jb = FW_GetValue(1138,假别,cp);
+    if(jb=="")
+    {
+        FW_Dialog1(请填写 "假别");
+        Goto(-1);
+    }
+
+    if(jb=="其他")
+    {
+        qt = FW_GetValue(1138,其他,cp);
+        if(qt=="")
+        {
+            FW_Dialog1(请填写 "其他");
+            Goto(-1);
+        }
+    }
+
+    qsrq = FW_GetValue(1138,请假起始日期,cp);
+    if(qsrq=="")
+    {
+        FW_Dialog1(请填写 "请假起始日期");
+        Goto(-1);
+    }
+
+    qssj = FW_GetValue(1138,请假起始时间,cp);
+    if(qssj=="")
+    {
+        FW_Dialog1(请填写 "请假起始时间");
+        Goto(-1);
+    }
+
+    jsrq = FW_GetValue(1138,请假结束日期,cp);
+    if(jsrq=="")
+    {
+        FW_Dialog1(请填写 "请假结束日期");
+        Goto(-1);
+    }
+
+    jssj = FW_GetValue(1138,请假结束时间,cp);
+    if(jssj=="")
+    {
+        FW_Dialog1(请填写 "请假结束时间");
+        Goto(-1);
+    }
+
+    qjgj = FW_GetValue(1138,请假共计,cp);
+    sqsj = FW_GetValue(1138,请假共计,cp);
+    if(qjgj=="")
+    {
+        FW_Dialog1(请填写 "请假共计");
+        Goto(-1);
+    }
+
+    sysm = FW_GetValue(1138,事由说明,cp);
+    if(sysm=="")
+    {
+        FW_Dialog1(请填写 "事由说明");
+        Goto(-1);
+    }
+
+    tdr = FW_GetValue(1138,替代人工号,cp);
+    if(tdr=="")
+    {
+        FW_Dialog1(请填写“替代人姓名（或工号）！”);
+        Goto(-1);
+    }
+    FW_SetValue_w(1138, 替代人工号, cp, tdr);
+    tdrzm = tdr.Left(2);
+    if(tdrzm == "xh")
+    {
+        FW_Dialog1("当选择填写替代人工号时，工号前两位字母需大写！");
+        Goto(-1);
+    }
+    jjlxdh = FW_GetValue(1138,紧急联系电话,cp);
+    if(jjlxdh=="")
+    {
+        FW_Dialog1(请填写 "紧急联系电话");
+        Goto(-1);
+    }
+
+    zt = FW_GetValue(1138,状态,cp);
+    if(zt!="待提交")
+    {
+        FW_Dialog1(已进入流程审批，无法修改！);
+        Goto(-1);
+    }
+//判断起始时间不一样
+    if(qsrq > jsrq)
+    {
+        FW_Dialog1(请假起始日期大于请假结束日期);
+        Goto(-1);
+    }
+    str=CURRENT.sVALUE;
+    if(str=="0")
+    {
+        Goto(-1);
+    }
+    gd = FW_GetValue(1138,GroupID,cp);
+    US = FW_GetUserID(2);
+}
+SERVER
+{
+    FW_SetValue_w(1138, 替代人工号, cp, tdr);
+    dqrq = FW_GetSysDate(0);
+    flag=0;
+//判断替代人工号是否输入正确
+    Srch2="1087,tdr@姓名";
+    st22=FW_FindRecords(Srch2,0);
+    total=st22.count;
+    if(st22.mError!=0)
+    {
+        Srch2="1087,tdr@UserName";
+        st22=FW_FindRecords(Srch2,1);
+        if(st22.mError!=0)
+        {
+            flag=3;
+            return(GotoClient);
+        }
+    }else if(total > 1)
+    {
+        flag=4;
+        return(GotoClient);
+    }
+
+    if(jb=="年假")
+    {
+        Srch1="1143,US@UserName";
+        st21=FW_FindRecords(Srch1,1);
+        if(st21.mError!=0)
+        {
+            flag=2;
+            return(GotoClient);
+        }
+        rec=st21.RecordNoList.Get[0];
+//判断可休年假是否过期
+        kxnj = FW_GetValue(1143,可休年假,rec);
+        jzrq = FW_GetValue(1143,跨年度可休年假截止日期,rec);
+        kndkxnj = FW_GetValue(1143,更新跨年度年假,rec);
+        if(dqrq > jzrq)
+        {
+            flag已过截止 = 1;
+            jzrqnf = jzrq.Left(4);
+            jzrqint = jzrqnf.toIntege;
+            jzrqint = jzrqint + 1;
+            jzrqnf = jzrqint.toString;
+            jzrq = jzrqnf + "/06/30";
+            FW_SetValue_w(1143,跨年度可休年假截止日期,rec,jzrq);
+            already_used = FW_GetValue(1143, 已休年假, rec);
+            if(already_used < kndkxnj)
+            {
+                kxnj = kxnj - kndkxnj + already_used;
+                FW_SetValue_w(1143,可休年假,rec,kxnj);
+            }
+            kndkxnj = 0.00;
+            FW_SetValue_w(1143, 更新跨年度年假, rec, kndkxnj);
+        }
+        if(sqsj > kxnj)
+        {
+            flag=1;
+            return(GotoClient);
+        }
+    }
+    return(GotoClient);
+}
+CLIENT
+{
+    if(flag==1)
+    {
+        FW_Dialog1(可申请年假时间不足);
+        Goto(-1);
+    }else if(flag==2)
+    {
+        FW_Dialog1(未找到该申请人的人员档案，请联系相关负责人先添加!);
+        Goto(-1);
+    }else if(flag==3)
+    {
+        FW_Dialog1(未找到该申请人的姓名或工号，请核查是否输入正确);
+        Goto(-1);
+    }else if(flag==4)
+    {
+        FW_Dialog1(社区中有相同姓名的员工，请填写工号);
+        Goto(-1);
+    }
+}

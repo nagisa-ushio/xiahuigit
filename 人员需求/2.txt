@@ -1,0 +1,127 @@
+FIELD
+{
+	.1099.状态;
+	.1099.UserName2;
+
+	.1099.POST3;
+	.1099.POST1;
+	.1099.UserName3;
+	.1099.GroupID3;
+	.1099.GroupID1;
+	.1099.UserName1;
+
+	.1099.姓名;
+	.1087.UserName;
+	.1087.归属范围;
+	.1087.POST;
+	.1087.GroupID;
+	.1087.姓名;
+	.1099.申请日期;
+	.1099.当前待处理标记Page;
+	.1099.当前待处理标记Page备用1;
+	.1235.事件状态;
+	.1235.处理人姓名;
+	.1235.处理人工号;
+	.1235.处理人职务;
+	.1235.处理人部门;
+	.1235.处理日期;
+	.1235.审批状态;
+	.1235.LinkToFormID;
+	.1235.LinkToFormPage;
+	.1235.提交人姓名;
+	.1235.提交人工号;
+	.1235.内容;
+	.1235.提交日期;
+}
+VAR
+{
+	String US, str, status,post;
+	int currentpage;
+	String 事件状态s, 处理人姓名s, 处理人工号s, 处理人职务s, 处理人部门s, 处理日期s, 审批状态s, 提交人姓名s, 提交人工号s, 内容s, 提交日期s, scon, 域名s,
+	    原事件状态s, 原处理日期s;
+	int LinkToFormID_int, LinkToFormPage_int, newPage, rec, markPage;
+	Struct2 st21;
+}
+CLIENT
+{
+	currentpage = FW_GetCurrentRecNum();
+	str = CURRENT.sVALUE;
+	if (str == "0")
+	{
+		return (0);
+	}
+	if (str == "1")
+	{
+		status = "待运营总监审批";
+		post = "运营总监";
+	}
+	if (str == "3")
+	{
+		status = "待提交";
+	}
+	US = FW_GetUserID(2);
+}
+SERVER
+{
+	原事件状态s = "已处理";
+	原处理日期s = FW_GetSysDate(0);
+
+	markPage = FW_GetValue(1099, 当前待处理标记Page, currentpage);
+
+	事件状态s = "待处理";
+	处理日期s = "";
+	审批状态s = status;
+	LinkToFormID_int = 1099;
+	LinkToFormPage_int = currentpage;
+	提交人姓名s = FW_GetValue(1099, 姓名, currentpage);
+	提交人工号s = FW_GetValue(1099, UserName1, currentpage);
+	内容s = "人力需求申请";
+	提交日期s = FW_GetValue(1099, 申请日期, currentpage);
+
+	if (str == "1")
+	{
+		处理人职务s = post;
+		处理人部门s = FW_GetValue(1099, GroupID3, currentpage);
+		scon = "1087,处理人职务s@POST";
+		st21 = FW_FindRecords(scon, 1);
+		rec = st21.RecordNoList.Get[0];
+		处理人姓名s = FW_GetValue(1087, 姓名, rec);
+		处理人工号s = FW_GetValue(1087, UserName, rec);
+	}else if (str == "3")
+	{
+		处理人职务s = FW_GetValue(1099, POST1, currentpage);
+		处理人部门s = FW_GetValue(1099, GroupID1, currentpage);
+		处理人工号s = FW_GetValue(1099, UserName1, currentpage);
+		处理人姓名s = FW_GetValue(1099, 姓名, currentpage);
+	}
+
+	newPage = FW_AddNewPage_w(1235);
+	FW_SetValue_w(1099, 当前待处理标记Page, currentpage, newPage);
+	FW_SetValue_w(1235, 事件状态, newPage, 事件状态s);
+	FW_SetValue_w(1235, 处理人姓名, newPage, 处理人姓名s);
+	FW_SetValue_w(1235, 处理人工号, newPage, 处理人工号s);
+	FW_SetValue_w(1235, 处理人职务, newPage, 处理人职务s);
+	FW_SetValue_w(1235, 处理人部门, newPage, 处理人部门s);
+	FW_SetValue_w(1235, 处理日期, newPage, 处理日期s);
+	FW_SetValue_w(1235, 审批状态, newPage, 审批状态s);
+	FW_SetValue_w(1235, LinkToFormID, newPage, LinkToFormID_int);
+	FW_SetValue_w(1235, LinkToFormPage, newPage, LinkToFormPage_int);
+	FW_SetValue_w(1235, 提交人姓名, newPage, 提交人姓名s);
+	FW_SetValue_w(1235, 提交人工号, newPage, 提交人工号s);
+	FW_SetValue_w(1235, 内容, newPage, 内容s);
+	FW_SetValue_w(1235, 提交日期, newPage, 提交日期s);
+
+	FW_SetValue_w(1235, 事件状态, markPage, 原事件状态s);
+	FW_SetValue_w(1235, 处理日期, markPage, 原处理日期s);
+
+	FW_SetValue_w(1099, UserName2, currentpage, US);
+	FW_SetValue_w(1099, 状态, currentpage, status);
+	return (GotoClient);
+}
+CLIENT
+{
+	FW_SetValue_w(1099, UserName2, currentpage, US);
+	FW_SetValue_w(1099, 状态, currentpage, status);
+	FW_Dialog1(审批成功！);
+}
+ 

@@ -1,0 +1,199 @@
+FIELD
+{
+	.1044.状态;
+	.1044.申请日期;
+    	.1044.UserName1;
+    	.1044.UserName2;
+   	.1044.替代人工号或姓名;
+	.1044.GroupID2;
+	.1044.POST2;
+	.1044.POST1;
+	.1044.GroupID;
+	.1044.申请日期;
+        .1044.调休共计;
+
+        .1143.申请中调休;
+        .1143.月调休可透支时间;
+        .1143.可调休共计;
+	.1143.弹性调休时间;
+	.1143.弹性调休剩余次数;
+	.1143.上季度剩余调休;
+	.1143.本季度可调休;
+	.1143.季度已调休累计;
+	
+	.1087.UserName;
+	.1087.归属范围;
+    	.1087.POST;
+	.1087.GroupID;
+	.1087.姓名;
+	
+	.1044.姓名;
+	.1044.事由说明;
+	.1044.当前待处理标记Page;
+	.1235.事件状态;
+	.1235.处理人姓名;
+	.1235.处理人工号;
+	.1235.处理人职务;
+	.1235.处理人部门;
+	.1235.处理日期;
+	.1235.审批状态;
+	.1235.LinkToFormID;
+	.1235.LinkToFormPage;
+	.1235.提交人姓名;
+	.1235.提交人工号;
+	.1235.内容;
+	.1235.提交日期;
+}
+VAR
+{
+	String applydate,username1,username2,str,status,scon;
+	int flag是否查找到工号,flag是否查找到处理人姓名,flag是否使用弹性调休,flag是否使用透支时间, correctpage, res, rec;
+	Struct2 st21,st22;
+	String 事件状态s,处理人姓名s,处理人工号s,处理人职务s,处理人部门s,处理日期s,审批状态s,提交人姓名s,提交人工号s,内容s,提交日期s,提交人职务s;
+	int LinkToFormID_int,LinkToFormPage_int,newPage,elasticnumber;
+        double overdrafttime, resttime, leavetime, overdrafttiming, standard, applyingtime, D上季度剩余调休, D本季度可调休, cache, D季度已调休累计;
+}
+CLIENT
+{
+	str = CURRENT.sVALUE;
+	if(str=="0")
+	{
+		return(0);		
+	}
+   	applydate = FW_GetSysDate(0);
+	correctpage = FW_GetCurrentRecNum();
+        username1 = FW_GetValue(1044,UserName1,correctpage);
+   	username2 = FW_GetValue(1044,替代人工号或姓名,correctpage);
+	status="待替代人同意";
+}
+SERVER
+{
+        st21 = FW_FindRecords("1143,username1@UserName",1);
+        res = st21.RecordNoList.Get[0];
+        overdrafttime = FW_GetValue(1143,月调休可透支时间,res);
+        resttime = FW_GetValue(1143,可调休共计,res);
+        leavetime = FW_GetValue(1044,调休共计,correctpage);
+        standard = FW_GetValue(1143,弹性调休时间,res);
+	scon = "1087,username2@UserName";
+	st21 = FW_FindRecords(scon,1);
+	if(st21.mError==0)
+	{
+		rec = st21.RecordNoList.Get[0];
+		处理人工号s=username2;
+		处理人姓名s = FW_GetValue(1087,姓名,rec);
+	}else if(st21.mError!=0)
+	{
+		scon="1087,username2@姓名";
+		st22=FW_FindRecords(scon,1);
+		rec=st22.RecordNoList.Get[0];
+		处理人工号s=FW_GetValue(1087,UserName,rec);
+		处理人姓名s=username2;
+	}
+	处理人职务s = FW_GetValue(1087,POST,rec);
+	处理人部门s = FW_GetValue(1087,GroupID,rec);
+        if(leavetime < standard)
+        {
+                flag是否使用弹性调休 = 1;
+                elasticnumber = FW_GetValue(1143,弹性调休剩余次数,res);
+                elasticnumber = elasticnumber - 1;
+                FW_SetValue_w(1143,弹性调休剩余次数,res,elasticnumber);
+        }
+        if(leavetime <= resttime){
+	}else if(leavetime > resttime)
+        {
+                flag是否使用透支时间 = 1;
+		if(resttime <= 0)
+		{
+			overdrafttime = overdrafttime - leavetime;
+		}else
+		{
+			overdrafttiming = leavetime - resttime;
+			overdrafttime = overdrafttime - overdrafttiming;
+		}
+                FW_SetValue_w(1143,月调休可透支时间,res,overdrafttime);
+        }
+	resttime = resttime - leavetime;
+        FW_SetValue_w(1143,可调休共计,res,resttime);
+
+	D上季度剩余调休 = FW_GetValue(1143,上季度剩余调休,res);
+	D本季度可调休 = FW_GetValue(1143,本季度可调休,res);
+	if(D上季度剩余调休 <= 0)
+	{
+		D本季度可调休 = D本季度可调休 - leavetime;
+	}else if(D上季度剩余调休 >= leavetime)
+	{
+		D上季度剩余调休 = D上季度剩余调休 - leavetime;
+	}else if(D上季度剩余调休 < leavetime)
+	{
+		cache = leavetime - D上季度剩余调休;
+		D本季度可调休 = D本季度可调休 - cache;
+		D上季度剩余调休 = 0;
+	}
+	FW_SetValue_w(1143,上季度剩余调休,res,D上季度剩余调休);
+	FW_SetValue_w(1143,本季度可调休,res,D本季度可调休);
+
+
+
+	提交人姓名s = FW_GetValue(1044,姓名,correctpage);
+	提交人工号s=FW_GetUserID(2);
+	scon="1087,提交人工号s@UserName";
+	st21=FW_FindRecords(scon,1);
+	rec=st21.RecordNoList.Get[0];
+	提交人职务s=FW_GetValue(1087,POST,rec);
+
+	事件状态s="待处理";
+	处理日期s = "";
+	审批状态s="待替代人同意";
+	LinkToFormID_int=1044;
+	LinkToFormPage_int=correctpage;
+	提交日期s=applydate;
+	newPage = FW_AddNewPage_w(1235);
+	FW_SetValue_w(1044,当前待处理标记Page,correctpage,newPage);
+	FW_SetValue_w(1235,事件状态,newPage,事件状态s);
+	FW_SetValue_w(1235,处理人姓名,newPage,处理人姓名s);
+	FW_SetValue_w(1235,处理人工号,newPage,处理人工号s);
+	FW_SetValue_w(1235,处理人职务,newPage,处理人职务s);
+	FW_SetValue_w(1235,处理人部门,newPage,处理人部门s);
+	FW_SetValue_w(1235,处理日期,newPage,处理日期s);
+	FW_SetValue_w(1235,审批状态,newPage,审批状态s);
+	FW_SetValue_w(1235,LinkToFormID,newPage,LinkToFormID_int);
+	FW_SetValue_w(1235,LinkToFormPage,newPage,LinkToFormPage_int);
+	FW_SetValue_w(1235,提交人姓名,newPage,提交人姓名s);
+	FW_SetValue_w(1235,提交人工号,newPage,提交人工号s);
+	FW_SetValue_w(1235,内容,newPage,"调休申请");
+	FW_SetValue_w(1235,提交日期,newPage,提交日期s);
+
+        applyingtime = FW_GetValue(1143,申请中调休,res);
+        applyingtime = applyingtime + leavetime;
+        FW_SetValue_w(1143,申请中调休,res,applyingtime);
+
+	FW_SetValue_w(1044,GroupID2,correctpage,处理人部门s);
+	FW_SetValue_w(1044,POST2,correctpage,处理人职务s);
+	FW_SetValue_w(1044,申请日期,correctpage,applydate);
+	FW_SetValue_w(1044,UserName2,correctpage,处理人工号s);
+	FW_SetValue_w(1044,POST1,correctpage,提交人职务s);
+	FW_SetValue_w(1044,状态,correctpage,status);
+	return(GotoClient);
+}
+CLIENT
+{
+        FW_SetValue_w(1143,可调休共计,res,resttime);
+        FW_SetValue_w(1143,申请中调休,res,applyingtime);
+	FW_SetValue_w(1143,上季度剩余调休,res,D上季度剩余调休);
+	FW_SetValue_w(1143,本季度可调休,res,D本季度可调休);
+        if(flag是否使用弹性调休 == 1)
+        {
+                FW_SetValue_w(1143,弹性调休剩余次数,res,elasticnumber);
+        }
+        if(flag是否使用透支时间 == 1)
+        {
+                FW_SetValue_w(1143,月调休可透支时间,res,overdrafttime);
+        }
+	FW_SetValue_w(1044,GroupID2,correctpage,处理人部门s);
+	FW_SetValue_w(1044,POST2,correctpage,处理人职务s);
+	FW_SetValue_w(1044,POST1,correctpage,提交人职务s);
+    	FW_SetValue_w(1044,申请日期,correctpage,applydate);
+	FW_SetValue_w(1044,UserName2,correctpage,处理人工号s);
+	FW_SetValue_w(1044,状态,correctpage,status);
+	FW_Dialog1(调休申请提交成功！);
+} 
