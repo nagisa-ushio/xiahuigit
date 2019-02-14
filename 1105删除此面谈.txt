@@ -1,0 +1,54 @@
+FIELD
+{
+    .1105.UserName;
+    .1105.状态;
+    .1105.面谈人工号;
+}
+VAR
+{
+    int cp, is_continue;
+    String us_resign, us_current, us_interviewer, status;
+    Struct0 st0_1024;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    us_current = FW_GetUserID(2);
+    us_interviewer = FW_GetValue(1105, 面谈人工号, cp);
+    if(us_current != us_interviewer)
+    {
+        FW_Dialog1(只有此纪录的面谈人才可以进行删除！);
+        return(0);
+        
+    }
+    is_continue = FW_Dialog1(确认删除此面谈记录？);
+    if(is_continue == 0)
+    {
+        return(0);
+    }
+    us_resign = FW_GetValue(1105, UserName, cp);
+    us_resign = "（删除）" + us_resign;
+    FW_SetValue_w(1105, UserName, cp, us_resign);
+
+    status = FW_GetValue(1105, 状态, cp);
+    status = "（删除）" + status;
+    FW_SetValue_w(1105, 状态, cp, status);
+    
+}
+SERVER
+{
+    FW_SetValue_w(1105, UserName, cp, us_resign);
+    FW_SetValue_w(1105, 状态, cp, status);
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_Dialog1(删除成功！);
+}
+SERVER
+{
+    st0_1024.FormID = 1024;
+    st0_1024.Record = 0;
+    return(st0_1024);
+}
+

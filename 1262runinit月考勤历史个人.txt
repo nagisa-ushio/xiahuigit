@@ -1,0 +1,20 @@
+FIELD
+{
+    .1262.QueryUserName;
+    .1262.QueryGroupID;
+    .1262.Query考勤年月;
+    .1262.Query姓名;
+}
+VAR
+{
+    String current_us;
+}
+CLIENT
+{
+    current_us = FW_GetUserID(2);
+    FW_SetValue_w(1262, Query考勤年月, 0, "****");
+    FW_SetValue_w(1262, QueryGroupID, 0, "****");
+    FW_SetValue_w(1262, QueryUserName, 0, current_us);
+    FW_SetValue_w(1262, Query姓名, 0, "****");
+    FW_RecordSort(1262, QueryUserName, 0);
+}

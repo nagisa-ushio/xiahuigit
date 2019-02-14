@@ -10,7 +10,7 @@ FIELD
     .1105.面谈内容记录;
     .1105.员工主要反馈意见;
     .1105.后续跟进安排;
-    .1105.记录状态;
+    .1105.状态;
 }
 VAR
 {
@@ -82,11 +82,11 @@ CLIENT
         FW_Dialog1(后续跟进安排不能为空！);
         return(0);
     }
-    FW_SetValue_w(1105, 记录状态, cp, "已完成");
+    FW_SetValue_w(1105, 状态, cp, "已完成");
 }
 SERVER
 {
-    FW_SetValue_w(1105, 记录状态, cp, "已完成");
+    FW_SetValue_w(1105, 状态, cp, "已完成");
     return(GotoClient);
 }
 CLIENT

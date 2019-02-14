@@ -1,16 +1,15 @@
 FIELD
 {
-    .1110.姓名;
-    .1110.GroupID;
-    .1110.工作岗位;
-    .1110.入职日期;
+    .1102.姓名;
+    .1102.试用部门;
+    .1102.试用职务;
+    .1102.入职时间;
 
-    .1257.UserName;
+    .1134.UserName;
 
     .1098.UserName;
     .1098.姓名;
 
-    .1105.状态;
     .1105.UserName;
     .1105.姓名;
     .1105.GroupID;
@@ -19,6 +18,7 @@ FIELD
     .1105.面谈日期;
     .1105.面谈人;
     .1105.面谈人工号;
+    .1105.状态;
 }
 VAR
 {
@@ -31,10 +31,10 @@ VAR
 CLIENT
 {
     cp = FW_GetCurrentRecNum();
-    name_resign = FW_GetValue(1110, 姓名, cp);
-    group_resign = FW_GetValue(1110, GroupID, cp);
-    post_resign = FW_GetValue(1110, 工作岗位, cp);
-    date_entry = FW_GetValue(1110, 入职日期, cp);
+    name_resign = FW_GetValue(1102, 姓名, cp);
+    group_resign = FW_GetValue(1102, 试用部门, cp);
+    post_resign = FW_GetValue(1102, 试用职务, cp);
+    date_entry = FW_GetValue(1102, 入职时间, cp);
     us_current = FW_GetUserID(2);
 }
 SERVER
@@ -48,7 +48,7 @@ SERVER
     }
     rec_1098 = st2_1098.RecordNoList.Get[0];
     interviewer = FW_GetValue(1098, 姓名, rec_1098);
-    us_resign = FW_GetValue(1257, UserName, cp);
+    us_resign = FW_GetValue(1134, UserName, cp);
     status = "待完善";
     st2_1105 = FW_FindRecords("1105, status@状态, us_resign@UserName, us_current@面谈人工号", 1);
     if(st2_1105.mError == 0)

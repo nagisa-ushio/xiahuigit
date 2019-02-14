@@ -1,0 +1,185 @@
+FIELD
+{
+    .1102.员工状态;
+    .1102.转正申请状态;
+    .1102.同意转正;
+    .1102.转正日期;
+    .1102.转岗;
+    .1102.建议岗位;
+    .1102.不同意转正;
+    .1102.辞退;
+    .1102.最后工作日;
+
+    .1134.机构确认转正日期;
+    .1134.机构签字;
+    .1134.机构意见日期;
+    .1134.试用结果;
+    .1134.机构审批状态;
+    .1134.人事确认状态;
+    .1134.name1;
+    .1134.UserName;
+    .1134.name3;
+    .1134.UserName3;
+    .1134.name5;
+    .1134.UserName5;
+    .1134.POST5;
+    .1134.name6;
+    .1134.1235待处理页;
+
+    .1235.事件状态;
+    .1235.处理人姓名;
+    .1235.处理人工号;
+    .1235.处理人职务;
+    .1235.处理人部门;
+    .1235.处理日期;
+    .1235.审批状态;
+    .1235.LinkToFormID;
+    .1235.LinkToFormPage;
+    .1235.提交人姓名;
+    .1235.提交人工号;
+    .1235.内容;
+    .1235.提交日期;
+
+    .1098.现任岗位;
+    .1098.转正日期;
+    .1098.离职日期;
+}
+VAR
+{
+    String status_org, status_finally, us_current, username3, approval_str, post_handle, us_handle, name_handle;
+    String result, get_job_day, post_advice, last_day;
+    String date_apply, name_resign, us_resign, date_current, status_approval, interviewer;
+    String group_resign, group_resign2, post_resign, id_resign, range_resign, date_approval;
+    int flag转正, flag转岗, flag辞退;
+    int cp, status_handle, approval_int, pending_page, np, rec_1087;
+    Struct0 st0_dialog1, st0_1111;
+    Struct2 st2_1087;
+}
+CLIENT
+{
+    cp = FW_GetCurrentRecNum();
+    us_current = FW_GetUserID(2);
+    username3 = FW_GetValue(1134, UserName3, cp);
+    if(us_current != username3)
+    {
+        FW_Dialog1(当前登录账号没有确认最后已离职的权限！);
+        return(0);
+    }
+
+    status_org = FW_GetValue(1134, 机构审批状态, cp);
+    status_finally = FW_GetValue(1134, 人事确认状态, cp);
+    if(status_org != "（已审批）")
+    {
+        FW_Dialog1(无法审批，暂未到达此流程！);
+        return(0);
+    }
+    if(status_finally == "（已确认）")
+    {
+        FW_Dialog1(转正已确认完成过！);
+        return(0);
+    }
+    st0_dialog1.message = "请填写确认或退回来进行审批。";   //设置可填写的对话框并设置提示信息
+    st0_dialog1.sVALUE = "确认";    //预设值为“通过”
+    approval_int = FW_Dialog1(st0_dialog1);    //当点击继续才会进行相关审批
+    if(approval_int == 1)
+    {
+        approval_str = st0_dialog1.sVALUE;    //取得审批人输入的内容
+        if((approval_str != "确认")&&(approval_str != "退回"))
+        {
+            FW_Dialog1(只能输入“确认”或“退回”来进行审批！);
+            return(0);
+        }
+    }else
+    {
+        return(0);
+    }
+    result = FW_GetValue(1134, 试用结果, cp);
+    if(result == "予以转正")
+    {
+        get_job_day = FW_GetValue(1134, 机构确认转正日期, cp);
+        flag转正 = 1;
+    }else if(result== "转岗试用")
+    {
+        post_advice = FW_GetValue(1102, 建议岗位, cp);
+        flag转岗 = 1;
+    }else if(result == "予以辞退")
+    {
+        last_day = FW_GetValue(1102, 最后工作日, cp);
+        flag辞退 = 1;
+    }
+}
+SERVER
+{
+    pending_page = FW_GetValue(1134, 1235待处理页, cp);
+    FW_SetValue_w(1235, 事件状态, pending_page, "已处理");
+    date_apply = FW_GetValue(1235, 提交日期, pending_page);
+    if(approval_str == "确认")
+    {
+        status_approval = "转正已完成";
+
+        if(flag转正 == 1)
+        {
+            FW_SetValue_w(1102, 员工状态, cp, "在职");
+            FW_SetValue_w(1098, 转正日期, cp, get_job_day);
+        }else if(flag转岗 == 1)
+        {
+            FW_SetValue_w(1098, 现任岗位, cp, post_advice);
+        }else if(flag辞退 == 1)
+        {
+            FW_SetValue_w(1098, 离职日期, cp, last_day);
+            FW_SetValue_w(1102, 员工状态, cp, "辞退");
+        }
+        FW_SetValue_w(1134, 人事确认状态, cp, "（已确认）");
+    }else if(approval_str == "退回")
+    {
+        FW_SetValue_w(1235, 事件状态, pending_page, "已处理");
+        post_handle = FW_GetValue(1134, POST5, cp);
+        us_handle = FW_GetValue(1134, UserName5, cp);
+        name_handle = FW_GetValue(1134, name5, cp);
+        status_approval = "退回待重新审批";
+        name_resign = FW_GetValue(1134, name1, cp);
+        us_resign = FW_GetValue(1134, UserName, cp);
+
+        np = FW_AddNewPage_w(1235);
+        FW_SetValue_w(1134, 1235待处理页, cp, np);
+
+        FW_SetValue_w(1235, 事件状态, np, "待处理");
+        FW_SetValue_w(1235, 审批状态, np, status_approval);
+        FW_SetValue_w(1235, 处理人姓名, np, name_handle);
+        FW_SetValue_w(1235, 处理人工号, np, us_handle);
+        FW_SetValue_w(1235, 处理人职务, np, post_handle);
+        FW_SetValue_w(1235, 处理日期, np, date_current);
+        FW_SetValue_w(1235, LinkToFormID, np, 1110);
+        FW_SetValue_w(1235, LinkToFormPage, np, cp);
+        FW_SetValue_w(1235, 提交人姓名, np, name_resign);
+        FW_SetValue_w(1235, 提交人工号, np, us_resign);
+        FW_SetValue_w(1235, 内容, np, "转正申请");
+        FW_SetValue_w(1235, 提交日期, np, date_apply);
+
+        FW_SetValue_w(1134, 机构审批状态, cp, "（已退回）");
+    }
+    FW_SetValue_w(1102, 转正申请状态, cp, status_approval);
+    return(GotoClient);
+}
+CLIENT
+{
+    FW_SetValue_w(1102, 转正申请状态, cp, status_approval);
+
+    if(approval_str == "通过")
+    {
+        FW_SetValue_w(1134, 人事确认状态, cp, "（已确认）");
+        if(flag转正 == 1)
+        {
+            FW_SetValue_w(1102, 员工状态, cp, "在职");
+        }else if(flag辞退 == 1)
+        {
+            FW_SetValue_w(1102, 员工状态, cp, "辞退");
+        }
+        FW_Dialog1(确认成功！转正已完成。);
+    }else
+    {
+        FW_SetValue_w(1134, 1235待处理页, cp, np);
+        FW_SetValue_w(1134, 机构审批状态, cp, "（已退回）");
+        FW_Dialog1(已退回此申请！);
+    }
+}

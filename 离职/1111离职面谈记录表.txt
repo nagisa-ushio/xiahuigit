@@ -16,11 +16,14 @@ FIELD
     .1111.填表日期;
     .1111.离职面谈记录表状态;
 
+    .1257.1235待处理页;
     .1257.人事确认状态;
 
+    .1235.事件状态;
+
+    .1110.离职申请状态;
     .1110.批准离职日期;
-    .1110.批准离职日期;
-    .1110.员工状态;
+    .1110.员工状态
 
     .1087.State;
     .1087.姓名;
@@ -31,11 +34,13 @@ FIELD
     .1087.用户ID;
     .1087.归属范围;
     .1087.部门;
+
+    .1098.离职日期;
 }
 VAR
 {
-    int cp, rec_1087;
-    String record1, caption1, interviewer, record2, record3, record4, record5, record6;
+    int cp, rec_1087, pending_page;
+    String status, record1, caption1, interviewer, record2, record3, record4, record5, record6;
     String record7, record8, record9, other, date_write, us_resign, group_resign2;
     String name_resign, group_resign, post_resign, id_resign, range_resign, date_approval;
     Struct2 st2_1087;
@@ -43,6 +48,12 @@ VAR
 CLIENT
 {
     cp = FW_GetCurrentRecNum();
+    status = FW_GetValue(1111, 离职面谈记录表状态, cp);
+    if(status == "已完成")
+    {
+        FW_Dialog1(此表格状态为“已完成”，无需重复提交！);
+        return(0);
+    }
     interviewer = FW_GetValue(1111, 面谈人, cp);
     if(interviewer=="")
     {
@@ -139,6 +150,9 @@ CLIENT
 }
 SERVER
 {
+    pending_page = FW_GetValue(1257, 1235待处理页, cp);
+    FW_SetValue_w(1235, 事件状态, pending_page, "已处理");
+
     st2_1087 = FW_FindRecords("1087, us_resign@UserName", 1);
     rec_1087 = st2_1087.RecordNoList.Get[0];
 
@@ -181,6 +195,8 @@ SERVER
 
     FW_SetValue_w(1110, 离职申请状态, cp, "已确认离职");
     FW_SetValue_w(1110, 员工状态, cp, "离职");
+
+    FW_SetValue_w(1098, 离职日期,cp, date_approval);
     return(GotoClient);
 }
 CLIENT

@@ -1,0 +1,41 @@
+FIELD
+{
+    .1262.Query考勤年月;
+    .1262.QueryGroupID;
+    .1262.QueryUserName;
+    .1262.Query姓名;
+
+    .1087.UserName;
+    .1087.GroupID;
+    .1087.POST;
+}
+VAR
+{
+    String current_us, current_post, current_groupid, flag;
+    int rec_1087;
+    Struct2 st2_1087;
+}
+CLIENT
+{
+    current_us = FW_GetUserID(2);
+}
+SERVER
+{
+    st2_1087 = FW_FindRecords("1087, current_us@UserName", 1);
+    return(GotoClient);
+}
+CLIENT
+{
+    if(st2_1087.mError == 0)
+    {
+        FW_SetValue_w(1262, Query考勤年月, 0, "****");
+        FW_SetValue_w(1262, QueryGroupID, 0, "全部");
+        FW_SetValue_w(1262, QueryUserName, 0, "****");
+        FW_SetValue_w(1262, Query姓名, 0, "****");
+        FW_RecordSort(1262, QueryGroupID, 0);
+    }else
+    {
+        FW_Dialog1(系统用户表中暂未找到你的工号信息！请联系相关人员设置。);
+    }
+}
+

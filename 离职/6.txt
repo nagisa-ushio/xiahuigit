@@ -1,6 +1,8 @@
 FIELD
 {
     .1110.离职申请状态;
+    .1110.批准离职日期;
+    .1110.员工状态;
 
     .1257.机构审批状态;
     .1257.人事确认状态;
@@ -31,13 +33,27 @@ FIELD
     .1111.面谈人;
     .1111.离职面谈记录表状态;
     .1111.填表日期;
+
+    .1087.State;
+    .1087.姓名;
+    .1087.GroupID;
+    .1087.UserName;
+    .1087.Expiry;
+    .1087.POST;
+    .1087.用户ID;
+    .1087.归属范围;
+    .1087.部门;
+
+    .1098.离职日期;
 }
 VAR
 {
     String status_org, status_finally, us_current, username3, approval_str, post_handle, us_handle, name_handle;
     String date_apply, name_resign, us_resign, date_current, status_approval, interviewer;
+    String group_resign, group_resign2, post_resign, id_resign, range_resign, date_approval;
     int cp, status_handle, approval_int, pending_page, np, rec_1087;
     Struct0 st0_dialog1, st0_1111;
+    Struct2 st2_1087;
 }
 CLIENT
 {
@@ -67,15 +83,15 @@ CLIENT
     }else
     {
         status_handle = 0;
-        st0_dialog1.message = "请填写确认或退回来进行审批。";   //设置可填写的对话框并设置提示信息
-        st0_dialog1.sVALUE = "确认";    //预设值为“通过”
+        st0_dialog1.message = "请填写 “确认离职需填写离职面谈记录表” 或 “确认离职无需填写离职面谈记录表” 或 “退回” 来进行审批！";   //设置可填写的对话框并设置提示信息
+        st0_dialog1.sVALUE = "确认离职需填写离职面谈记录表";    //预设值为“通过”
         approval_int = FW_Dialog1(st0_dialog1);    //当点击继续才会进行相关审批
         if(approval_int == 1)
         {
             approval_str = st0_dialog1.sVALUE;    //取得审批人输入的内容
-            if((approval_str != "确认")&&(approval_str != "退回"))
+            if((approval_str != "确认离职无需填写离职面谈记录表")&&(approval_str != "确认离职需填写离职面谈记录表")&&(approval_str != "退回"))
             {
-                FW_Dialog1(只能输入“确认”或“退回”来进行审批！);
+                FW_Dialog1(只能输入 “确认离职无需填写离职面谈记录表” 或 “确认离职需填写离职面谈记录表” 或 “退回” 来进行审批！);
                 return(0);
             }
         }else
@@ -90,16 +106,62 @@ SERVER
     {
         date_current = FW_GetSysDate(0);
         pending_page = FW_GetValue(1257, 1235待处理页, cp);
-        FW_SetValue_w(1235, 事件状态, pending_page, "已处理");
         date_apply = FW_GetValue(1235, 提交日期, pending_page);
-        if(approval_str == "确认")
+        if(approval_str == "确认离职需填写离职面谈记录表")
         {
             interviewer = FW_GetValue(1257, name6, cp);
             FW_SetValue_w(1111, 面谈人, cp, interviewer);
             FW_SetValue_w(1111, 离职面谈记录表状态, cp, "待完善");
             FW_SetValue_w(1111, 填表日期, cp, date_current);
-        }else
+        }else if(approval_str == "确认离职无需填写离职面谈记录表")
         {
+            FW_SetValue_w(1235, 事件状态, pending_page, "已处理");
+            //查找1087用户表对应的账号并把相关的所有信息添加上（停止使用）标记
+            us_resign = FW_GetValue(1257, UserName, cp);
+            st2_1087 = FW_FindRecords("1087, us_resign@UserName", 1);
+            rec_1087 = st2_1087.RecordNoList.Get[0];
+
+            FW_SetValue_w(1087, State, rec_1087, "停止使用");
+
+            name_resign = FW_GetValue(1087, 姓名, rec_1087);
+            name_resign = name_resign + "（停止使用）";
+            FW_SetValue_w(1087, 姓名, rec_1087, name_resign);
+
+            group_resign = FW_GetValue(1087, GroupID, rec_1087);
+            group_resign = group_resign + "（停止使用）";
+            FW_SetValue_w(1087, GroupID, rec_1087, group_resign);
+
+            group_resign2 = FW_GetValue(1087, 部门, rec_1087);
+            group_resign2 = group_resign2 + "（停止使用）";
+            FW_SetValue_w(1087, 部门, rec_1087, group_resign2);
+
+            us_resign = us_resign + "（停止使用）";
+            FW_SetValue_w(1087, UserName, rec_1087, us_resign);
+
+            date_approval = FW_GetValue(1110, 批准离职日期, cp);
+            FW_SetValue_w(1087, Expiry, rec_1087, date_approval);
+
+            post_resign = FW_GetValue(1087, POST, rec_1087);
+            post_resign = post_resign + "（停止使用）";
+            FW_SetValue_w(1087, POST, rec_1087, post_resign);
+
+            id_resign = FW_GetValue(1087, 用户ID, rec_1087);
+            id_resign = id_resign + "（停止使用）";
+            FW_SetValue_w(1087, 用户ID, rec_1087, id_resign);
+
+            range_resign = FW_GetValue(1087, 归属范围, rec_1087);
+            range_resign = range_resign + "（停止使用）";
+            FW_SetValue_w(1087, 归属范围, rec_1087, range_resign);
+
+            FW_SetValue_w(1257, 人事确认状态, cp, "（已确认）");
+
+            FW_SetValue_w(1110, 离职申请状态, cp, "已确认离职");
+            FW_SetValue_w(1110, 员工状态, cp, "离职");
+
+            FW_SetValue_w(1098, 离职日期,cp, date_approval);
+        }else if(approval_str == "退回")
+        {
+            FW_SetValue_w(1235, 事件状态, pending_page, "已处理");
             post_handle = FW_GetValue(1257, POST5, cp);
             us_handle = FW_GetValue(1257, UserName5, cp);
             name_handle = FW_GetValue(1257, name5, cp);
@@ -132,10 +194,18 @@ CLIENT
 {
     if(status_handle == 0)
     {
-        if(approval_str == "确认")
+        if(approval_str == "确认离职需填写离职面谈记录表")
         {
-            FW_Dialog1(确认成功！即将进入《离职员工面谈记录表》填写。);
-        }else
+            FW_Dialog1(即将进入《离职员工面谈记录表》填写！);
+        }else if(approval_str == "确认离职无需填写离职面谈记录表")
+        {
+            FW_SetValue_w(1257, 人事确认状态, cp, "（已确认）");
+
+            FW_SetValue_w(1110, 离职申请状态, cp, "已确认离职");
+            FW_SetValue_w(1110, 员工状态, cp, "离职");
+            FW_Dialog1(确认成功，离职完成！);
+            return(0);
+        }else if(approval_str == "退回")
         {
             FW_SetValue_w(1257, 1235待处理页, cp, np);
             FW_SetValue_w(1257, 机构审批状态, cp, "（已退回）");

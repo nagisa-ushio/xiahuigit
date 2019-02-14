@@ -1,5 +1,6 @@
 FIELD
 {
+    .1102.转正申请状态;
     .1102.员工状态;
     .1102.姓名;
     .1102.性别;
@@ -43,6 +44,7 @@ FIELD
     .1134.POST2;
     .1134.POST3;
     .1134.POST4;
+    .1134.POST5;
     .1134.1235待处理页;
     .1134.1235待处理页备用;
 
@@ -68,7 +70,7 @@ FIELD
 }
 VAR
 {
-    String current_us, apply_us, status_staff, status_executive, status_personnel, status_director;
+    String current_us, apply_us, is_on_job, status_staff, status_executive, status_personnel, status_director;
     String status_organization, date_form, name, sex, birthday, education, job_title, marry, name_current;
     String group_try, post_try, date_entry, date_regular_work, date_fill_in_form;
     String signature_applier, date_signature_applier, front, reverse, word_work_summary;
@@ -81,21 +83,25 @@ VAR
 CLIENT
 {
     cp = FW_GetCurrentRecNum();
-    status_staff = FW_GetValue(1134, 员工提交状态, cp);
-    if((status_staff != "（待提交）")&&(status_staff != ""))
+    is_on_job = FW_GetValue(1102, 员工状态, cp);
+    if(is_on_job != "在职")
     {
-        if(status_staff != "（已退回）")
-        {
-            FW_Dialog1(当前离职申请已进行过提交！);
-            return(0);
-        }
+        FW_Dialog1(当前员工不是在职状态！);
+        return(0);
+    }
+
+    status_staff = FW_GetValue(1134, 员工提交状态, cp);
+    if(status_staff == "（已提交）")
+    {
+        FW_Dialog1(当前转正申请已进行过提交！);
+        return(0);
     }
 
     apply_us = FW_GetValue(1134, UserName, cp);
     current_us = FW_GetUserID(2);
     if(current_us != apply_us)
     {
-        FW_Dialog1(当前登录的账号不是转正员工账号！);
+        FW_Dialog1(当前登录的账号不是转正员工账号，无法进行提交！);
         return(0);
     }
 
@@ -190,19 +196,19 @@ CLIENT
         return(0);
     }
 
-    front = FW_GetValue(1102, 转正正面扫描件, cp);
-    if(front == "")
-    {
-        FW_Dialog1(请填写 "转正正面扫描件");
-        return(0);
-    }
+    //front = FW_GetValue(1102, 转正正面扫描件, cp);
+    //if(front == "")
+    //{
+    //    FW_Dialog1(请填写 "转正正面扫描件");
+    //    return(0);
+    //}
 
-    reverse = FW_GetValue(1102, 转正反面扫描件, cp);
-    if(reverse == "")
-    {
-        FW_Dialog1(请填写 "转正反面扫描件");
-        return(0);
-    }
+    //reverse = FW_GetValue(1102, 转正反面扫描件, cp);
+    //if(reverse == "")
+    //{
+        //FW_Dialog1(请填写 "转正反面扫描件");
+        //return(0);
+    //}
 
     word_work_summary = FW_GetValue(1102, 工作小结word, cp);
     if(word_work_summary == "")
@@ -225,6 +231,7 @@ SERVER
     rec_1087 = st2_1087.RecordNoList.Get[0];
     post_current = FW_GetValue(1087, POST, rec_1087);
     range_current = FW_GetValue(1087, 归属范围, rec_1087);
+    //确定下面各流程的审批职位
     if((post_current == "主管")||(range_current == "后台"))
     {
         post2 = "运营总监";
@@ -276,7 +283,7 @@ SERVER
         FW_SetValue_w(1235, LinkToFormPage, np, cp);
         FW_SetValue_w(1235, 提交人姓名, np, name_current);
         FW_SetValue_w(1235, 提交人工号, np, apply_us);
-        FW_SetValue_w(1235, 内容, np, "离职申请");
+        FW_SetValue_w(1235, 内容, np, "转正申请");
         FW_SetValue_w(1235, 提交日期, np, date_current);
     }
     FW_SetValue_w(1134, 员工提交状态, cp, "（已提交）");
@@ -288,6 +295,9 @@ SERVER
     FW_SetValue_w(1134, 机构审批状态, cp, "（待审批）");
     FW_SetValue_w(1134, 人事确认状态, cp, "（待确认）");
     FW_SetValue_w(1134, POST5, cp, post5);
+
+    FW_SetValue_w(1102, 转正申请状态, cp, status_handle);
+    FW_SetValue_w(1102, 填表日期, cp, date_current);
 
     return(GotoClient);
 }
@@ -302,5 +312,8 @@ CLIENT
     FW_SetValue_w(1134, 机构审批状态, cp, "（待审批）");
     FW_SetValue_w(1134, 人事确认状态, cp, "（待确认）");
     FW_SetValue_w(1134, POST5, cp, post5);
-    FW_Dialog1(离职申请提交成功！);
+
+    FW_SetValue_w(1102, 转正申请状态, cp, status_handle);
+    FW_SetValue_w(1102, 填表日期, cp, date_current);
+    FW_Dialog1(转正申请提交成功！);
 }

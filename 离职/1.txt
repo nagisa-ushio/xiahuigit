@@ -209,12 +209,12 @@ CLIENT
         return(0);
     }
 
-    photo_resign = FW_GetValue(1112, 登记表1, cp);
-    if(photo_resign == "")
-    {
-        FW_Dialog1(请上传 "离职交接登记表照片" ！);
-        return(0);
-    }
+    //photo_resign = FW_GetValue(1112, 登记表1, cp);
+    //if(photo_resign == "")
+    //{
+    //    FW_Dialog1(请上传 "离职交接登记表照片" ！);
+    //    return(0);
+    //}
     is_continue = FW_Dialog1(确认填写无误并进行提交吗？);
     if(is_continue == 0)
     {
