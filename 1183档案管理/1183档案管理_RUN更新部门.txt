@@ -1,0 +1,49 @@
+FIELD
+{
+        .1183.现属部门;
+        .1183.UserName;
+        .1087.UserName;
+        .1087.GroupID;
+}
+VAR
+{
+        String us,gd;
+        int cp,isFind,rec;
+        Struct2 st2;
+}
+CLIENT
+{
+        cp = FW_GetCurrentRecNum();
+        gd = FW_GetValue(1183,现属部门,cp);
+        if(gd == "")
+        {
+                FW_Dialog1(现属部门不能为空！);
+                return(0);
+        }
+        us = FW_GetValue(1183,UserName,cp);
+}
+SERVER
+{
+        st2 = FW_FindRecords("1087,us@UserName",1);
+        if(st2.mError == 0)
+        {
+                isFind = 1;
+                rec = st2.RecordNoList.Get[0];
+                FW_SetValue_w(1087,GroupID,rec,gd);
+        }else
+        {
+                isFind = 0;
+        }
+        return(GotoClient);
+}
+CLIENT
+{
+        if(isFind == 1)
+        {
+                FW_SetValue_w(1087,GroupID,rec,gd);
+                FW_Dialog1(现属部门更新成功！);
+        }else
+        {
+                FW_Dialog1(系统中暂未录入此员工帐号,无法更新部门信息！请联系管理员处理。);
+        }
+}

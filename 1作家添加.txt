@@ -1,0 +1,80 @@
+VAR
+{
+    Struct0 st0AuthorFieldName, st0, st0Msg;
+    Struct2 st2FindinTargetForm;
+    String strAuthorFormID, targetFormFieldName, authorName, condition, msg, us;
+    int currentFormID, currentRec, targetFormID, lastRec, newRec, i, countFieldName;
+}
+FIELD
+{
+    .1042.UserName;
+}
+
+SERVER
+{
+    currentFormID = CURRENT.FormID;
+    currentRec = CURRENT.Record;
+    st0Msg.FormID = currentFormID;
+    st0Msg.Record = currentRec;
+    st0Msg.message = "WEB_STRUCT0";
+    us = FW_GetUserID(2);
+    targetFormID = 1032;
+    lastRec = FW_GetTotalRecords(targetFormID);
+    lastRec--;
+    st0AuthorFieldName.Json = {"AuthorName":"名稱", "AuthorWorks":"相關作品", "AuthorProfile":"簡介", "AuthorPic":"作家圖片"};
+    countFieldName = st0AuthorFieldName.Json.length;
+    for(i=0;i<countFieldName;i++)
+    {
+        targetFormFieldName = st0AuthorFieldName.Json[i].name;
+
+        // 添加失敗情況
+        FW_Dialog1(i);
+        st0 = FW_GetValue(currentFormID, targetFormFieldName, currentRec);
+        if(st0.sVALUE == "")
+        {
+            msg = st0AuthorFieldName.Json[i].value;
+            msg = "您未输入" + msg + "，請輸入後再確認添加。";
+            st0Msg.sVALUE = msg;
+            return(st0Msg);
+        }
+        if(targetFormFieldName == "AuthorName")
+        {
+            authorName = st0.sVALUE;
+            strAuthorFormID = targetFormID.toString;
+            condition = strAuthorFormID + ", authorName@" + targetFormFieldName;
+            st2FindinTargetForm = FW_FindRecords(condition, 1);
+            if(st2FindinTargetForm.mError == 0)
+            {
+                msg = "無法添加！" + typeName + "作家資料庫中已存在相同作家。";
+                st0Msg.sVALUE = msg;
+                return(st0Msg);
+            }
+            st0 = FW_GetValue(targetFormID, targetFormFieldName, lastRec);
+            if(st0.sVALUE != "")
+            {
+                newRec = FW_AddNewPage_w(targetFormID);
+            }else
+            {
+                newRec = lastRec;
+            }
+        }
+    }
+
+    // 添加新的作家信息至作家資料庫表格
+    for(i=0;i<countFieldName;i++)
+    {
+        targetFormFieldName = st0AuthorFieldName.Json[i].name;
+        st0 = FW_GetValue(currentFormID, targetFormFieldName, currentRec);
+        FW_SetValue_w(targetFormID, targetFormFieldName, newRec, st0.sVALUE);
+    }
+
+    // 添加完成後的重置操作
+    FW_SetValue_w(currentFormID, "DYNAMIC", currentRec, "");    // 將當前表格上所有動態域域值清空
+    us = FW_GetUserID(2);
+    us = us + ";";
+    FW_SetValue_w(currentFormID, UserName, currentRec, us);    // 因為UserName域值也被清空，因此從新獲取填入，否則服務器每次都會自動添加一頁UserName為登錄用戶的新記錄（因為該表格設置了WebAccessRight）
+    msg = "添加成功！";
+    st0Msg.sVALUE = msg;
+    return(st0Msg);
+}
+

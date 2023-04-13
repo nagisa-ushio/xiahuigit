@@ -1,0 +1,60 @@
+VAR
+{
+    Struct0 st0Msg;
+    Struct2 st2_find_result;
+    String us, enSemicolon, condition, collectionStatus, status;
+    int currentFormID, currentRec, newRec, i, countField;
+    StringList sl_Field;
+}
+FIELD
+{
+    .1035.UserName;
+    .1035.CollectionStatus;
+    .1035.EnSemicolon;
+}
+
+SERVER
+{
+    currentFormID = CURRENT.FormID;
+    currentRec = CURRENT.Record;
+    st0Msg.FormID = currentFormID;
+    st0Msg.message = "";
+    status = "藏品新增待完善保存";
+    collectionStatus = FW_GetValue(currentFormID, CollectionStatus, currentRec);
+    if(collectionStatus == status)
+    {
+        newRec = currentRec;
+        st0Msg.message = "WEB_STRUCT0";
+        st0Msg.sVALUE = "當前藏品狀態為：" + status + "，需完善保存後才能添加新的藏品。";
+    }else
+    {
+        us = FW_GetUserID(2);
+        enSemicolon = FW_GetValue(currentFormID, EnSemicolon, currentRec);
+        us = us + enSemicolon;
+        condition = currentFormID.toString;
+        condition = condition + ", us@UserName, status@CollectionStatus";
+        st2_find_result = FW_FindRecords(condition, 0);
+        if(st2_find_result.mError != 0)
+        {
+            newRec = FW_AddNewPage_w(currentFormID);
+            FW_SetValue_w(currentFormID, UserName, newRec, us);
+            FW_SetValue_w(currentFormID, CollectionStatus, newRec, status);
+        }else
+        {
+            newRec =st2_find_result.RecordNoList.Get[0];
+        }
+        
+    }
+
+    // 對特定的域進行鎖定暫不讓點擊，待完善保存後解鎖
+    sl_Field = ["TransferToAuctionAfter","UpdateAfter"];
+    countField = sl_Field.Get[];
+    for(i=0;i<countField;i++)
+    {
+        condition = sl_Field.Get[i];
+        FW_SetValueStatus_w(currentFormID, newRec, condition, 1);
+    }
+    st0Msg.Record = newRec;
+    return(st0Msg);
+}
+

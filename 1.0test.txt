@@ -1,4 +1,0 @@
-SERVER
-{
-    FW_DeleteRecords_w(.1252(1,94));
-}

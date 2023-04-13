@@ -1,95 +1,39 @@
-FIELD
-{
-    .1171.待办数字;
-
-    .1235.事件状态;
-    .1235.处理人工号;
-
-    .1171.UserName;
-}
 VAR
 {
-    Struct0 st0;
-    Struct2 st2;
-    String current_us, condition, status, string_to_do;
-    int count_to_do, us_record;
-}
-CLIENT
-{
-    current_us = FW_GetUserID(2);
-    status = "待处理";
-}
-SERVER
-{
-    st2 = FW_FindRecords("1171,current_us@UserName",1);
-    us_record = st2.RecordNoList.Get[0];
-    condition = "1235,current_us@处理人工号,status@事件状态";
-    st2 = FW_FindRecords(condition, 0);
-    if(st2.mError != 0)
-    {
-        FW_SetValue_w(1171, 待办数字, us_record, "（0）");
-    }else
-    {
-        count_to_do = st2.count;
-        string_to_do = count_to_do.toString;
-        string_to_do = "（" + string_to_do + "）";
-        FW_SetValue_w(1171, 待办数字, us_record, string_to_do);
-    }
-    return(GotoClient);
-}
-CLIENT
-{
-    if(st2.mError != 0)
-    {
-        FW_SetValue_w(1171, 待办数字, us_record, "（0）");
-    }else
-    {
-        FW_SetValue_w(1171, 待办数字, us_record, string_to_do);
-    }
+    Struct0 st0, st01;
+    StringList slFieldName;
+    String prefix,str0, str1, str2, strTargetID, msg;
+    int currentID, currentRec, targetID, newRec1025;
 }
 FIELD
 {
-    .1174.待办数字;
+    .1024.FilteredString;
+    .1024.Test;
+}
 
-    .1235.事件状态;
-    .1235.处理人工号;
-}
-VAR
-{
-    Struct0 st0;
-    Struct2 st2;
-    String current_us, condition, status;
-    int count_to_do, us_record;
-}
-CLIENT
-{
-    us_record = FW_GetCurrentRecNum();
-    current_us = FW_GetUserID(2);
-    status = "待处理";
-}
 SERVER
 {
-    condition = "1235,current_us@处理人工号,status@事件状态";
-    st2 = FW_FindRecords(condition, 0);
-    if(st2.mError != 0)
+    currentID = CURRENT.FormID;
+    currentRec = CURRENT.Record;
+    st0.Json = {"测试1":"GDWX", "测试2":"GD"};
+    st01 = FW_GetValue(currentID, Test, currentRec);
+    str0 = st01.sVALUE;
+    str0 = "\"" + str0 + "\"";
+    prefix = st0.Json(str0);
+    st01 = FW_GetValue(currentID, FilteredString, currentRec);
+    str1 = st01.sVALUE;
+    str1.TrimLeft(prefix);
+    //str1.Trim(prefix);
+    str2 = st01.sVALUE;
+    if(str1 == "1")
     {
-        FW_SetValue_w(1174, 待办数字, us_record, "0");
-    }else
-    {
-        count_to_do = st2.count;
-        FW_SetValue_w(1174, 待办数字, us_record, count_to_do);
+        targetID = 1025;
+    }else{
+        return(0);
     }
-    return(GotoClient);
-}
-CLIENT
-{
-    if(st2.mError != 0)
-    {
-        FW_SetValue_w(1174, 待办数字, us_record, "0");
-    }else
-    {
-        count_to_do = st2.count;
-        FW_SetValue_w(1174, 待办数字, us_record, count_to_do);
-    }
-    FW_GotoFormPage(1174,us_record);
+    strTargetID = targetID.toString;
+    msg = "添加的表ID为：" + strTargetID;
+    FW_Dialog1(msg);
+    newRec1025 = FW_AddNewPage_w(targetID);
+    FW_Dialog1(newRec1025);
 }

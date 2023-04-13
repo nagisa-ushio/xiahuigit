@@ -1,0 +1,164 @@
+< script >
+    (function () {
+        'use strict';
+
+        const {
+            dayjs,
+            axios
+        } = fn_third_api;
+        const SyncIntervalTime = 5000;
+        const ConfirmText = (lastTime, lastUser) => `该表格数据已被更新过，更新时间为：${lastTime}，更新用户为：${lastUser}，是否继续保存？确认保存后无法撤销。`;
+        const ConfirmReloadText = () => `"数据已被其它用户更改,是否重新加载当前页面"`;
+        const getOnloadFlag = () => {
+            const onloadString = document.body.getAttribute("onload");
+            return +onloadString.match(/(?<=fn_onload_current_page\()\d+(?=\))/) ? . [0];
+        };
+        const getFieldElement = (name) => {
+            return document.getElementById(name) || document.getElementsByName(name)[0];
+        };
+        const getFieldValue = (ele) => {
+            if ([
+                    "INPUT",
+                    "SELECT"
+                ].includes(ele.tagName)) {
+                return ele.value;
+            } else {
+                return ele.innerText;
+            }
+        };
+        const makeLeaveHandle = () => {
+            const handle = (e) => {
+                e.returnValue = true;
+            };
+            const setLeaveDisplayMessage = (result) => {
+                if (result) {
+                    window.addEventListener("beforeunload", handle);
+                } else {
+                    window.removeEventListener("beforeunload", handle);
+                }
+            };
+            return {
+                setLeaveDisplayMessage
+            };
+        };
+        const {
+            setLeaveDisplayMessage
+        } = makeLeaveHandle();
+        setLeaveDisplayMessage(true);
+        const requestPageData = async (flag) => {
+            var strPath = "CurrentPage=" + FW_Page + "&handle=" + FW_Handle + "&code=" + FW_UserCode + "&flag=" + flag.toString() + "&OnLoad=yes&";
+            var strP = "/to_" + PageId + "_" + "OnLoad" + ".xml";
+            return await axios.post(strP, strPath, {
+                responseType: "document"
+            });
+        };
+        const getNewFillPageFunction = () => {
+            const funcText = fn_fill_page.toString();
+            const funcContentText = funcText.replace("function fn_fill_page()\n{", "").replace(/\}$/, "");
+            const fillDocData = new Function("xmlDoc", funcContentText);
+            return fillDocData;
+        };
+        getNewFillPageFunction();
+        const getSubmitButtons = () => {
+            const allEles = document.querySelectorAll("*");
+            let submitBtns = [];
+            for (let index = 0; index < allEles.length; index++) {
+                const element = allEles[index];
+                const onclickString = element.getAttribute("onclick");
+                if (onclickString ? .startsWith("fn_submit_page")) {
+                    submitBtns.push(element);
+                }
+            }
+            return submitBtns;
+        };
+        const runField = async (fieldname) => {
+            const path = `to_${PageId}_${fieldname}.xml`;
+            const body = `Submit=${PageId}&page=${FW_Page}&handle=${FW_Handle}&code=${FW_UserCode}&`;
+            const {
+                data
+            } = await axios.post(path, body, {
+                responseType: "document"
+            });
+            return data.querySelector("faultstring").innerHTML;
+        };
+        const isLastData = async () => {
+            const onloadFlag = getOnloadFlag();
+            const {
+                data
+            } = await requestPageData(onloadFlag);
+            const lastUpdateTime = data.querySelector("LastUpdateTime").innerHTML;
+            const lastUpdateField = getFieldElement("LastUpdateTime");
+            const oldLastUpdateTime = getFieldValue(lastUpdateField);
+            return {
+                isLast: lastUpdateTime === oldLastUpdateTime,
+                lastTime: lastUpdateTime,
+                lastUpdateUser: data.querySelector("LastUpdateUser").innerHTML
+            };
+        };
+        const intervalExist = () => {
+            return setInterval(async () => {
+                const existUsers = await runField("exist");
+                const ele = getFieldElement("ExistingUsers");
+                ele.innerText = existUsers;
+            }, SyncIntervalTime);
+        };
+        const intervalCheckLastTime = () => {
+            return setInterval(async () => {
+                const {
+                    isLast
+                } = await isLastData();
+                if (!isLast) {
+                    const result = confirm(ConfirmReloadText());
+                    if (result == true) {
+                        location.reload();
+                        // loadData(data, onloadFlag);
+                    }
+                }
+            }, SyncIntervalTime);
+        };
+        window.addEventListener("load", () => {
+            runField("enterPage").then((existUsers) => {
+                const ele = getFieldElement("ExistingUsers");
+                ele.innerText = existUsers;
+            });
+            const submitBtns = getSubmitButtons();
+            let intervalCheckLastTimeId;
+            if (submitBtns.length) {
+                for (let index = 0; index < submitBtns.length; index++) {
+                    const submitBtn = submitBtns[index];
+                    const onclickFunc = () => {
+                        fn_submit_page(submitBtn);
+                    };
+                    const confirmIsLast = async (func, oldLastTime) => {
+                        const {
+                            lastTime,
+                            lastUpdateUser
+                        } = await isLastData();
+                        if (lastTime !== oldLastTime) {
+                            if (confirm(ConfirmText(lastTime, lastUpdateUser))) {
+                                confirmIsLast(func, lastTime);
+                            } else {
+                                intervalCheckLastTimeId = intervalCheckLastTime();
+                            }
+                        } else {
+                            setLeaveDisplayMessage(false);
+                            func.call(submitBtn);
+                        }
+                    };
+                    submitBtn.addEventListener("click", async () => {
+                        clearInterval(intervalCheckLastTimeId);
+                        const lastUpdateField = getFieldElement("LastUpdateTime");
+                        const oldLastUpdateTime = getFieldValue(lastUpdateField);
+                        confirmIsLast(onclickFunc, oldLastUpdateTime);
+                    });
+                    submitBtn.removeAttribute("onclick");
+                }
+            }
+            intervalCheckLastTimeId = intervalCheckLastTime();
+            intervalExist();
+        });
+
+    })();
+
+<
+/script>

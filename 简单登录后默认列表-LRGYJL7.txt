@@ -1,0 +1,125 @@
+VAR
+{
+    String us, start_date, end_date, search_word, find_condition, field_name_prefix, field_name_suffix, field_name, name_1024field, value_1024;
+    Struct2 st2_find_result;
+    int flag, find_count, i, j, rec1028, rec1024, count_1028field_prefix, count_1028field_suffix, id_num;
+    StringList slist_prefix_1028field, slist_suffix_1028field, slist_1024field;
+    Struct3 st3;
+    Struct0 st00;
+}
+FIELD
+{
+    .1028.UserName;
+    .1028.sortDateFrom;
+    .1028.sortDateTo;
+    .1028.empName1;
+    .1028.dept1;
+    .1028.leaveType1;
+    .1028.date1;
+    .1028.viewBtn1;
+
+    .1024.UserName;
+    .1024.dateOrder;
+}
+SERVER
+{
+    flag = CURRENT.flag;
+    if(flag != 300)
+    
+    {
+        return(0);  // not a web service,end directly.
+    }
+    us = FW_GetUserID(2);
+    us = us + ";";
+    st2_find_result = FW_FindRecords("1028, us@UserName", 1);    // 查找1028中UserName为当前登录用户名的第一个记录
+    if(st2_find_result.mError == 0)
+    {
+        // 如果找到，则获取查找结果记录页号
+        rec1028 = st2_find_result.RecordNoList.Get[0];
+    }else{
+        // 如果未找到，则新增一页并获取该新记录页号并在UserName域中写入当前登录用户名
+        rec1028 = FW_AddNewPage_w(1028);
+        FW_SetValue_w(1028, UserName, rec1028, us);
+    }
+    end_date = FW_GetSysDate(0);
+    start_date = FW_SpanDate(end_date, -6, 0);
+    FW_SetValue_w(1028, sortDateFrom, rec1028, start_date);
+    FW_SetValue_w(1028, sortDateTo, rec1028, end_date);
+
+    // 将1028中的列表重置为空
+    slist_prefix_1028field = ["id", "empName", "dept", "leaveType", "date", "viewBtn"];
+    slist_suffix_1028field = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+    count_1028field_prefix = slist_prefix_1028field.Get[];    // 获取1028需要域名前缀总个数
+    count_1028field_suffix = slist_suffix_1028field.Get[];    // 获取1028需要域名后缀总个数
+    for(i=0;i<count_1028field_suffix;i++)
+    {
+        field_name_suffix = slist_suffix_1028field.Get[i];    // 获取1028需要赋值的域名后缀
+        for(j=0;j<count_1028field_prefix;j++)
+        {
+            field_name_prefix = slist_prefix_1028field.Get[j];    // 循环取得所有1028需要赋值的域名前缀以便和后缀都组成过一次
+            field_name = field_name_prefix + field_name_suffix;
+            FW_SetValue_w(1028, field_name, rec1028, "");
+            if(field_name_prefix == "viewBtn")
+            {
+                FW_SetValueStatus_w(1028, rec1028, field_name, 1);    // 锁定viewBtn域防止在没有列表数据的情况下可以被用户点击
+            }
+        }
+    }
+
+    // 在1024中查找条件设为：UserName为当前登录用户名及dateOrder在开始日期和结束日期之间的
+    find_condition = "1024, us@UserName, RANGE(start_date-end_date)@dateOrder";
+    st2_find_result = FW_FindRecords(find_condition, 0);    // 找到符合条件的所有结果记录
+    if(st2_find_result.mError == 0)
+    {
+        // 首尾添加的“notUsed”是因为1028需要赋值的域名中首尾的“id”和“viewBtn”不是在1024中取值的，但两者的StringList元素个数又需保持一致，才能方便在后面的循环中取值赋值
+        slist_1024field = ["notUsed", "name", "hpNo", "orderTakenBy", "dateOrder", "notUsed"];
+        find_count = st2_find_result.count;    // 查找到的总记录数
+        if(find_count > count_1028field_suffix)
+        {
+            // 因为目前此程序示例只考虑展示一页列表，而一页列表只显示count_1028field_suffix个记录，所以如果查找的总记录数大于count_1028field_suffix则固定为count_1028field_suffix
+            find_count = count_1028field_suffix;
+        }
+        for(i=0;i<find_count;i++)
+        {
+            // 将1028列表中的前find_count行中的域通过循环操作依次赋值
+            rec1024 = st2_find_result.RecordNoList.Get[i];    // 依次获取查找的结果记录页号
+            field_name_suffix = slist_suffix_1028field.Get[i];    // 获取1028需要赋值的域名后缀
+            for(j=0;j<count_1028field_prefix;j++)
+            {
+                field_name_prefix = slist_prefix_1028field.Get[j];    // 循环取得所有1028需要赋值的域名前缀以便和后缀都组成过一次
+                field_name = field_name_prefix + field_name_suffix;
+                if(field_name_prefix == "id")
+                {
+                    id_num = i + 1;    // 1028的id是从1开始
+                    FW_SetValue_w(1028, field_name, rec1028, id_num);
+                    continue;    // 因为1028的id*是直接赋值而不从1024中取值再赋值，所以直接进入下一个循环
+                }else if(field_name_prefix == "viewBtn")
+                {
+                    FW_SetValueStatus_w(1028, rec1028, field_name, 0);    // 解锁该viewBtn域可以被用户点击
+                    FW_SetValue_w(1028, field_name, rec1028, "Edit");
+                    st3.FormID = 1024;
+                    st3.Record = rec1024;
+                    st3.operation = 2;
+                    FW_FieldPropertySet_w(1028, field_name, st3);
+                    continue;    // 因为1028的viewBtn*是直接赋值而不从1024中取值再赋值，所以直接进入下一个循环
+                }
+
+                // 除了id*和viewBtn*外其它域值需从1024中取值再赋值
+                name_1024field = slist_1024field.Get[j];
+                value_1024 = FW_GetValue(1024, name_1024field, rec1024);
+                FW_SetValue_w(1028, field_name, rec1028, value_1024);
+            }
+        }
+        st00.FormID = 1028;
+        st00.Record = rec1028;
+        st00.sVALUE = "已找到记录！";
+        st00.message = "WEB_STRUCT0";
+        return(st00);
+    }else{
+        st00.FormID = 1028;
+        st00.Record = rec1028;
+        st00.sVALUE = "未找到记录！";
+        st00.message = "WEB_STRUCT0";
+        return(st00);
+    }
+}

@@ -1,0 +1,687 @@
+VAR
+{
+    int totalRecord, page, counter,flag, totalRelatedRecord, record, activeRecord, recordNo, pgSize, totalPg, firstPg, lastPg, startId, endId, currentPg, pgRemainder;
+    Struct0 getId, getName, getDescription, getPersonInCharge, getStartDate, getEndDate, getPriority, getStatus, getTaskStatus, st00, getGreenhouse, checkPage;
+    String us, usName, startDateStr, endDateStr, yearStr, dayStr, monthStr, completeStartDate, completeEndDate;
+    Struct3 st3, stPriority, vt, et;
+}
+FIELD
+{
+    .1032.UserName;
+    .1032.taskID1;
+    .1032.taskName1;
+    .1032.taskDescription1;
+    .1032.taskStartDate1;
+    .1032.personInCharge1;
+    .1032.taskEndDate1;
+    .1032.taskPriority1;
+    .1032.taskStatus1;
+    .1032.greenhouse1;
+    .1032.viewTask1;
+    .1032.editTask1;
+    .1032.taskID2;
+    .1032.taskName2;
+    .1032.taskDescription2;
+    .1032.taskStartDate2;
+    .1032.personInCharge2;
+    .1032.taskEndDate2;
+    .1032.taskPriority2;
+    .1032.taskStatus2;
+    .1032.greenhouse2;
+    .1032.viewTask2;
+    .1032.editTask2;
+    .1032.taskID3;
+    .1032.taskName3;
+    .1032.taskDescription3;
+    .1032.taskStartDate3;
+    .1032.personInCharge3;
+    .1032.taskEndDate3;
+    .1032.taskPriority3;
+    .1032.taskStatus3;
+    .1032.greenhouse3;
+    .1032.viewTask3;
+    .1032.editTask3;
+    .1032.taskID4;
+    .1032.taskName4;
+    .1032.taskDescription4;
+    .1032.taskStartDate4;
+    .1032.personInCharge4;
+    .1032.taskEndDate4;
+    .1032.taskPriority4;
+    .1032.taskStatus4;
+    .1032.greenhouse4;
+    .1032.viewTask4;
+    .1032.editTask4;
+    .1032.taskID5;
+    .1032.taskName5;
+    .1032.taskDescription5;
+    .1032.taskStartDate5;
+    .1032.personInCharge5;
+    .1032.taskEndDate5;
+    .1032.taskPriority5;
+    .1032.taskStatus5;
+    .1032.greenhouse5;
+    .1032.viewTask5;
+    .1032.editTask5;
+    .1032.taskID6;
+    .1032.taskName6;
+    .1032.taskDescription6;
+    .1032.taskStartDate6;
+    .1032.personInCharge6;
+    .1032.taskEndDate6;
+    .1032.taskPriority6;
+    .1032.taskStatus6;
+    .1032.greenhouse6;
+    .1032.viewTask6;
+    .1032.editTask6;
+    .1032.taskID7;
+    .1032.taskName7;
+    .1032.taskDescription7;
+    .1032.taskStartDate7;
+    .1032.personInCharge7;
+    .1032.taskEndDate7;
+    .1032.taskPriority7;
+    .1032.taskStatus7;
+    .1032.greenhouse7;
+    .1032.viewTask7;
+    .1032.editTask7;
+    .1032.taskID8;
+    .1032.taskName8;
+    .1032.taskDescription8;
+    .1032.taskStartDate8;
+    .1032.personInCharge8;
+    .1032.taskEndDate8;
+    .1032.taskPriority8;
+    .1032.taskStatus8;
+    .1032.greenhouse8;
+    .1032.viewTask8;
+    .1032.editTask8;
+    .1032.taskID9;
+    .1032.taskName9;
+    .1032.taskDescription9;
+    .1032.taskStartDate9;
+    .1032.personInCharge9;
+    .1032.taskEndDate9;
+    .1032.taskPriority9;
+    .1032.taskStatus9;
+    .1032.greenhouse9;
+    .1032.viewTask9;
+    .1032.editTask9;
+    .1032.taskID10;
+    .1032.taskName10;
+    .1032.taskDescription10;
+    .1032.taskStartDate10;
+    .1032.personInCharge10;
+    .1032.taskEndDate10;
+    .1032.taskPriority10;
+    .1032.taskStatus10;
+    .1032.greenhouse10;
+    .1032.viewTask10;
+    .1032.editTask10;
+    .1032.firstPage;
+    .1032.lastPage;
+    .1032.currentPage;
+    .1032.startIndex;
+    .1032.endIndex;
+    .1032.pageSize;
+    .1026.taskID;
+    .1026.taskName;
+    .1026.taskDescription;
+    .1026.personInCharge;
+    .1026.taskStartDate;
+    .1026.taskEndDate;
+    .1026.taskPriority;
+    .1026.taskStatus;
+    .1026.status;
+    .1026.greenhouse;
+    .1032.viewFinding1;
+    .1032.viewFinding2;
+    .1032.viewFinding3;
+    .1032.viewFinding4;
+    .1032.viewFinding5;
+    .1032.viewFinding6;
+    .1032.viewFinding7;
+    .1032.viewFinding8;
+    .1032.viewFinding9;
+    .1032.viewFinding10;
+    .1032.sortCondition;
+}
+SERVER
+{
+    flag = CURRENT.flag;
+    if(flag != 300)
+    
+    {
+        return(0);  // not a web service,end directly.
+    }
+    counter = 0;
+    activeRecord = 0;
+    
+    //get the number of total records
+    totalRecord = FW_GetTotalRecords(1026);
+    totalRecord = totalRecord - 1;
+    
+    //get and set the username to the task list
+    us = FW_GetUserID(2);
+    usName = us;
+    us = us + ";";
+    FW_SetValue_w(1032, UserName, 0, us);
+
+    FW_SetValue_w(1032, sortCondition, 0, "a");
+    
+    //reset
+    FW_SetValue_w(1032,taskID1,0,"");
+    FW_SetValue_w(1032,taskName1,0,"");
+    FW_SetValue_w(1032,personInCharge1,0,"");
+    FW_SetValue_w(1032,taskDescription1,0,"");
+    FW_SetValue_w(1032,taskStartDate1,0,"");
+    FW_SetValue_w(1032,taskEndDate1,0,"");
+    FW_SetValue_w(1032,taskPriority1,0,"");
+    FW_SetValue_w(1032,taskStatus1,0,"");
+    FW_SetValue_w(1032,viewTask1,0,"");
+    FW_SetValue_w(1032,editTask1,0,"");
+    FW_SetValue_w(1032,viewFinding1,0,"");
+    FW_SetValue_w(1032,greenhouse1,0,"");
+    
+    FW_SetValue_w(1032,taskID2,0,"");
+    FW_SetValue_w(1032,taskName2,0,"");
+    FW_SetValue_w(1032,personInCharge2,0,"");
+    FW_SetValue_w(1032,taskDescription2,0,"");
+    FW_SetValue_w(1032,taskStartDate2,0,"");
+    FW_SetValue_w(1032,taskEndDate2,0,"");
+    FW_SetValue_w(1032,taskPriority2,0,"");
+    FW_SetValue_w(1032,taskStatus2,0,"");
+    FW_SetValue_w(1032,viewTask2,0,"");
+    FW_SetValue_w(1032,editTask2,0,"");
+    FW_SetValue_w(1032,viewFinding2,0,"");
+    FW_SetValue_w(1032,greenhouse2,0,"");
+    
+    FW_SetValue_w(1032,taskID3,0,"");
+    FW_SetValue_w(1032,taskName3,0,"");
+    FW_SetValue_w(1032,personInCharge3,0,"");
+    FW_SetValue_w(1032,taskDescription3,0,"");
+    FW_SetValue_w(1032,taskStartDate3,0,"");
+    FW_SetValue_w(1032,taskEndDate3,0,"");
+    FW_SetValue_w(1032,taskPriority3,0,"");
+    FW_SetValue_w(1032,taskStatus3,0,"");
+    FW_SetValue_w(1032,viewTask3,0,"");
+    FW_SetValue_w(1032,editTask3,0,"");
+    FW_SetValue_w(1032,viewFinding3,0,"");
+    FW_SetValue_w(1032,greenhouse3,0,"");
+    
+    FW_SetValue_w(1032,taskID4,0,"");
+    FW_SetValue_w(1032,taskName4,0,"");
+    FW_SetValue_w(1032,personInCharge4,0,"");
+    FW_SetValue_w(1032,taskDescription4,0,"");
+    FW_SetValue_w(1032,taskStartDate4,0,"");
+    FW_SetValue_w(1032,taskEndDate4,0,"");
+    FW_SetValue_w(1032,taskPriority4,0,"");
+    FW_SetValue_w(1032,taskStatus4,0,"");
+    FW_SetValue_w(1032,viewTask4,0,"");
+    FW_SetValue_w(1032,editTask4,0,"");
+    FW_SetValue_w(1032,viewFinding4,0,"");
+    FW_SetValue_w(1032,greenhouse4,0,"");
+    
+    FW_SetValue_w(1032,taskID5,0,"");
+    FW_SetValue_w(1032,taskName5,0,"");
+    FW_SetValue_w(1032,personInCharge5,0,"");
+    FW_SetValue_w(1032,taskDescription5,0,"");
+    FW_SetValue_w(1032,taskStartDate5,0,"");
+    FW_SetValue_w(1032,taskEndDate5,0,"");
+    FW_SetValue_w(1032,taskPriority5,0,"");
+    FW_SetValue_w(1032,taskStatus5,0,"");
+    FW_SetValue_w(1032,viewTask5,0,"");
+    FW_SetValue_w(1032,editTask5,0,"");
+    FW_SetValue_w(1032,viewFinding5,0,"");
+    FW_SetValue_w(1032,greenhouse5,0,"");
+    
+    FW_SetValue_w(1032,taskID6,0,"");
+    FW_SetValue_w(1032,taskName6,0,"");
+    FW_SetValue_w(1032,personInCharge6,0,"");
+    FW_SetValue_w(1032,taskDescription6,0,"");
+    FW_SetValue_w(1032,taskStartDate6,0,"");
+    FW_SetValue_w(1032,taskEndDate6,0,"");
+    FW_SetValue_w(1032,taskPriority6,0,"");
+    FW_SetValue_w(1032,taskStatus6,0,"");
+    FW_SetValue_w(1032,viewTask6,0,"");
+    FW_SetValue_w(1032,editTask6,0,"");
+    FW_SetValue_w(1032,viewFinding6,0,"");
+    FW_SetValue_w(1032,greenhouse6,0,"");
+    
+    FW_SetValue_w(1032,taskID7,0,"");
+    FW_SetValue_w(1032,taskName7,0,"");
+    FW_SetValue_w(1032,personInCharge7,0,"");
+    FW_SetValue_w(1032,taskDescription7,0,"");
+    FW_SetValue_w(1032,taskStartDate7,0,"");
+    FW_SetValue_w(1032,taskEndDate7,0,"");
+    FW_SetValue_w(1032,taskPriority7,0,"");
+    FW_SetValue_w(1032,taskStatus7,0,"");
+    FW_SetValue_w(1032,viewTask7,0,"");
+    FW_SetValue_w(1032,editTask7,0,"");
+    FW_SetValue_w(1032,viewFinding7,0,"");
+    FW_SetValue_w(1032,greenhouse7,0,"");
+    
+    FW_SetValue_w(1032,taskID8,0,"");
+    FW_SetValue_w(1032,taskName8,0,"");
+    FW_SetValue_w(1032,personInCharge8,0,"");
+    FW_SetValue_w(1032,taskDescription8,0,"");
+    FW_SetValue_w(1032,taskStartDate8,0,"");
+    FW_SetValue_w(1032,taskEndDate8,0,"");
+    FW_SetValue_w(1032,taskPriority8,0,"");
+    FW_SetValue_w(1032,taskStatus8,0,"");
+    FW_SetValue_w(1032,viewTask8,0,"");
+    FW_SetValue_w(1032,editTask8,0,"");
+    FW_SetValue_w(1032,viewFinding8,0,"");
+    FW_SetValue_w(1032,greenhouse8,0,"");
+    
+    FW_SetValue_w(1032,taskID9,0,"");
+    FW_SetValue_w(1032,taskName9,0,"");
+    FW_SetValue_w(1032,personInCharge9,0,"");
+    FW_SetValue_w(1032,taskDescription9,0,"");
+    FW_SetValue_w(1032,taskStartDate9,0,"");
+    FW_SetValue_w(1032,taskEndDate9,0,"");
+    FW_SetValue_w(1032,taskPriority9,0,"");
+    FW_SetValue_w(1032,taskStatus9,0,"");
+    FW_SetValue_w(1032,viewTask9,0,"");
+    FW_SetValue_w(1032,editTask9,0,"");
+    FW_SetValue_w(1032,viewFinding9,0,"");
+    FW_SetValue_w(1032,greenhouse9,0,"");
+    
+    FW_SetValue_w(1032,taskID10,0,"");
+    FW_SetValue_w(1032,taskName10,0,"");
+    FW_SetValue_w(1032,personInCharge10,0,"");
+    FW_SetValue_w(1032,taskDescription10,0,"");
+    FW_SetValue_w(1032,taskStartDate10,0,"");
+    FW_SetValue_w(1032,taskEndDate10,0,"");
+    FW_SetValue_w(1032,taskPriority10,0,"");
+    FW_SetValue_w(1032,taskStatus10,0,"");
+    FW_SetValue_w(1032,viewTask10,0,"");
+    FW_SetValue_w(1032,editTask10,0,"");
+    FW_SetValue_w(1032,viewFinding10,0,"");
+    FW_SetValue_w(1032,greenhouse10,0,"");
+    
+    vt.operation = 2;
+    vt.FormID = 0;
+    FW_FieldPropertySet_w(1032,viewTask1,vt);
+    FW_FieldPropertySet_w(1032,viewTask2,vt);
+    FW_FieldPropertySet_w(1032,viewTask3,vt);
+    FW_FieldPropertySet_w(1032,viewTask4,vt);
+    FW_FieldPropertySet_w(1032,viewTask5,vt);
+    FW_FieldPropertySet_w(1032,viewTask6,vt);
+    FW_FieldPropertySet_w(1032,viewTask7,vt);
+    FW_FieldPropertySet_w(1032,viewTask8,vt);
+    FW_FieldPropertySet_w(1032,viewTask9,vt);
+    FW_FieldPropertySet_w(1032,viewTask10,vt);
+    
+    et.operation = 2;
+    et.FormID = 0;
+    FW_FieldPropertySet_w(1032,editTask1,et);
+    FW_FieldPropertySet_w(1032,editTask2,et);
+    FW_FieldPropertySet_w(1032,editTask3,et);
+    FW_FieldPropertySet_w(1032,editTask4,et);
+    FW_FieldPropertySet_w(1032,editTask5,et);
+    FW_FieldPropertySet_w(1032,editTask6,et);
+    FW_FieldPropertySet_w(1032,editTask7,et);
+    FW_FieldPropertySet_w(1032,editTask8,et);
+    FW_FieldPropertySet_w(1032,editTask9,et);
+    FW_FieldPropertySet_w(1032,editTask10,et);
+    
+    //generate data for 10 rows
+    for(record=1; record <= totalRecord; record++)
+    {
+        getId=FW_GetValue(1026,taskID,record);
+        getName = FW_GetValue(1026,taskName,record);
+        getDescription = FW_GetValue(1026,taskDescription,record);
+        getPersonInCharge = FW_GetValue(1026,personInCharge,record);
+        getStartDate = FW_GetValue(1026,taskStartDate,record);
+        getEndDate = FW_GetValue(1026,taskEndDate,record);
+        getPriority = FW_GetValue(1026,taskPriority,record);
+        getStatus = FW_GetValue(1026,taskStatus,record);
+        getTaskStatus = FW_GetValue( 1026, status, record );
+        getGreenhouse = FW_GetValue( 1026, greenhouse, record );
+        
+        startDateStr = getStartDate.sVALUE;
+        yearStr = startDateStr.Left(4);
+        startDateStr = startDateStr.Mid(4);
+        monthStr = startDateStr.Left(4);
+        dayStr = startDateStr.Mid(4);
+        completeStartDate = dayStr + monthStr + yearStr;
+        
+        endDateStr = getEndDate.sVALUE;
+        yearStr = endDateStr.Left(4);
+        endDateStr = endDateStr.Mid(4);
+        monthStr = endDateStr.Left(4);
+        dayStr = endDateStr.Mid(4);
+        completeEndDate = dayStr + monthStr + yearStr;
+        
+        //set priority color
+        stPriority.operation = 4;
+        stPriority.Color = 0x00000000;
+        
+        if(getPriority.sVALUE == "Low")
+        {
+            stPriority.Color = 0x00009966;
+        }
+        
+        if(getPriority.sVALUE == "Medium")
+        {
+            stPriority.Color = 0x000099ff;
+        }
+        
+        if(getPriority.sVALUE == "High")
+        {
+            stPriority.Color = 0x00000099;
+        }
+        
+        if(getPriority.sVALUE == "Urgent")
+        {
+            stPriority.Color = 0x000000ff;
+        }
+        
+        
+        //set status color
+        st3.operation = 4;
+        st3.Color = 0x00000000;
+        
+        if(getStatus.sVALUE == "Pending")
+        {
+            st3.Color = 0x00003366;
+        }
+        
+        if(getStatus.sVALUE == "In Progress")
+        {
+            st3.Color = 0x00990000;
+        }
+        
+        if(getStatus.sVALUE == "At Risk")
+        {
+            st3.Color = 0x000099ff;
+        }
+        
+        if(getStatus.sVALUE == "Completed")
+        {
+            st3.Color = 0x00009966;
+        }
+        
+        if(getStatus.sVALUE == "Overdue")
+        {
+            st3.Color = 0x000000ff;
+        }
+        
+        vt.operation = 2;
+        et.operation = 2;
+
+        if(getTaskStatus.sVALUE != "Deleted")
+        {		
+            vt.FormID = 1034;
+            vt.Record = record;
+            et.FormID = 1044;
+            et.Record = record;
+            if(counter == 0)
+            {
+                FW_SetValue_w(1032,taskID1,0,getId.sVALUE);
+                FW_SetValue_w(1032,taskName1,0,getName.sVALUE);
+                FW_SetValue_w(1032,personInCharge1,0,getPersonInCharge.sVALUE);
+                FW_SetValue_w(1032,taskDescription1,0,getDescription.sVALUE);
+                FW_SetValue_w(1032,taskStartDate1,0,completeStartDate);
+                FW_SetValue_w(1032,taskEndDate1,0,completeEndDate);
+                FW_SetValue_w(1032,taskPriority1,0,getPriority.sVALUE);
+                FW_SetValue_w(1032,taskStatus1,0,getStatus.sVALUE);
+                FW_SetValue_w(1032,greenhouse1,0,getGreenhouse.sVALUE);
+                FW_SetValue_w(1032,viewTask1,0,"Details");
+                FW_SetValue_w(1032,editTask1,0,"Edit");
+                FW_SetValue_w(1032,viewFinding1,0,"Finding");
+                FW_SetValue_w(1034, UserName, record, us);  
+                FW_SetValue_w(1044, UserName, record, us);  
+                FW_FieldPropertySet_w(1032,taskStatus1,st3);
+                FW_FieldPropertySet_w(1032,taskPriority1,stPriority);
+                FW_FieldPropertySet_w(1032,viewTask1,vt);
+                FW_FieldPropertySet_w(1032,editTask1,et);
+                startId = 0;
+                endId = 0;
+        
+            }
+            if(counter == 1)
+            {
+                FW_SetValue_w(1032,taskID2,0,getId.sVALUE);
+                FW_SetValue_w(1032,taskName2,0,getName.sVALUE);
+                FW_SetValue_w(1032,personInCharge2,0,getPersonInCharge.sVALUE);
+                FW_SetValue_w(1032,taskDescription2,0,getDescription.sVALUE);
+                FW_SetValue_w(1032,taskStartDate2,0,completeStartDate);
+                FW_SetValue_w(1032,taskEndDate2,0,completeEndDate);
+                FW_SetValue_w(1032,taskPriority2,0,getPriority.sVALUE);
+                FW_SetValue_w(1032,taskStatus2,0,getStatus.sVALUE);
+                FW_SetValue_w(1032,greenhouse2,0,getGreenhouse.sVALUE);
+                FW_SetValue_w(1032,viewTask2,0,"Details");
+                FW_SetValue_w(1032,editTask2,0,"Edit");
+                FW_SetValue_w(1032,viewFinding2,0,"Finding");
+                FW_SetValue_w(1034, UserName, record, us);  
+                FW_SetValue_w(1044, UserName, record, us);  
+                FW_FieldPropertySet_w(1032,taskStatus2,st3);
+                FW_FieldPropertySet_w(1032,taskPriority2,stPriority);
+                FW_FieldPropertySet_w(1032,viewTask2,vt);
+                FW_FieldPropertySet_w(1032,editTask2,et);
+                endId = 1;
+        
+            }
+            if(counter == 2)
+            {				
+                FW_SetValue_w(1032,taskID3,0,getId.sVALUE);
+                FW_SetValue_w(1032,taskName3,0,getName.sVALUE);
+                FW_SetValue_w(1032,personInCharge3,0,getPersonInCharge.sVALUE);
+                FW_SetValue_w(1032,taskDescription3,0,getDescription.sVALUE);
+                FW_SetValue_w(1032,taskStartDate3,0,completeStartDate);
+                FW_SetValue_w(1032,taskEndDate3,0,completeEndDate);
+                FW_SetValue_w(1032,taskPriority3,0,getPriority.sVALUE);
+                FW_SetValue_w(1032,taskStatus3,0,getStatus.sVALUE);
+                FW_SetValue_w(1032,greenhouse3,0,getGreenhouse.sVALUE);
+                FW_SetValue_w(1032,viewTask3,0,"Details");
+                FW_SetValue_w(1032,editTask3,0,"Edit");
+                FW_SetValue_w(1032,viewFinding3,0,"Finding");
+                FW_SetValue_w(1034, UserName, record, us);  
+                FW_SetValue_w(1044, UserName, record, us);  
+                FW_FieldPropertySet_w(1032,taskStatus3,st3);
+                FW_FieldPropertySet_w(1032,taskPriority3,stPriority);
+                FW_FieldPropertySet_w(1032,viewTask3,vt);
+                FW_FieldPropertySet_w(1032,editTask3,et);
+                endId = 2;
+        
+            }
+            if(counter == 3)
+            {
+                FW_SetValue_w(1032,taskID4,0,getId.sVALUE);
+                FW_SetValue_w(1032,taskName4,0,getName.sVALUE);
+                FW_SetValue_w(1032,personInCharge4,0,getPersonInCharge.sVALUE);
+                FW_SetValue_w(1032,taskDescription4,0,getDescription.sVALUE);
+                FW_SetValue_w(1032,taskStartDate4,0,completeStartDate);
+                FW_SetValue_w(1032,taskEndDate4,0,completeEndDate);
+                FW_SetValue_w(1032,taskPriority4,0,getPriority.sVALUE);
+                FW_SetValue_w(1032,taskStatus4,0,getStatus.sVALUE);
+                FW_SetValue_w(1032,greenhouse4,0,getGreenhouse.sVALUE);
+                FW_SetValue_w(1032,viewTask4,0,"Details");
+                FW_SetValue_w(1032,editTask4,0,"Edit");
+                FW_SetValue_w(1032,viewFinding4,0,"Finding");
+                FW_SetValue_w(1034, UserName, record, us);  
+                FW_SetValue_w(1044, UserName, record, us);  
+                FW_FieldPropertySet_w(1032,taskStatus4,st3);
+                FW_FieldPropertySet_w(1032,taskPriority4,stPriority);
+                FW_FieldPropertySet_w(1032,viewTask4,vt);
+                FW_FieldPropertySet_w(1032,editTask4,et);
+                endId = 3;
+        
+            }
+            if(counter == 4)
+            {
+                FW_SetValue_w(1032,taskID5,0,getId.sVALUE);
+                FW_SetValue_w(1032,taskName5,0,getName.sVALUE);
+                FW_SetValue_w(1032,personInCharge5,0,getPersonInCharge.sVALUE);
+                FW_SetValue_w(1032,taskDescription5,0,getDescription.sVALUE);
+                FW_SetValue_w(1032,taskStartDate5,0,completeStartDate);
+                FW_SetValue_w(1032,taskEndDate5,0,completeEndDate);
+                FW_SetValue_w(1032,taskPriority5,0,getPriority.sVALUE);
+                FW_SetValue_w(1032,taskStatus5,0,getStatus.sVALUE);
+                FW_SetValue_w(1032,greenhouse5,0,getGreenhouse.sVALUE);
+                FW_SetValue_w(1032,viewTask5,0,"Details");
+                FW_SetValue_w(1032,editTask5,0,"Edit");
+                FW_SetValue_w(1032,viewFinding5,0,"Finding");
+                FW_SetValue_w(1034, UserName, record, us);  
+                FW_SetValue_w(1044, UserName, record, us);  
+                FW_FieldPropertySet_w(1032,taskStatus5,st3);
+                FW_FieldPropertySet_w(1032,taskPriority5,stPriority);
+                FW_FieldPropertySet_w(1032,viewTask5,vt);
+                FW_FieldPropertySet_w(1032,editTask5,et);
+                endId = 4;
+        
+            }
+            if(counter == 5)
+            {
+                FW_SetValue_w(1032,taskID6,0,getId.sVALUE);
+                FW_SetValue_w(1032,taskName6,0,getName.sVALUE);
+                FW_SetValue_w(1032,personInCharge6,0,getPersonInCharge.sVALUE);
+                FW_SetValue_w(1032,taskDescription6,0,getDescription.sVALUE);
+                FW_SetValue_w(1032,taskStartDate6,0,completeStartDate);
+                FW_SetValue_w(1032,taskEndDate6,0,completeEndDate);
+                FW_SetValue_w(1032,taskPriority6,0,getPriority.sVALUE);
+                FW_SetValue_w(1032,taskStatus6,0,getStatus.sVALUE);
+                FW_SetValue_w(1032,greenhouse6,0,getGreenhouse.sVALUE);
+                FW_SetValue_w(1032,viewTask6,0,"Details");
+                FW_SetValue_w(1032,editTask6,0,"Edit");
+                FW_SetValue_w(1032,viewFinding6,0,"Finding");
+                FW_SetValue_w(1034, UserName, record, us);  
+                FW_SetValue_w(1044, UserName, record, us);  
+                FW_FieldPropertySet_w(1032,taskStatus6,st3);
+                FW_FieldPropertySet_w(1032,taskPriority6,stPriority);
+                FW_FieldPropertySet_w(1032,viewTask6,vt);
+                FW_FieldPropertySet_w(1032,editTask6,et);
+                endId = 5;
+        
+            }
+            if(counter == 6)
+            {
+                FW_SetValue_w(1032,taskID7,0,getId.sVALUE);
+                FW_SetValue_w(1032,taskName7,0,getName.sVALUE);
+                FW_SetValue_w(1032,personInCharge7,0,getPersonInCharge.sVALUE);
+                FW_SetValue_w(1032,taskDescription7,0,getDescription.sVALUE);
+                FW_SetValue_w(1032,taskStartDate7,0,completeStartDate);
+                FW_SetValue_w(1032,taskEndDate7,0,completeEndDate);
+                FW_SetValue_w(1032,taskPriority7,0,getPriority.sVALUE);
+                FW_SetValue_w(1032,taskStatus7,0,getStatus.sVALUE);
+                FW_SetValue_w(1032,greenhouse7,0,getGreenhouse.sVALUE);
+                FW_SetValue_w(1032,viewTask7,0,"Details");
+                FW_SetValue_w(1032,editTask7,0,"Edit");
+                FW_SetValue_w(1032,viewFinding7,0,"Finding");
+                FW_SetValue_w(1034, UserName, record, us);  
+                FW_SetValue_w(1044, UserName, record, us);  
+                FW_FieldPropertySet_w(1032,taskStatus7,st3);
+                FW_FieldPropertySet_w(1032,taskPriority7,stPriority);
+                FW_FieldPropertySet_w(1032,viewTask7,vt);
+                FW_FieldPropertySet_w(1032,editTask7,et);
+                endId = 6;
+            }
+            if(counter == 7)
+            {
+                FW_SetValue_w(1032,taskID8,0,getId.sVALUE);
+                FW_SetValue_w(1032,taskName8,0,getName.sVALUE);
+                FW_SetValue_w(1032,personInCharge8,0,getPersonInCharge.sVALUE);
+                FW_SetValue_w(1032,taskDescription8,0,getDescription.sVALUE);
+                FW_SetValue_w(1032,taskStartDate8,0,completeStartDate);
+                FW_SetValue_w(1032,taskEndDate8,0,completeEndDate);
+                FW_SetValue_w(1032,taskPriority8,0,getPriority.sVALUE);
+                FW_SetValue_w(1032,taskStatus8,0,getStatus.sVALUE);
+                FW_SetValue_w(1032,greenhouse8,0,getGreenhouse.sVALUE);
+                FW_SetValue_w(1032,viewTask8,0,"Details");
+                FW_SetValue_w(1032,editTask8,0,"Edit");
+                FW_SetValue_w(1032,viewFinding8,0,"Finding");
+                FW_SetValue_w(1034, UserName, record, us);  
+                FW_SetValue_w(1044, UserName, record, us);  
+                FW_FieldPropertySet_w(1032,taskStatus8,st3);
+                FW_FieldPropertySet_w(1032,taskPriority8,stPriority);
+                FW_FieldPropertySet_w(1032,viewTask8,vt);
+                FW_FieldPropertySet_w(1032,editTask8,et);
+                endId = 7;
+            }
+            if(counter == 8)
+            {
+                FW_SetValue_w(1032,taskID9,0,getId.sVALUE);
+                FW_SetValue_w(1032,taskName9,0,getName.sVALUE);
+                FW_SetValue_w(1032,personInCharge9,0,getPersonInCharge.sVALUE);
+                FW_SetValue_w(1032,taskDescription9,0,getDescription.sVALUE);
+                FW_SetValue_w(1032,taskStartDate9,0,completeStartDate);
+                FW_SetValue_w(1032,taskEndDate9,0,completeEndDate);
+                FW_SetValue_w(1032,taskPriority9,0,getPriority.sVALUE);
+                FW_SetValue_w(1032,taskStatus9,0,getStatus.sVALUE);
+                FW_SetValue_w(1032,greenhouse9,0,getGreenhouse.sVALUE);
+                FW_SetValue_w(1032,viewTask9,0,"Details");
+                FW_SetValue_w(1032,editTask9,0,"Edit");
+                FW_SetValue_w(1032,viewFinding9,0,"Finding");
+                FW_SetValue_w(1034, UserName, record, us);  
+                FW_SetValue_w(1044, UserName, record, us);  
+                FW_FieldPropertySet_w(1032,taskStatus9,st3);
+                FW_FieldPropertySet_w(1032,taskPriority9,stPriority);
+                FW_FieldPropertySet_w(1032,viewTask9,vt);
+                FW_FieldPropertySet_w(1032,editTask9,et);
+                endId = 8;
+            }
+            if(counter == 9)
+            {
+                FW_SetValue_w(1032,taskID10,0,getId.sVALUE);
+                FW_SetValue_w(1032,taskName10,0,getName.sVALUE);
+                FW_SetValue_w(1032,personInCharge10,0,getPersonInCharge.sVALUE);
+                FW_SetValue_w(1032,taskDescription10,0,getDescription.sVALUE);
+                FW_SetValue_w(1032,taskStartDate10,0,completeStartDate);
+                FW_SetValue_w(1032,taskEndDate10,0,completeEndDate);
+                FW_SetValue_w(1032,taskPriority10,0,getPriority.sVALUE);
+                FW_SetValue_w(1032,taskStatus10,0,getStatus.sVALUE);
+                FW_SetValue_w(1032,greenhouse10,0,getGreenhouse.sVALUE);
+                FW_SetValue_w(1032,viewTask10,0,"Details");
+                FW_SetValue_w(1032,editTask10,0,"Edit");
+                FW_SetValue_w(1032,viewFinding10,0,"Finding");
+                FW_SetValue_w(1034, UserName, record, us);  
+                FW_SetValue_w(1044, UserName, record, us);  
+                FW_FieldPropertySet_w(1032,taskStatus10,st3);
+                FW_FieldPropertySet_w(1032,taskPriority10,stPriority);
+                FW_FieldPropertySet_w(1032,viewTask10,vt);
+                FW_FieldPropertySet_w(1032,editTask10,et);
+                endId = 9;
+            }
+            counter=counter+1;
+            activeRecord = activeRecord +1;
+        }
+    }
+    
+    //page setting
+    pgSize = 10;
+    checkPage = div(activeRecord, pgSize);
+    pgRemainder = checkPage.flag;
+    if(activeRecord == pgSize)
+    {
+        totalPg = 1;
+    }
+    if(pgRemainder == 0)
+    {
+        totalPg = (activeRecord / pgSize);
+    }
+    else
+    {
+        totalPg = (activeRecord / pgSize) + 1;
+    }
+    
+    firstPg = 1;
+    lastPg = totalPg;
+    currentPg = 1;
+    
+    //set first page, last page, current page, start id, end id and page size
+    FW_SetValue_w(1032,firstPage,0,firstPg);
+    FW_SetValue_w(1032,lastPage,0,lastPg);
+    FW_SetValue_w(1032,currentPage,0,currentPg);
+    FW_SetValue_w(1032,startIndex,0,startId);
+    FW_SetValue_w(1032,endIndex,0,endId);
+    FW_SetValue_w(1032,pageSize,0,pgSize);
+    
+    //refresh page
+    st00.FormID = 1032;
+    st00.Record = 0;
+    st00.sVALUE = "Success";
+    st00.message = "WEB_STRUCT0";
+    return(st00);
+}

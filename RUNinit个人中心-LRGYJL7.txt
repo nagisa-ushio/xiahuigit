@@ -1,0 +1,56 @@
+VAR
+{
+    String webModifiedDate, serverModifiedDate, alertMsg, newModifiedDate, newModifiedUser, us;
+    Struct0 st00, st01;
+    int currentRec, ret;
+}
+FIELD
+{
+    .1024.ExistingUsers;
+    .1024.LastUpdateTime;
+    .1024.LastUpdateUser;
+}
+SERVER
+{
+    currentRec = CURRENT.Record;
+    // FW_SetValueStatus_w(1024, currentRec, LastUpdateTime, 1);    //目前只有Write属性的域才能被FW_GetValueFromWeb函数获取域值，但修改时间域是自动生成的不能被手动修改，因此要在上一个表格进入前时使用该功能函数将修改时间域锁定
+    st00 = FW_GetValueFromWeb(LastUpdateTime, CURRENT);    // 获取当前网页上修改时间域的域值
+    st01 =  FW_GetValue(1024, LastUpdateTime, currentRec);    // 获取服务器上修改时间域最新的域值
+    webModifiedDate = st00.sVALUE;
+    serverModifiedDate = st01.sVALUE;
+    // if(webModifiedDate != serverModifiedDate)
+    // {
+    // 如果服务器上的修改时间域值跟刚才进入网页时的不同，则说明该表格已被更新过，应该出现提示告知是否确定修改，确定后才保存数据至服务器，取消则不保存数据
+    // CS端弹窗及获取用户点击弹窗中的确认或取消按钮再进行操作
+    newModifiedUser = FW_GetValue(1024, LastUpdateUser, currentRec);
+    alertMsg = "该表格数据已被更新过，更新时间为：" + serverModifiedDate + "，更新用户为：" + newModifiedUser + "，是否继续保存？确认保存后无法撤销。";
+    // ret = FW_Dialog1(alertMsg);
+    // if(ret == 1)
+    // {
+    //     newModifiedDate = FW_GetSysDateTime(1);
+    //     FW_SetValue_w(1024, LastUpdateTime, currentRec, newModifiedDate);
+    //     us = FW_GetUserID(2);
+    //     FW_SetValue_w(1024, LastUpdateUser, currentRec, us);
+    // }else{
+    //     return(currentRec);
+    // }
+
+    // BS端弹窗功能
+    st00.FormID = 1024;
+    st00.Record = 0;
+    st00.message = "WEB_STRUCT0";
+    st00.sVALUE = alertMsg;
+
+    // 如何获取用户点击的为网页弹窗中的确认或取消再进行是否保存数据到服务器的操作
+    // if(点击得为确认按钮){
+    newModifiedDate = FW_GetSysDateTime(1);
+    FW_SetValue_w(1024, LastUpdateTime, currentRec, newModifiedDate);
+    us = FW_GetUserID(2);
+    FW_SetValue_w(1024, LastUpdateUser, currentRec, us);
+    return(st00);
+    // }else if(点击得为取消按钮){
+    //     取消保存操作
+    //     return(currentRec);
+    // }
+    //}
+}

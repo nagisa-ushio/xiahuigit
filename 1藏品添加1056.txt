@@ -1,0 +1,49 @@
+VAR
+{
+    Struct0 st0Msg;
+    Struct2 st2_find_result;
+    String us, enSemicolon, condition, status;
+    int targetFormID, newRec, i, countField;
+    StringList sl_Field;
+}
+FIELD
+{
+    .1035.UserName;
+    .1035.CollectionStatus;
+    .1035.EnSemicolon;
+}
+
+SERVER
+{
+    targetFormID = 1035;
+    st0Msg.FormID = targetFormID;
+    st0Msg.message = "";
+    status = "藏品新增待完善保存";
+    us = FW_GetUserID(2);
+    enSemicolon = FW_GetValue(targetFormID, EnSemicolon, 0);
+    us = us + enSemicolon;
+    condition = targetFormID.toString;
+    condition = condition + ", us@UserName, status@CollectionStatus";
+    st2_find_result = FW_FindRecords(condition, 0);
+    if(st2_find_result.mError != 0)
+    {
+        newRec = FW_AddNewPage_w(targetFormID);
+        FW_SetValue_w(targetFormID, UserName, newRec, us);
+        FW_SetValue_w(targetFormID, CollectionStatus, newRec, status);
+    }else
+    {
+        newRec =st2_find_result.RecordNoList.Get[0];
+    }
+
+    // 對特定的域進行鎖定暫不讓點擊，待完善保存後解鎖
+    sl_Field = ["TransferToAuctionAfter","UpdateAfter"];
+    countField = sl_Field.Get[];
+    for(i=0;i<countField;i++)
+    {
+        condition = sl_Field.Get[i];
+        FW_SetValueStatus_w(targetFormID, newRec, condition, 1);
+    }
+    st0Msg.Record = newRec;
+    return(st0Msg);
+}
+

@@ -1,0 +1,377 @@
+VAR
+{
+    Struct0 st00, getId, getVerifier, getstatus, getCreateDate;
+	int current_record, ret, counter, totalRecord, recordNo, record, totalRelatedRecord, flag, r, quotient, prod, page_size, page_count, endNo, dateFlag;
+	String startDate, endDate, us,dateStr, dayStr, monthStr, dayMonthStr, yearStr, wholeDateStr, balDayStr, semicolon;
+	Struct1 recList;
+	Struct3 vt;
+}
+FIELD
+{
+	.1064.UserName;
+	.1064.sortDateFrom;
+	.1064.sortDateTo;
+	.1064.currentKeyword;
+	.1065.Semicolon;
+	
+	.1064.id1;
+	.1064.id2;
+	.1064.id3;
+	.1064.id4;
+	.1064.id5;
+	.1064.id6;
+	.1064.id7;
+	.1064.id8;
+	.1064.id9;
+	.1064.id10;
+	
+	.1064.verifier1;
+	.1064.verifier2;
+	.1064.verifier3;
+	.1064.verifier4;
+	.1064.verifier5;
+	.1064.verifier6;
+	.1064.verifier7;
+	.1064.verifier8;
+	.1064.verifier9;
+	.1064.verifier10;
+	
+	.1064.status1;
+	.1064.status2;
+	.1064.status3;
+	.1064.status4;
+	.1064.status5;
+	.1064.status6;
+	.1064.status7;
+	.1064.status8;
+	.1064.status9;
+	.1064.status10;
+
+	.1064.createDate1;
+	.1064.createDate2;
+	.1064.createDate3;
+	.1064.createDate4;
+	.1064.createDate5;
+	.1064.createDate6;
+	.1064.createDate7;
+	.1064.createDate8;
+	.1064.createDate9;
+	.1064.createDate10;
+	
+	.1064.view1;
+	.1064.view2;
+	.1064.view3;
+	.1064.view4;
+	.1064.view5;
+	.1064.view6;
+	.1064.view7;
+	.1064.view8;
+	.1064.view9;
+	.1064.view10;
+	
+	.1064.remainder;
+	.1064.firstPage;
+	.1064.lastPage;
+	.1064.startIndex;
+	.1064.endIndex;
+	.1064.pageSize;
+	.1064.currentPage;
+	
+	.1031.verifierName;
+	.1031.regCreateDate;
+	.1031.status;
+	.1031.UserName;
+}
+SERVER
+{
+	flag = CURRENT.flag;
+	current_record = CURRENT.Record;
+	endDate = FW_GetSysDate(0);
+	startDate = FW_SpanDate(endDate, -6, 0);
+	FW_SetValue_w(1064, sortDateFrom, 0, startDate);
+	FW_SetValue_w(1064, sortDateTo, 0, endDate);
+	FW_SetValue_w(1064, currentKeyword, 0, "");
+	ret = FW_SpanDateTime(startDate, endDate, 1);
+	if(ret > 0)
+	{
+		st00.FormID = 1064;
+		st00.Record = 0;
+		st00.sVALUE = "The start date should be earlier than end date";
+		st00.message = "WEB_STRUCT0";
+		return(st00);
+	}
+	
+	totalRecord = FW_GetTotalRecords(1031);
+	totalRecord = totalRecord - 1;
+	
+	//get related record
+	for(record = 1; record <= totalRecord; record ++)
+	{
+		getCreateDate = FW_GetValue(1031, regCreateDate, record);
+		dateFlag =1;
+		
+		if(getCreateDate.sVALUE < startDate)
+		{
+			dateFlag = 0;
+		}
+		if(getCreateDate.sVALUE > endDate)
+		{
+			dateFlag = 0;
+		}
+		
+		if(dateFlag == 1)
+		{
+			recList.RecordNoList.Insert(-1,record);
+		}
+		
+	}
+	
+	counter = 0;
+	record = 0;
+	us = FW_GetUserID(2);
+	semicolon = FW_GetValue(1065, Semicolon, 0);
+	us = us + semicolon;
+	FW_SetValue_w(1064, UserName, 0, us);
+	
+	//reset
+	FW_SetValue_w(1064, id1, 0, "");
+	FW_SetValue_w(1064, id2, 0, "");
+	FW_SetValue_w(1064, id3, 0, "");
+	FW_SetValue_w(1064, id4, 0, "");
+	FW_SetValue_w(1064, id5, 0, "");
+	FW_SetValue_w(1064, id6, 0, "");
+	FW_SetValue_w(1064, id7, 0, "");
+	FW_SetValue_w(1064, id8, 0, "");
+	FW_SetValue_w(1064, id9, 0, "");
+	FW_SetValue_w(1064, id10, 0, "");
+	
+	FW_SetValue_w(1064, verifier1, 0, "");
+	FW_SetValue_w(1064, verifier2, 0, "");
+	FW_SetValue_w(1064, verifier3, 0, "");
+	FW_SetValue_w(1064, verifier4, 0, "");
+	FW_SetValue_w(1064, verifier5, 0, "");
+	FW_SetValue_w(1064, verifier6, 0, "");
+	FW_SetValue_w(1064, verifier7, 0, "");
+	FW_SetValue_w(1064, verifier8, 0, "");
+	FW_SetValue_w(1064, verifier9, 0, "");
+	FW_SetValue_w(1064, verifier10, 0, "");
+	
+	FW_SetValue_w(1064, status1, 0, "");
+	FW_SetValue_w(1064, status2, 0, "");
+	FW_SetValue_w(1064, status3, 0, "");
+	FW_SetValue_w(1064, status4, 0, "");
+	FW_SetValue_w(1064, status5, 0, "");
+	FW_SetValue_w(1064, status6, 0, "");
+	FW_SetValue_w(1064, status7, 0, "");
+	FW_SetValue_w(1064, status8, 0, "");
+	FW_SetValue_w(1064, status9, 0, "");
+	FW_SetValue_w(1064, status10, 0, "");
+
+	FW_SetValue_w(1064, createDate1, 0, "");
+	FW_SetValue_w(1064, createDate2, 0, "");
+	FW_SetValue_w(1064, createDate3, 0, "");
+	FW_SetValue_w(1064, createDate4, 0, "");
+	FW_SetValue_w(1064, createDate5, 0, "");
+	FW_SetValue_w(1064, createDate6, 0, "");
+	FW_SetValue_w(1064, createDate7, 0, "");
+	FW_SetValue_w(1064, createDate8, 0, "");
+	FW_SetValue_w(1064, createDate9, 0, "");
+	FW_SetValue_w(1064, createDate10, 0, "");
+	
+	FW_SetValue_w(1064, view1, 0, "");
+	FW_SetValue_w(1064, view2, 0, "");
+	FW_SetValue_w(1064, view3, 0, "");
+	FW_SetValue_w(1064, view4, 0, "");
+	FW_SetValue_w(1064, view5, 0, "");
+	FW_SetValue_w(1064, view6, 0, "");
+	FW_SetValue_w(1064, view7, 0, "");
+	FW_SetValue_w(1064, view8, 0, "");
+	FW_SetValue_w(1064, view9, 0, "");
+	FW_SetValue_w(1064, view10, 0, "");
+	
+	vt.operation = 2;
+	vt.FormID = 0;
+	
+	FW_FieldPropertySet_w(1064, view1, vt);
+	FW_FieldPropertySet_w(1064, view2, vt);
+	FW_FieldPropertySet_w(1064, view3, vt);
+	FW_FieldPropertySet_w(1064, view4, vt);
+	FW_FieldPropertySet_w(1064, view5, vt);
+	FW_FieldPropertySet_w(1064, view6, vt);
+	FW_FieldPropertySet_w(1064, view7, vt);
+	FW_FieldPropertySet_w(1064, view8, vt);
+	FW_FieldPropertySet_w(1064, view9, vt);
+	FW_FieldPropertySet_w(1064, view10, vt);
+	
+	totalRelatedRecord = recList.RecordNoList.Get[];
+	for(record = 0; record < totalRelatedRecord; record++)
+	{
+		recordNo = recList.RecordNoList.Get[record];
+		getVerifier = FW_GetValue(1031, verifierName, recordNo);
+		getstatus = FW_GetValue(1031, status, recordNo);
+		getCreateDate = FW_GetValue(1031, regCreateDate, recordNo);
+		dateStr = getCreateDate.sVALUE;
+		yearStr = dateStr.Left(4);
+		dayMonthStr = dateStr.Mid(4);
+		monthStr = dayMonthStr.Left(4);
+		dayStr = dayMonthStr.Mid(4);
+		wholeDateStr = dayStr + monthStr + yearStr;
+		
+		vt.operation = 2;
+		vt.FormID = 1031;
+		vt.Record = recordNo;
+		
+		if(counter == 0)
+		{
+			FW_SetValue_w(1064, id1, 0, "1");
+			FW_SetValue_w(1064, verifier1, 0, getVerifier.sVALUE);
+			FW_SetValue_w(1064, status1, 0, getstatus.sVALUE);
+			FW_SetValue_w(1064, createDate1, 0, wholeDateStr);
+			FW_SetValue_w(1064, view1, 0, "Edit");
+			FW_SetValue_w(1031, UserName, recordNo, us);
+			FW_FieldPropertySet_w(1064, view1, vt);
+		}
+		if(counter == 1)
+		{
+			FW_SetValue_w(1064, id2, 0, "2");
+			FW_SetValue_w(1064, verifier2, 0, getVerifier.sVALUE);
+			FW_SetValue_w(1064, status2, 0, getstatus.sVALUE);
+			FW_SetValue_w(1064, createDate2, 0, wholeDateStr);
+			FW_SetValue_w(1064, view2, 0, "Edit");
+			FW_SetValue_w(1031, UserName, recordNo, us);
+			FW_FieldPropertySet_w(1064, view2, vt);
+		}
+		if(counter == 2)
+		{
+			FW_SetValue_w(1064, id3, 0, "3");
+			FW_SetValue_w(1064, verifier3, 0, getVerifier.sVALUE);
+			FW_SetValue_w(1064, status3, 0, getstatus.sVALUE);
+			FW_SetValue_w(1064, createDate3, 0, wholeDateStr);
+			FW_SetValue_w(1064, view3, 0, "Edit");
+			FW_SetValue_w(1031, UserName, recordNo, us);
+			FW_FieldPropertySet_w(1064, view3, vt);
+		}
+		if(counter == 3)
+		{
+			FW_SetValue_w(1064, id4, 0, "4");
+			FW_SetValue_w(1064, verifier4, 0, getVerifier.sVALUE);
+			FW_SetValue_w(1064, status4, 0, getstatus.sVALUE);
+			FW_SetValue_w(1064, createDate4, 0, wholeDateStr);
+			FW_SetValue_w(1064, view4, 0, "Edit");
+			FW_SetValue_w(1031, UserName, recordNo, us);
+			FW_FieldPropertySet_w(1064, view4, vt);
+		}
+		if(counter == 4)
+		{
+			FW_SetValue_w(1064, id5, 0, "5");
+			FW_SetValue_w(1064, verifier5, 0, getVerifier.sVALUE);
+			FW_SetValue_w(1064, status5, 0, getstatus.sVALUE);
+			FW_SetValue_w(1064, createDate5, 0, wholeDateStr);
+			FW_SetValue_w(1064, view5, 0, "Edit");
+			FW_SetValue_w(1031, UserName, recordNo, us);
+			FW_FieldPropertySet_w(1064, view5, vt);
+		}
+		if(counter == 5)
+		{
+			FW_SetValue_w(1064, id6, 0, "6");
+			FW_SetValue_w(1064, verifier6, 0, getVerifier.sVALUE);
+			FW_SetValue_w(1064, status6, 0, getstatus.sVALUE);
+			FW_SetValue_w(1064, createDate6, 0, wholeDateStr);
+			FW_SetValue_w(1064, view6, 0, "Edit");
+			FW_SetValue_w(1031, UserName, recordNo, us);
+			FW_FieldPropertySet_w(1064, view6, vt);
+		}
+		if(counter == 6)
+		{
+			FW_SetValue_w(1064, id7, 0, "7");
+			FW_SetValue_w(1064, verifier7, 0, getVerifier.sVALUE);
+			FW_SetValue_w(1064, status7, 0, getstatus.sVALUE);
+			FW_SetValue_w(1064, createDate7, 0, wholeDateStr);
+			FW_SetValue_w(1064, view7, 0, "Edit");
+			FW_SetValue_w(1031, UserName, recordNo, us);
+			FW_FieldPropertySet_w(1064, view7, vt);
+		}
+		if(counter == 7)
+		{
+			FW_SetValue_w(1064, id8, 0, "8");
+			FW_SetValue_w(1064, verifier8, 0, getVerifier.sVALUE);
+			FW_SetValue_w(1064, status8, 0, getstatus.sVALUE);
+			FW_SetValue_w(1064, createDate8, 0, wholeDateStr);
+			FW_SetValue_w(1064, view8, 0, "Edit");
+			FW_SetValue_w(1031, UserName, recordNo, us);
+			FW_FieldPropertySet_w(1064, view8, vt);
+		}
+		if(counter == 8)
+		{
+			FW_SetValue_w(1064, id9, 0, "9");
+			FW_SetValue_w(1064, verifier9, 0, getVerifier.sVALUE);
+			FW_SetValue_w(1064, status9, 0, getstatus.sVALUE);
+			FW_SetValue_w(1064, createDate9, 0, wholeDateStr);
+			FW_SetValue_w(1064, view9, 0, "Edit");
+			FW_SetValue_w(1031, UserName, recordNo, us);
+			FW_FieldPropertySet_w(1064, view9, vt);
+		}
+		if(counter == 9)
+		{
+			FW_SetValue_w(1064, id10, 0, "10");
+			FW_SetValue_w(1064, verifier10, 0, getVerifier.sVALUE);
+			FW_SetValue_w(1064, status10, 0, getstatus.sVALUE);
+			FW_SetValue_w(1064, createDate10, 0, wholeDateStr);
+			FW_SetValue_w(1064, view10, 0, "Edit");
+			FW_SetValue_w(1031, UserName, recordNo, us);
+			FW_FieldPropertySet_w(1064, view10, vt);
+		}
+		counter = counter + 1;
+	}
+	FW_SetValue_w(1064, firstPage, 0, "1");
+	FW_SetValue_w(1064, startIndex, 0, "0");
+	FW_SetValue_w(1064, currentPage, 0, "1");
+	
+	page_size = FW_GetValue(1064, pageSize, 0);
+	quotient = totalRecord / page_size;
+	prod = quotient * page_size;
+	r = totalRecord - prod;
+	
+	if(totalRecord == page_size)
+	{
+		page_count = 1; //page_count = last page number
+		//FW_Dialog1(page_count);
+	}
+	else
+	{
+		if(r==0)
+		{
+			page_count = totalRecord/page_size;
+		}
+		else
+		{
+			page_count = (totalRecord/page_size) + 1;
+		}
+	}
+	//FW_Dialog1(page_count);
+	FW_SetValue_w(1064, remainder, 0, r);
+	if(page_count == 0)
+	{
+		FW_SetValue_w(1064, lastPage, 0, "1");
+	}
+	else
+	{
+		FW_SetValue_w(1064, lastPage, 0, page_count);
+	}
+	
+	
+	endNo = 9;
+	if(totalRecord < page_size)
+	{
+		endNo = r - 1;
+	}
+	
+	//FW_Dialog1(endNo);
+	FW_SetValue_w(1064, endIndex, 0, endNo);
+	
+	st00.FormID = 1064;
+	st00.Record = 0;
+	st00.sVALUE = "Success";
+	st00.message = "WEB_STRUCT0";
+	return(st00);
+}

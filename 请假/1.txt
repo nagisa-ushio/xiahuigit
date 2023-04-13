@@ -26,6 +26,7 @@ FIELD
 
     .1143.可休年假;
     .1143.申请中年假;
+    .1143.更新本年度年假;
     .1143.更新跨年度年假;
 
     .1138.姓名;
@@ -49,7 +50,7 @@ VAR
 {
     String us,scon,applydate,username,groupid,str,scope,selfpost,post,审批状态s,reusername;
     int correctpage, rec,total, rec_1143, mark_page;
-    double useable_leave,applying_leava,current_apply,D跨年度年假;
+    double useable_leave,applying_leava,current_apply,thisyear_leave,D跨年度年假;
     Struct2 st21,st22;
     String 事件状态s,处理人姓名s,处理人工号s,处理人职务s,处理人部门s,处理日期s,提交人姓名s;
     String 提交人工号s,内容s,提交日期s,提交人职务s,leave;
@@ -110,6 +111,7 @@ SERVER
         rec_1143 = st21.RecordNoList.Get[0];
         useable_leave = FW_GetValue(1143, 可休年假, rec_1143);
         applying_leava = FW_GetValue(1143, 申请中年假, rec_1143);
+        thisyear_leave = FW_GetValue(1143, 更新本年度年假, rec_1143);
         D跨年度年假 = FW_GetValue(1143, 更新跨年度年假, rec_1143);
     }
     return(GotoClient);
@@ -129,6 +131,7 @@ CLIENT
         current_apply = FW_GetValue(1138, 请假共计, correctpage);
         useable_leave = useable_leave - current_apply;
         applying_leava = applying_leava + current_apply;
+        thisyear_leave = thisyear_leave - current_apply;
         if(D跨年度年假 > 0)
         {
             D跨年度年假 = D跨年度年假 - current_apply;
@@ -137,6 +140,7 @@ CLIENT
                 D跨年度年假 = 0;
             }
         }
+        FW_SetValue_w(1143, 更新本年度年假, rec_1143, thisyear_leave);
         FW_SetValue_w(1143, 更新跨年度年假, rec_1143, D跨年度年假);
         FW_SetValue_w(1143, 可休年假, rec_1143, useable_leave);
         FW_SetValue_w(1143, 申请中年假, rec_1143, applying_leava);
@@ -157,6 +161,7 @@ SERVER
     }
     if(leave == "年假")
     {
+        FW_SetValue_w(1143, 更新本年度年假, rec_1143, thisyear_leave);
         FW_SetValue_w(1143, 更新跨年度年假, rec_1143, D跨年度年假);
         FW_SetValue_w(1143, 可休年假, rec_1143, useable_leave);
         FW_SetValue_w(1143, 申请中年假, rec_1143, applying_leava);

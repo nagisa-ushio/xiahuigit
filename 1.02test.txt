@@ -1,0 +1,30 @@
+VAR
+{
+    String webModifiedDate, serverModifiedDate, alertMsg, newModifiedDate, newModifiedUser, us;
+    Struct0 st00, st01;
+    int currentRec, ret;
+}
+FIELD
+{
+    .1024.LastUpdateTime;
+    .1024.LastUpdateUser;
+}
+SERVER
+{
+    currentRec = CURRENT.Record;
+    st00 = FW_GetValueFromWeb(LastUpdateTime, CURRENT);    // 获取当前网页上修改时间域的域值
+    st01 =  FW_GetValue(1024, LastUpdateTime, currentRec);    // 获取服务器上修改时间域最新的域值
+    webModifiedDate = st00.sVALUE;
+    serverModifiedDate = st01.sVALUE;
+    newModifiedUser = FW_GetValue(1024, LastUpdateUser, currentRec);
+    alertMsg = "是否继续保存？确认保存后无法撤销。";
+    st00.FormID = 1024;
+    st00.Record = 0;
+    st00.message = "WEB_STRUCT0";
+    st00.sVALUE = alertMsg;
+    newModifiedDate = FW_GetSysDateTime(1);
+    FW_SetValue_w(1024, LastUpdateTime, currentRec, newModifiedDate);
+    us = FW_GetUserID(2);
+    FW_SetValue_w(1024, LastUpdateUser, currentRec, us);
+    return(st00);
+}

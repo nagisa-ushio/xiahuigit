@@ -1,0 +1,99 @@
+VAR
+{
+    Struct0 st0BookType, st0BookFormID, st0BookFieldName, st0, st0Msg;
+    Struct2 st2FindinTargetForm;
+    String typeName, typeAbbr, strBookFormID, targetFormFieldName, bookName, condition, msg, strBookID, us;
+    int currentFormID, currentRec, flag, cp, targetBookFormID, lastRec, newRec, i, countFieldName, countFailure, bookIDNumSuffix;
+}
+FIELD
+{
+    .1045.UserName;
+    .1045.BookType;
+
+    .1028.BookName;
+}
+
+SERVER
+{
+    currentFormID = CURRENT.FormID;
+    currentRec = CURRENT.Record;
+    st0Msg.FormID = currentFormID;
+    st0Msg.Record = currentRec;
+    st0Msg.message = "WEB_STRUCT0";
+    st0BookType.Json = {"古典文學":"GDWX", "一般書籍":"YBSJ", "兒童讀物":"ETDW", "紀念專輯":"JNZJ", "綜合藝術":"ZHYS", "香港故事":"XGGS", "營養與保健":"YYYBJ", "集郵":"JY"};
+    st0BookFormID.Json = {"古典文學":"1028", "一般書籍":"1039", "兒童讀物":"1029", "紀念專輯":"1051", "綜合藝術":"1052", "香港故事":"1053", "營養與保健":"1054", "集郵":"1055"};
+    st0 = FW_GetValue(currentFormID, BookType, currentRec);
+    typeName = st0.sVALUE;
+    typeName = "\"" + typeName + "\"";
+    typeAbbr = st0BookType.Json(typeName);
+    strBookFormID = st0BookFormID.Json(typeName);
+    targetBookFormID = strBookFormID.toIntege;
+    lastRec = FW_GetTotalRecords(targetBookFormID);
+    lastRec--;
+    st0BookFieldName.Json = {"BookName":"書名", "AuthorName":"作者姓名", "PublishingHouse":"出版社", "PublicationDate":"出版日期", "RentalPrice":"1日價格", "BookPic":"書籍圖片", "Instruction":"內容介紹", "BookID":"編號"};
+    countFieldName = st0BookFieldName.Json.length;
+    countFailure = countFieldName - 1;
+    for(i=0;i<countFailure;i++)
+    {
+        targetFormFieldName = st0BookFieldName.Json[i].name;
+        st0 = FW_GetValue(targetBookFormID, targetFormFieldName, lastRec);
+        if(targetFormFieldName != "BookID")
+        {
+            // 添加失敗情況
+            st0 = FW_GetValue(currentFormID, targetFormFieldName, currentRec);
+            if(st0.sVALUE == "")
+            {
+                msg = st0BookFieldName.Json[i].value;
+                msg = "您未输入" + msg + "，請輸入後再確認添加。";
+                st0Msg.sVALUE = msg;
+                return(st0Msg);
+            }else if(targetFormFieldName == "BookName")
+            {
+                bookName = st0.sVALUE;
+                condition = strBookFormID + ", bookName@" + targetFormFieldName;
+                st2FindinTargetForm = FW_FindRecords(condition, 1);
+                if(st2FindinTargetForm.mError == 0)
+                {
+                    msg = "無法添加！" + typeName + "分类中已存在相同書籍。";
+                    st0Msg.sVALUE = msg;
+                    return(st0Msg);
+                }
+                st0 = FW_GetValue(targetBookFormID, targetFormFieldName, lastRec);
+                if(st0.sVALUE != "")
+                {
+                    newRec = FW_AddNewPage_w(targetBookFormID);
+                }else
+                {
+                    newRec = lastRec;
+                    lastRec--;
+                }
+            }
+        }
+    }
+    for(i=0;i<countFieldName;i++)
+    {
+        targetFormFieldName = st0BookFieldName.Json[i].name;
+        if(targetFormFieldName == "BookID")
+        {
+            st0 = FW_GetValue(targetBookFormID, targetFormFieldName, lastRec);
+            strBookID = st0.sVALUE;
+            strBookID.TrimLeft(typeAbbr);
+            bookIDNumSuffix = strBookID.toIntege;
+            bookIDNumSuffix++;
+            strBookID = bookIDNumSuffix.toString;
+            strBookID = typeAbbr + strBookID;
+            FW_SetValue_w(targetBookFormID, targetFormFieldName, newRec, strBookID);
+            break;
+        }
+        st0 = FW_GetValue(currentFormID, targetFormFieldName, currentRec);
+        FW_SetValue_w(targetBookFormID, targetFormFieldName, newRec, st0.sVALUE);
+    }
+    FW_SetValue_w(currentFormID, "DYNAMIC", currentRec, "");    // 將當前表格上所有動態域域值清空
+    us = FW_GetUserID(2);
+    us = us + ";";
+    FW_SetValue_w(currentFormID, UserName, currentRec, us);    // 因為UserName域值也被清空，因此從新獲取填入，否則服務器每次都會自動添加一頁UserName為登錄用戶的新記錄（因為該表格設置了WebAccessRight）
+    msg = "添加成功！";
+    st0Msg.sVALUE = msg;
+    return(st0Msg);
+}
+

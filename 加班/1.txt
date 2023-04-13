@@ -50,7 +50,8 @@ VAR
     String 域名S, 当前用户工号S, 审批操作S, 审批状态S, 查找处理人条件S, 处理人工号S, 处理人姓名S;
     String 提交人姓名S, 提交人工号S, 申请日期S, 处理人职务S, 处理人部门S, 处理日期S, 提交人职务s;
     StringList 记录页存放域名;
-    int i, exist_1143提交人记录, 查找处理人总数I, 当前页I, 处理人记录页I, 当前待处理标记I, 新纪录I, rec_1087提交人, rec_1143提交人;
+    int i, exist_1143提交人记录, 查找处理人总数I, 当前页I, 处理人记录页I, 当前待处理标记I;
+    int 新纪录I, rec_1087提交人, rec_1143提交人, return_value, return_error;
     Struct2 st2_1087查找处理人操作, st2_1087查找提交人操作, st2_1143查找提交人操作;
     double D加班时间, 月度加班d, 季度加班d, 年度加班d, 在职加班d, 可调休共计d, 个人上限d;
     double 本季度可调休d, 本月剩余调休透支时间d, 已透支时间d, D剩余透支标准, D预计可调休共计;
@@ -69,10 +70,10 @@ CLIENT
     提交人工号S = FW_GetValue(1139, UserName1, 当前页I);
     申请日期S = FW_GetSysDate(0);
     处理人职务S = FW_GetValue(1139, POST2, 当前页I);
-    审批状态S = "待"+处理人职务S+"同意";
+    审批状态S = "待" + 处理人职务S + "同意";
     处理人部门S = FW_GetValue(1139, GroupID2, 当前页I);
     D加班时间 = FW_GetValue(1139, 预计加班共计小时数, 当前页I);
-    FW_Dialog1(正在提交中...请按“继续”并等待完成提示。);
+    FW_Dialog1(正在提交中...请按 “继续” 并等待申请提交完成提示！);
 }
 SERVER
 {
@@ -80,7 +81,7 @@ SERVER
     rec_1087提交人 = st2_1087查找提交人操作.RecordNoList.Get[0];
     提交人职务s = FW_GetValue(1087, POST, rec_1087提交人);
 
-//如果提交人为执行主任则直接通过
+    //如果提交人为执行主任则直接通过
     if(提交人职务s == "执行主任")
     {
         st2_1143查找提交人操作=FW_FindRecords("1143, 提交人工号S@UserName", 1);
@@ -91,7 +92,7 @@ SERVER
         }
         rec_1143提交人 = st2_1143查找提交人操作.RecordNoList.Get[0];
 
-//上月透支时间计算
+        //加班时间先抵扣掉上月透支时间，再抵扣本月透支时间，但最后可调休共计还是要加上加班的总时间（未抵扣前的）
         D上月透支时间 = FW_GetValue(1143, 上月调休透支时间, rec_1143提交人);
         D抵扣上月透支时间剩余 = D加班时间;
         if(D上月透支时间 > 0)
@@ -106,9 +107,13 @@ SERVER
                 D上月透支时间 = 0;
             }
         }
-        FW_SetValue_w(1143, 上月调休透支时间, rec_1143提交人, D上月透支时间);
-
-//个人本月调休透支时间计算
+        return_value = FW_SetValue_w(1143, 上月调休透支时间, rec_1143提交人, D上月透支时间);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        //个人本月调休透支时间计算
         if(D抵扣上月透支时间剩余 > 0)
         {
             本月剩余调休透支时间d = FW_GetValue(1143, 月调休可透支时间, rec_1143提交人);
@@ -120,19 +125,34 @@ SERVER
                 D抵扣上月透支时间剩余 = 0;
             }else if(D抵扣上月透支时间剩余 > 已透支时间d)
             {
-                D抵扣上月透支时间剩余 = D抵扣上月透支时间剩余 - 已透支时间d;
+                //D抵扣上月透支时间剩余 = D抵扣上月透支时间剩余 - 已透支时间d;
                 本月剩余调休透支时间d = D剩余透支标准;
             }
-            FW_SetValue_w(1143, 月调休可透支时间, rec_1143提交人, 本月剩余调休透支时间d);
+            return_value = FW_SetValue_w(1143, 月调休可透支时间, rec_1143提交人, 本月剩余调休透支时间d);
+            if(return_value != 0)
+            {
+                return_error = 1;
+                return(GotoClient);
+            }
         }
 
-//申请的总加班时间算进可调休共计和本季度可调休
+        //申请的总加班时间算进可调休共计和本季度可调休
         可调休共计d = FW_GetValue(1143, 可调休共计, rec_1143提交人);
         本季度可调休d = FW_GetValue(1143, 本季度可调休, rec_1143提交人);
         可调休共计d = 可调休共计d + D加班时间;
         本季度可调休d = 本季度可调休d + D加班时间;
-        FW_SetValue_w(1143, 可调休共计, rec_1143提交人, 可调休共计d);
-        FW_SetValue_w(1143, 本季度可调休, rec_1143提交人, 本季度可调休d);
+        return_value = FW_SetValue_w(1143, 可调休共计, rec_1143提交人, 可调休共计d);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1143, 本季度可调休, rec_1143提交人, 本季度可调休d);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
 
         月度加班d=FW_GetValue(1143,月度加班累计,rec_1143提交人);
         月度加班d= 月度加班d + D加班时间;
@@ -142,19 +162,53 @@ SERVER
         年度加班d= 年度加班d + D加班时间;
         在职加班d=FW_GetValue(1143,在职加班累计,rec_1143提交人);
         在职加班d= 在职加班d + D加班时间;
-        FW_SetValue_w(1143,月度加班累计,rec_1143提交人,月度加班d);
-        FW_SetValue_w(1143,季度加班累计,rec_1143提交人,季度加班d);
-        FW_SetValue_w(1143,年度加班累计,rec_1143提交人,年度加班d);
-        FW_SetValue_w(1143,在职加班累计,rec_1143提交人,在职加班d);
-
-        FW_SetValue_w(1139,申请日期,当前页I,申请日期S);
+        return_value = FW_SetValue_w(1143,月度加班累计,rec_1143提交人,月度加班d);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1143,季度加班累计,rec_1143提交人,季度加班d);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1143,年度加班累计,rec_1143提交人,年度加班d);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1143,在职加班累计,rec_1143提交人,在职加班d);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1139,申请日期,当前页I,申请日期S);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
         审批状态S="已通过";
-        FW_SetValue_w(1139,状态,当前页I,审批状态S);
-        FW_SetValue_w(1139,POST1,当前页I,"执行主任");
+        return_value = FW_SetValue_w(1139,状态,当前页I,审批状态S);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1139,POST1,当前页I,"执行主任");
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
         return(GotoClient);
     }
 
-//不为执行主任时正常提交
+    //不为执行主任时正常提交
     if(处理人部门S != "")
     {
         查找处理人条件S = "1087,处理人职务S@POST,处理人部门S@GroupID";
@@ -172,22 +226,97 @@ SERVER
         处理人记录页I = st2_1087查找处理人操作.RecordNoList.Get[i];
         处理人工号S = FW_GetValue(1087, UserName, 处理人记录页I);
         处理人姓名S = FW_GetValue(1087, 姓名, 处理人记录页I);
-        FW_SetValue_w(1139, 域名S, 当前页I, 新纪录I);
-        FW_SetValue_w(1235, 处理人工号, 新纪录I, 处理人工号S);
-        FW_SetValue_w(1235, 处理人姓名, 新纪录I, 处理人姓名S);
-        FW_SetValue_w(1235, 处理人部门, 新纪录I, 处理人部门S);
-        FW_SetValue_w(1235, 处理人职务, 新纪录I, 处理人职务S);
-        FW_SetValue_w(1235, 事件状态, 新纪录I, "待处理");
-        FW_SetValue_w(1235, 审批状态, 新纪录I, 审批状态S);
-        FW_SetValue_w(1235, LinkToFormID, 新纪录I, "1139");
-        FW_SetValue_w(1235, LinkToFormPage, 新纪录I, 当前页I);
-        FW_SetValue_w(1235, 提交人姓名, 新纪录I, 提交人姓名S);
-        FW_SetValue_w(1235, 提交人工号, 新纪录I, 提交人工号S);
-        FW_SetValue_w(1235, 内容, 新纪录I, "加班申请");
-        FW_SetValue_w(1235, 提交日期, 新纪录I, 申请日期S);
+        return_value = FW_SetValue_w(1139, 域名S, 当前页I, 新纪录I);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1235, 处理人工号, 新纪录I, 处理人工号S);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1235, 处理人姓名, 新纪录I, 处理人姓名S);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1235, 处理人部门, 新纪录I, 处理人部门S);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1235, 处理人职务, 新纪录I, 处理人职务S);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1235, 事件状态, 新纪录I, "待处理");
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1235, 审批状态, 新纪录I, 审批状态S);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1235, LinkToFormID, 新纪录I, "1139");
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1235, LinkToFormPage, 新纪录I, 当前页I);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1235, 提交人姓名, 新纪录I, 提交人姓名S);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1235, 提交人工号, 新纪录I, 提交人工号S);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1235, 内容, 新纪录I, "加班申请");
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
+        return_value = FW_SetValue_w(1235, 提交日期, 新纪录I, 申请日期S);
+        if(return_value != 0)
+        {
+            return_error = 1;
+            return(GotoClient);
+        }
     }
-    FW_SetValue_w(1139, 申请日期, 当前页I, 申请日期S);
-    FW_SetValue_w(1139, 状态, 当前页I, 审批状态S);
+    return_value = FW_SetValue_w(1139, 申请日期, 当前页I, 申请日期S);
+    if(return_value != 0)
+    {
+        return_error = 1;
+        return(GotoClient);
+    }
+    return_value = FW_SetValue_w(1139, 状态, 当前页I, 审批状态S);
+    if(return_value != 0)
+    {
+        return_error = 1;
+        return(GotoClient);
+    }
     return(GotoClient);
 }
 CLIENT
@@ -200,20 +329,51 @@ SERVER
 }
 CLIENT
 {
-    if(提交人职务s == "执行主任")
+    return_value = FW_SetValue_w(1139, 申请日期, 当前页I, 申请日期S);
+    if(return_value != 0)
     {
+        FW_Dialog1("1139ClientSetValue失败!");
+        return(0);
     }
-    FW_SetValue_w(1139, 申请日期, 当前页I, 申请日期S);
-    FW_SetValue_w(1139, 状态, 当前页I, 审批状态S);
+    return_value = FW_SetValue_w(1139, 状态, 当前页I, 审批状态S);
+    if(return_value != 0)
+    {
+        FW_Dialog1("1139ClientSetValue失败!");
+        return(0);
+    }
     if(提交人职务s == "执行主任")
     {
-        FW_SetValue_w(1143,月度加班累计,rec_1143提交人,月度加班d);
-        FW_SetValue_w(1143,季度加班累计,rec_1143提交人,季度加班d);
-        FW_SetValue_w(1143,年度加班累计,rec_1143提交人,年度加班d);
-        FW_SetValue_w(1143,在职加班累计,rec_1143提交人,在职加班d);
+        return_value = FW_SetValue_w(1143,月度加班累计,rec_1143提交人,月度加班d);
+        if(return_value != 0)
+        {
+            FW_Dialog1("1139ClientSetValue失败!");
+            return(0);
+        }
+        return_value = FW_SetValue_w(1143,季度加班累计,rec_1143提交人,季度加班d);
+        if(return_value != 0)
+        {
+            FW_Dialog1("1139ClientSetValue失败!");
+            return(0);
+        }
+        return_value = FW_SetValue_w(1143,年度加班累计,rec_1143提交人,年度加班d);
+        if(return_value != 0)
+        {
+            FW_Dialog1("1139ClientSetValue失败!");
+            return(0);
+        }
+        return_value = FW_SetValue_w(1143,在职加班累计,rec_1143提交人,在职加班d);
+        if(return_value != 0)
+        {
+            FW_Dialog1("1139ClientSetValue失败!");
+            return(0);
+        }
 
-        FW_SetValue_w(1139, Field5, 当前页I, "ClientListWinRefresh");
-
+        return_value = FW_SetValue_w(1139, Field5, 当前页I, "ClientListWinRefresh");
+        if(return_value != 0)
+        {
+            FW_Dialog1("1139ClientSetValue失败!");
+            return(0);
+        }
         FW_Dialog1(此申请单现已通过！);
     }else
     {

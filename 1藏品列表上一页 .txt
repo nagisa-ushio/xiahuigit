@@ -1,0 +1,131 @@
+VAR
+{
+    int flag, currentFormID, currentRec, currentIPage, targetFormID, countPrefix, countSuffix, i, j, findCount, prevPageRecBegin, rec1035, idNum;
+    String searchStatus, fieldNameSuffix, fieldNamePrefix, fieldName, us, enSemicolon, searchWord, condition, fieldName1035, fieldValue1035;
+    Struct2 st2FindResult;
+    StringList slPrefix, slSuffix, slField1035;
+    Struct3 st3;
+    Struct0 st0Msg;
+}
+FIELD
+{
+    .1056.SearchWord;
+    .1056.CurrentPage;
+    .1056.SearchStatus;
+    .1056.id9;
+
+    .1035.UserName;
+    .1035.EnSemicolon;
+    .1035.CollectionName;
+}
+SERVER
+{
+    // not a web service,end directly.
+    flag = CURRENT.flag;
+    if(flag != 300)
+    
+    {
+        return(0);
+    }
+
+    currentFormID = CURRENT.FormID;
+    currentRec = CURRENT.Record;
+    st0Msg.FormID = currentFormID;
+    st0Msg.Record = currentRec;
+    currentIPage = FW_GetValue(currentFormID, CurrentPage, currentRec);
+    if(currentIPage == 1)
+    {
+        st0Msg.message = "WEB_STRUCT0";
+        st0Msg.sVALUE = "已經是第一頁！";
+        return(st0Msg);
+    }
+    targetFormID = 1035;
+    condition = targetFormID.toString;
+    us = FW_GetUserID(2);
+    enSemicolon = FW_GetValue(targetFormID, EnSemicolon, 0);
+    us = us + enSemicolon;
+
+    // 上一頁的搜索條件判斷設置，因為默認進入藏品列表顯示的為當前用戶名全部記錄，搜索條件顯示的為當前用戶名+藏品名關鍵字列表
+    searchStatus = FW_GetValue(currentFormID, SearchStatus, currentRec);
+    if(searchStatus == "")
+    {
+        condition = condition + ",us@UserName";
+    }else
+    {
+        searchWord = FW_GetValue(currentFormID, SearchWord, currentRec);
+        condition = condition + ",us@UserName,RANGE(searchWord)@CollectionName";
+    }
+
+    // 將列表數據重置為空
+    slPrefix = ["id", "Collection", "Author", "PublishingHouse", "PublishingDate", "viewBtn"];
+    slSuffix = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+    countPrefix = slPrefix.Get[];    // 獲取列表域名前綴總個數
+    countSuffix = slSuffix.Get[];    // 獲取列表域名后綴總個數
+    for(i=0;i<countSuffix;i++)
+    {
+        fieldNameSuffix = slSuffix.Get[i];    // 获取需要赋值的域名后缀
+        for(j=0;j<countPrefix;j++)
+        {
+            fieldNamePrefix = slPrefix.Get[j];    // 循环取得所有需要赋值的域名前缀以便和后缀都组成过一次
+            fieldName = fieldNamePrefix + fieldNameSuffix;
+            FW_SetValue_w(currentFormID, fieldName, currentRec, "");
+            if(fieldNamePrefix == "viewBtn")
+            {
+                FW_SetValueStatus_w(currentFormID, currentRec, fieldName, 1);    // 锁定viewBtn域防止在没有列表数据的情况下可以被用户点击跳轉
+            }
+        }
+    }
+
+    // 上一頁搜索操作
+    currentIPage--;
+    findCount = currentIPage * countSuffix;
+    st2FindResult = FW_FindRecords(condition, findCount);    // 查找當前頁之前的所有記錄
+    prevPageRecBegin = findCount - countSuffix;    // 上一頁列表的第一行記錄標記
+    if(st2FindResult.mError == 0)
+    {
+        FW_SetValue_w(currentFormID, CurrentPage, currentRec, currentIPage);    // 頁碼數
+
+        // 首尾添加的“notUsed”是因为列表需要赋值的域名中首尾的“id”和“viewBtn”不是在1035中取值的，但两者的StringList元素个数又需保持一致，才能方便在后面的循环中取值赋值
+        slField1035 = ["notUsed", "CollectionName", "CollectionAuthor", "PublishingHouse", "PublishingDate", "notUsed"];
+        for(i=prevPageRecBegin;i<findCount;i++)
+        {
+            // 将列表中的前findCount行中的域通过循环操作依次赋值
+            rec1035 = st2FindResult.RecordNoList.Get[i];    // 依次获取查找的结果记录页号
+            fieldNameSuffix = slSuffix.Get[i];    // 获取赋值的列表域名后缀
+            for(j=0;j<countPrefix;j++)
+            {
+                fieldNamePrefix = slPrefix.Get[j];    // 循环取得所有1028需要赋值的域名前缀以便和后缀都组成过一次
+                fieldName = fieldNamePrefix + fieldNameSuffix;
+                if(fieldNamePrefix == "id")
+                {
+                    idNum = i + 1;    // 1028的id是从1开始
+                    FW_SetValue_w(currentFormID, fieldName, currentRec, idNum);
+                    continue;    // 因为id*域是直接赋值而不从1035中取值再赋值，所以直接进入下一个循环
+                }else if(fieldNamePrefix == "viewBtn")
+                {
+                    FW_SetValueStatus_w(currentFormID, currentRec, fieldName, 0);    // 解锁该viewBtn域可以被用户点击
+                    FW_SetValue_w(currentFormID, fieldName, currentRec, "view");
+                    st3.FormID = 1035;
+                    st3.Record = rec1035;
+                    st3.operation = 2;
+                    FW_FieldPropertySet_w(currentFormID, fieldName, st3);
+                    continue;    // 因为viewBtn*域是直接赋值而不从1035中取值再赋值，所以直接进入下一个循环
+                }
+
+                // 除了id*和viewBtn*外其它域值需从1035中取值再赋值
+                fieldName1035 = slField1035.Get[j];
+                fieldValue1035 = FW_GetValue(targetFormID, fieldName1035, rec1035);
+                FW_SetValue_w(currentFormID, fieldName, currentRec, fieldValue1035);
+            }
+        }
+        st0Msg.FormID = currentFormID;
+        st0Msg.Record = currentRec;
+        st0Msg.message = "";
+    }else{
+        st0Msg.FormID = currentFormID;
+        st0Msg.Record = currentRec;
+        st0Msg.message = "WEB_STRUCT0";
+        st0Msg.sVALUE = "未找到相關信息！";
+    }
+    return(st0Msg);
+}

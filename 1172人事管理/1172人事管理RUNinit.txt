@@ -1,0 +1,73 @@
+FIELD
+{
+    .1172.待办数字;
+
+    .1235.事件状态;
+    .1235.处理人工号;
+
+    .1172.生日提醒;
+    .1172.合同到期提醒;
+
+    .1156.状态;
+    
+    .1168.生日提醒;
+    .1168.合同到期提醒;
+}
+VAR
+{
+    String string_to_do,current_us, condition, status, zt, Srch1,Srch2,Srch3,dqrq,dqyf, d2,d3;
+    Struct2 st2,st21,st22,st23;
+    int count_to_do, us_record, tp1,tp2,tp3,day2,day3;
+}
+CLIENT
+{
+    us_record = FW_GetCurrentRecNum();
+    current_us = FW_GetUserID(2);
+    status = "待处理";
+    zt = "在职";
+}
+SERVER
+{
+    condition = "1235,current_us@处理人工号,status@事件状态";
+    st2 = FW_FindRecords(condition, 0);
+    if(st2.mError != 0)
+    {
+        FW_SetValue_w(1172, 待办数字, us_record, "（0）");
+    }else
+    {
+        count_to_do = st2.count;
+        string_to_do = count_to_do.toString;
+        string_to_do = "（" + string_to_do + "）";
+        FW_SetValue_w(1172, 待办数字, us_record, string_to_do);
+    }
+    
+    dqrq = FW_GetSysDate(0);
+    dqyf = dqrq.Left(7);
+    Srch2="1183, zt@员工状态,RANGE(dqyf)@生日时间";
+    st22=FW_FindRecords( Srch2,0 );
+    tp2=st22.count;
+
+//判断合同到期提醒
+    day3=FW_GetValue(1168,合同到期提醒,0);
+    d3=FW_SpanDate(dqrq,day3,0);
+    Srch3="1183, zt@员工状态,RANGE(dqrq-d3)@合同到期日";
+    st23=FW_FindRecords( Srch3,0 );
+    tp3=st23.count;
+
+    FW_SetValue_w(1172,生日提醒,0,tp2);
+    FW_SetValue_w(1172,合同到期提醒,0,tp3);
+    return(GotoClient);
+} 
+CLIENT
+{
+    if(st2.mError != 0)
+    {
+        FW_SetValue_w(1172, 待办数字, us_record, "（0）");
+    }else
+    {
+        FW_SetValue_w(1172, 待办数字, us_record, string_to_do);
+    }
+    FW_GotoFormPage(1172,us_record);
+    FW_SetValue_w(1172,生日提醒,0,tp2);
+    FW_SetValue_w(1172,合同到期提醒,0,tp3);
+} 

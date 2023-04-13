@@ -1,0 +1,36 @@
+FIELD
+{
+    .1143.本年度年假;
+    .1143.更新本年度年假;
+    .1143.可休年假;
+    .1143.员工状态;
+}
+VAR
+{
+    String status;
+    double thisyear, therest, thisyear_updata;
+    int i, total, rec1143;
+    Struct2 st2_1143;
+}
+SERVER
+{
+    status = "在职";
+    st2_1143 = FW_FindRecords("1143, status@员工状态", 0);
+    total = st2_1143.count;
+    for(i=0; i<total; i++)
+    {
+        rec1143 = st2_1143.RecordNoList.Get[i];
+        thisyear = FW_GetValue(1143, 本年度年假, rec1143);
+        therest = FW_GetValue(1143, 可休年假, rec1143);
+        if(thisyear < therest)
+        {
+            FW_SetValue_w(1143, 更新本年度年假, rec1143, thisyear);
+        }else
+        {
+            FW_SetValue_w(1143, 更新本年度年假, rec1143, therest);
+        }
+    }
+    FW_Dialog1(“succeed”);
+    
+}
+

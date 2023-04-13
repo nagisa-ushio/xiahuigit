@@ -1,24 +1,35 @@
 FIELD
 {
+    .1143.今年跨年度年假申请通过临时存放;
     .1143.入职日期;
     .1143.年假共计;
     .1143.本年度年假;
+    .1143.跨年度可休年假;
+    .1143.已休年假;
     .1143.可休年假;
     .1143.已交厦门社保年数;
 }
 VAR
 {
-    int cp, social_security_years, induction_interval_days, thisyear_days, current_last_days, real_days_int, thisyear_vacation_int, afterOneYear_int, this_year_int;
-    String induction_date, date_after_oneyear, afterOneYear, afterOneYear_month_day, this_year, current_date, lastdate_afterOneYear, thisyear_vacation_intToString;
-    double total_vacation, real_days, thisyear_vacation, decimal, useable_vacation, thisyear_vacation_stringToDouble, one, two, thisyear_vacation_before;
+    int cp, social_security_years, induction_interval_days, thisyear_days, current_last_days;
+    int real_days_int, thisyear_vacation_int, afterOneYear_int, this_year_int;
+    String induction_date, date_after_oneyear, afterOneYear, afterOneYear_month_day;
+    String this_year, current_date, lastdate_afterOneYear, thisyear_vacation_intToString;
+    String current_month_day;
+    double total_vacation, real_days, thisyear_vacation, decimal, useable_vacation;
+    double thisyear_vacation_stringToDouble, one, two, thisyear_vacation_before;
+    double vacation_spilt_year;
 }
 CLIENT
 {
     cp = CURRENT.iVALUE;
     induction_date = FW_GetValue(1143, 入职日期, cp);
     current_date = FW_GetSysDate(0);
+
+    //计算入职日期到当前日期的间隔天数
     induction_interval_days = FW_SpanDateTime(current_date, induction_date, 2);
-    induction_interval_days = induction_interval_days/24 + 1;   //计算入职日期到当前日期的间隔天数
+    induction_interval_days = induction_interval_days/24 + 1;
+
     thisyear_vacation = 0.00;
     if(induction_interval_days > 365)
     {
@@ -31,11 +42,11 @@ CLIENT
         this_year = current_date.Left(4);
         this_year_int = this_year.toIntege;
 
-//入职一年或一年以上才会开始计算年假
+        //入职一年或一年以上才会开始计算年假
         if(afterOneYear_int == this_year_int)
         {
             thisyear_vacation = 5.00;    //满一年后年假基数为5
-//取入职一年后的那一年最后日期和当前日期计算天数间隔，正数代表今年实际年假天数是（入职一年后的日期到今年最后日期的天数）除以（今年一年的总天数）乘以（年假基数）
+            //取入职一年后的那一年最后日期和当前日期计算天数间隔，正数代表今年实际年假天数是（入职一年后的日期到今年最后日期的天数）除以（今年一年的总天数）乘以（年假基数）
             lastdate_afterOneYear = afterOneYear + "/12/31";
             current_last_days = FW_GetSysTime(lastdate_afterOneYear, current_date, 2);
             current_last_days = current_last_days/24 + 1;
@@ -52,8 +63,10 @@ CLIENT
                 thisyear_vacation_intToString = thisyear_vacation_int.toString;
                 thisyear_vacation_stringToDouble = thisyear_vacation_intToString.toDouble;
                 decimal = thisyear_vacation - thisyear_vacation_stringToDouble;    //得到今年年假的小数部分
+
+                //小数部分小于0.1的算0天，大等于0.1小于0.7的算0,5天，大等于0.7的算1天
                 one = 0.10;
-                two = 0.70;    //小数部分小于0.1的算0天，大等于0.1小于0.7的算0,5天，大等于0.7的算1天
+                two = 0.70;
                 if((decimal >= 0)&&(decimal < one))
                 {
                     thisyear_vacation = thisyear_vacation_stringToDouble;
@@ -67,7 +80,7 @@ CLIENT
             }
         }else if(afterOneYear_int < this_year_int)
         {
-//今年的年份要大于入职一年后的年份则开始计算额外条件，即在职满三年同时社保满十年不满二十年，或则在职满十年不满二十年，则年假为10天。社保满二十年同时在职满五年，或在职满二十年，则年假为15天
+            //今年的年份要大于入职一年后的年份则开始计算额外条件，即在职满三年同时社保满十年不满二十年，或则在职满十年不满二十年，则年假为10天。社保满二十年同时在职满五年，或在职满二十年，则年假为15天
             thisyear_vacation = 5.00;
             social_security_years = FW_GetValue(1143, 已交厦门社保年数, cp);
             if((social_security_years >= 10)&&(social_security_years < 20)&&(induction_interval_days >= 1095))
@@ -86,7 +99,8 @@ CLIENT
         }
     }
     thisyear_vacation_before = FW_GetValue(1143, 本年度年假, cp);
-//如果计算出的实际今年年假要大于之前的今年年假则进行年假增加
+
+    //如果计算出的实际今年年假要大于之前的今年年假则进行年假共计和可休年假的增加
     if(thisyear_vacation > thisyear_vacation_before)
     {
         total_vacation = FW_GetValue(1143, 年假共计, cp);
@@ -97,6 +111,29 @@ CLIENT
         FW_SetValue_w(1143, 可休年假, cp, useable_vacation);
         FW_SetValue_w(1143, 年假共计, cp, total_vacation);
     }
+    //取当前日期日月
+    current_month_day = current_date.Mid(4);
+    
+    //新的一年恢复去年申请通过的跨年度年假
+    if(current_month_day == "/01/01")
+    {
+        vacation_spilt_year = FW_GetValue(1143, 今年跨年度年假申请通过临时存放, cp);
+        thisyear_vacation = FW_GetValue(1143, 本年度年假, cp);
+        if(vacation_spilt_year == 0)
+        {
+            FW_SetValue_w(1143, 跨年度可休年假, cp, "0");
+        }
+        if(vacation_spilt_year > 0)
+        {
+            FW_SetValue_w(1143, 跨年度可休年假, cp, vacation_spilt_year);
+        }
+        total_vacation = thisyear_vacation + vacation_spilt_year;
+        useable_vacation = total_vacation;
+        FW_SetValue_w(1143, 已休年假, cp, 0);
+        FW_SetValue_w(1143, 可休年假, cp, useable_vacation);
+        FW_SetValue_w(1143, 年假共计, cp, total_vacation);
+    }
+    
 }
 SERVER
 {
@@ -106,8 +143,10 @@ SERVER
         FW_SetValue_w(1143, 可休年假, cp, useable_vacation);
         FW_SetValue_w(1143, 年假共计, cp, total_vacation);
     }
-}
-CLIENT
-{
-
+    if(current_month_day == "/01/01")
+    {
+        FW_SetValue_w(1143, 已休年假, cp, 0);
+        FW_SetValue_w(1143, 可休年假, cp, useable_vacation);
+        FW_SetValue_w(1143, 年假共计, cp, total_vacation);
+    }
 }

@@ -1,0 +1,42 @@
+VAR
+{
+    Struct0 st0Msg;
+    String msg;
+    int currentFormID, currentRec, prevRec;
+}
+FIELD
+{
+
+}
+
+SERVER
+{
+    currentFormID = CURRENT.FormID;
+    currentRec = CURRENT.Record;
+    prevRec = currentRec - 1;
+    st0Msg.FormID = currentFormID;
+    st0Msg.Record = prevRec;
+    st0Msg.message = "";
+    if(prevRec < 0)
+    {
+        st0Msg.Record = currentRec;
+        st0Msg.message = "WEB_STRUCT0";
+        msg = "已經是第一頁！";
+        st0Msg.sVALUE = msg;
+    }
+    return(st0Msg);
+}
+
+
+VAR
+{
+    
+}
+FIELD
+{
+    .1024.test;
+}
+SERVER
+{
+    FW_SetValueStatus_w(1024, 0, test, 1);
+}

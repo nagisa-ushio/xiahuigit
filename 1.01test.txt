@@ -1,1 +1,70 @@
-test
+    VAR
+    {
+        int flag, cp, cp2;
+        Struct0 st00, getReqRequested, getReqApprove, getReqFrom, getReqTo, getReqReceived, getSerialNo, getMachine, getRepairDesc, getRemark, getReqDate, getReqTime;
+        String us, current_date, taskIdStr, current_time, lastIdStr, semicolon, lastNoStr, emailStr, subjStr, dateStr, dayStr, monthDayStr, monthStr, yearStr, newDateStr;
+    }
+    FIELD
+    {
+        .1039.UserName;
+        .1043.UserName;
+        .1039.reqRequested;
+        .1039.reqApprove;
+        .1039.reqFrom;
+        .1039.reqTo;
+        .1039.reqReceived;
+        .1039.serialNo;
+        .1039.machine;
+        .1039.repairDesc;
+        .1039.remark;
+        .1039.reqDate;
+        .1039.reqTime;
+        .1038.Semicolon;
+        .1054.MailSubject;
+        .1054.MailContent;
+        .1055.currentRec;
+    }
+    SERVER
+    {
+        flag = CURRENT.flag;
+        cp = FW_GetValue(1055, currentRec, 0);
+        if(flag != 300)
+
+        {
+            return(0);  // not a web service,end directly.
+        }
+        
+        getReqRequested = FW_GetValue(1039, reqRequested, cp); 
+        getReqFrom = FW_GetValue(1039, reqFrom, cp); 
+        getMachine = FW_GetValue(1039, machine, cp); 
+        getReqDate = FW_GetValue(1039, reqDate, cp);
+        getReqTime = FW_GetValue(1039, reqTime, cp);
+        
+        semicolon = FW_GetValue(1038, Semicolon, 0);
+        us = FW_GetUserID(2);
+        us = us + semicolon;
+        
+        //change date format from yyyy/mm/dd to dd/mm/yyyy 
+        dateStr = getReqDate.sVALUE;
+        yearStr = dateStr.Left(4);
+        monthDayStr = dateStr.Mid(4);
+        monthStr = monthDayStr.Left(4);
+        dayStr = monthDayStr.Mid(4);
+        newDateStr = dayStr + monthStr + yearStr;
+        
+        //set email content and send email
+        subjStr = "New Request - " + getReqFrom.sVALUE + " Department";
+        FW_SetValue_w(1054, MailSubject, 0, subjStr);
+        emailStr = getReqRequested.sVALUE + " from " + getReqFrom.sVALUE + " department has created a new request on " + newDateStr;
+        FW_SetValue_w(1054, MailContent, 0, emailStr);
+        st00 = FW_ToolBarEmail(1054,0);
+
+
+        st00.FormID = 1043;
+        st00.Record = 0;
+        st00.sVALUE = "Created!";
+        st00.message = "WEB_STRUCT0";
+
+
+        return(st00);
+    }

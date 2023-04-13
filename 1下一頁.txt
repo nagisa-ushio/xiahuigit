@@ -1,0 +1,32 @@
+VAR
+{
+    Struct0 st0BookID, st0Msg;
+    String bookIDFieldName, msg;
+    int currentFormID, currentRec, nextRec, lastRec;
+}
+FIELD
+{
+
+}
+
+SERVER
+{
+    currentFormID = CURRENT.FormID;
+    currentRec = CURRENT.Record;
+    nextRec = currentRec + 1;
+    st0Msg.FormID = currentFormID;
+    st0Msg.Record = nextRec;
+    st0Msg.message = "";
+    lastRec = FW_GetTotalRecords(currentFormID);
+    bookIDFieldName = "BookID";
+    st0BookID = FW_GetValue(currentFormID, bookIDFieldName, currentRec);
+    lastRec--;
+    if((nextRec > lastRec)||((nextRec == lastRec)&&(st0BookID.sVALUE == "")))
+    {
+        st0Msg.Record = currentRec;
+        st0Msg.message = "WEB_STRUCT0";
+        msg = "已經是最後一頁！";
+        st0Msg.sVALUE = msg;
+    }
+    return(st0Msg);
+}

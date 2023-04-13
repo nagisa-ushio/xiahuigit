@@ -1,0 +1,26 @@
+VAR
+{
+    int rec;
+    Struct0 st00;
+}
+FIELD
+{
+    .1025.Field0;
+}
+SERVER
+{add
+    rec = CURRENT.flag;
+    if(rec != 300)
+    
+    {
+        return(0);  // not a web service,end directly.
+    }
+    rec = FW_AddNewPage_w(1025);
+    FW_SetValue_w(1025, Field0, rec, "test");
+
+    st00.FormID = 1025;
+    st00.Record = rec;
+    st00.message = "WEB_STRUCT0";
+    st00.sVALUE = "Created successfully";
+    return(st00);
+}

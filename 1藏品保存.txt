@@ -1,0 +1,73 @@
+VAR
+{
+    Struct0 st0Msg, st0Collection;
+    Struct2 st2_find_result;
+    String us, enSemicolon, collectionField, collectionStatus, content, dateTime;
+    int currentFormID, currentRec, lastRec, newRec, i, countField;
+    StringList sl_Field;
+}
+FIELD
+{
+    .1035.UserName;
+    .1035.CollectionStatus;
+    .1035.EnSemicolon;
+}
+
+SERVER
+{
+    currentFormID = CURRENT.FormID;
+    currentRec = CURRENT.Record;
+    st0Msg.FormID = currentFormID;
+    st0Msg.Record = currentRec;
+    collectionStatus = FW_GetValue(currentFormID, CollectionStatus, currentRec);
+    if((collectionStatus == "藏品修改待更新保存")||(collectionStatus == "藏品新增待完善保存"))
+    {
+        // 對特定的域的內容是否為空進行判斷
+        st0Collection.Json = {"CollectionName":"藏品名","CollectionAuthor":"作者姓名","PublishingHouse":"出版社","PublishingDate":"出版日期","Instruction":"內容介紹","CollectionPic":"藏品圖片"};
+        countField = st0Collection.Json.length;
+        for(i=0;i<countField;i++)
+        {
+            collectionField = st0Collection.Json[i].name;
+            content = FW_GetValue(currentFormID, collectionField, currentRec);
+            if(content == "")
+            {
+                content = st0Collection.Json[i].value;
+                content = content + "為必填項！";
+                st0Msg.message = "WEB_STRUCT0";
+                st0Msg.sVALUE = content;
+                return(st0Msg);
+            }
+        }
+
+        // 對特定的域的編輯狀態進行鎖定
+        sl_Field = ["CollectionName","CollectionAuthor","PublishingHouse","PublishingDate","Instruction","CollectionPic","SaveAfter"];
+        countField = sl_Field.Get[];
+        for(i=0;i<countField;i++)
+        {
+            collectionField = sl_Field.Get[i];
+            FW_SetValueStatus_w(currentFormID, newRec, collectionField, 1);
+        }
+
+        // 將特定按鈕域解鎖以供點擊
+        sl_Field = ["TransferToAuctionAfter","UpdateAfter"];
+        countField = sl_Field.Get[];
+        for(i=0;i<countField;i++)
+        {
+            collectionField = sl_Field.Get[i];
+            FW_SetValueStatus_w(currentFormID, newRec, collectionField, 0);
+        }
+        FW_SetValue_w(currentFormID, CollectionStatus, currentRec, "藏品已完善");
+        st0Msg.message = "WEB_STRUCT0";
+        st0Msg.sVALUE = "保存成功！";
+    }else if(collectionStatus == "藏品已轉入拍賣")
+    {
+        st0Msg.message = "WEB_STRUCT0";
+        st0Msg.sVALUE = "該藏品已轉入拍賣！";
+    }else
+    {
+        st0Msg.message = "WEB_STRUCT0";
+        st0Msg.sVALUE = "該藏品未處於修改狀態，無需保存。";
+    }
+    return(st0Msg);
+}
+

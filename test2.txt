@@ -1,0 +1,44 @@
+VAR
+{
+    Struct0 st00;
+    Struct2 st20;
+    String us,tips;
+    int rec,count_num;
+}
+FIELD
+{
+    .1026.UserName;
+}
+SERVER
+{
+    st00 = FW_GetUserID(2);    // 获取当前登录用户名，操作手册说明位置“编程 → 功能函数 → FW_GetUserID”
+    if(st00.sVALUE == "")
+    {
+        // 当获取到的用户名为空字符串说明网页用户未登录，跳转到指定表格1025
+        st00.FormID = 1025;  // 指定跳转表格的ID
+        st00.Record = 0; // 指定跳转表格的记录页号
+        st00.message = "WEB_STRUCT0";  // 需要网页消息提示，如不需要此处则为空字符串
+        st00.sVALUE = "用户未登录，将跳转到表格1025......";  // 进行网页消息提示
+        return(st00);  // 跳转到指定表格的指定记录页，操作手册说明位置“编程 → 语法 → return → 2.1”
+    }
+
+    // 获取到用户名进行的操作
+    us = st00.sVALUE + ";";
+    // FW_Dialog1(us);  // (开发时核对用)在平台上提示变量us的内容，即登录用户名+英文分号
+    st20 = FW_FindRecords("1026, us@UserName", 0);  // 查找表格1026记录中UserName为登录用户名的记录页，操作手册说明位置“编程 → 功能函数 → FW_FindRecords”
+    if(st20.mError == 0)
+    {
+        count_num = st20.count;
+        FW_Dialog1(count_num);
+        rec=RecordNoList.Get[0];  // 找到时，获取结果数组中第1个记录页号
+    }else{
+        rec = FW_AddNewPage_w(1026);  // 未找到时则新增一个记录页，并获取该记录页号，操作手册说明位置“编程 → 功能函数 → FW_AddNewPage_w”
+        FW_SetValue_w(1026, UserName, rec, us);  // 对该记录页上的UserName写入当前登录用户名，操作手册说明位置“编程 → 功能函数 → FW_SetValue_w”
+    }
+    st00.FormID = 1026;  // 指定跳转表格的ID
+    st00.Record = rec;  // 指定跳转表格的记录页号
+    st00.message = "WEB_STRUCT0";  // 需要网页消息提示，如不需要此处则为空字符串
+    tips =  st00.sVALUE + "用户已登录，将跳转到表格1026......";  // 网页提示消息存放
+    st00.sVALUE = tips;  // 进行网页消息提示
+    return(st00);  // 跳转到指定表格的指定记录页，操作手册说明位置“编程 → 语法 → return → 2.1”
+}
